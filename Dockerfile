@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Copy Apache config first (needed before other files)
+COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
+
 # Copy application files
 COPY . /var/www/html
 
@@ -40,7 +43,6 @@ RUN php artisan key:generate --force || true
 
 # Configure Apache
 RUN a2enmod rewrite
-COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 # Expose port (Render will set PORT env var)
 EXPOSE 80
