@@ -351,7 +351,7 @@ h2, .section-title {
 }
 
 .nav-btn {
-    border: 1px solid rgba(0, 217, 255, 0.3);
+    border: 1px solid rgba(74, 158, 255, 0.3);
     background: transparent;
     color: var(--text-main);
     border-radius: 999px;
@@ -1886,7 +1886,7 @@ select:focus {
     justify-content: space-between;
     align-items: flex-start;
     padding: 0.75rem 0;
-    border-bottom: 1px solid rgba(0, 217, 255, 0.05);
+    border-bottom: 1px solid rgba(74, 158, 255, 0.05);
 }
 
 .admin-info-item:last-child {
@@ -1976,7 +1976,7 @@ select:focus {
 /* Trainer Card Footer */
 .admin-trainer-card-footer {
     padding: 1.5rem;
-    border-top: 1px solid rgba(0, 217, 255, 0.1);
+    border-top: 1px solid rgba(74, 158, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
 }
 
@@ -2005,19 +2005,19 @@ select:focus {
 .admin-btn-primary {
     background: var(--primary);
     color: var(--button-text);
-    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
 }
 
 .admin-btn-primary:hover {
     background: var(--primary-dark);
-    box-shadow: 0 6px 16px rgba(0, 217, 255, 0.4);
+    box-shadow: 0 6px 16px rgba(74, 158, 255, 0.2);
     transform: translateY(-1px);
 }
 
 .admin-btn-secondary {
     background: transparent;
     color: var(--text-main);
-    border: 1px solid rgba(0, 217, 255, 0.3);
+    border: 1px solid rgba(74, 158, 255, 0.3);
 }
 
 .admin-btn-secondary:hover {
@@ -2050,7 +2050,7 @@ select:focus {
     padding: 4rem 2rem;
     background: rgba(30, 41, 59, 0.4);
     border-radius: 16px;
-    border: 1px dashed rgba(0, 217, 255, 0.2);
+    border: 1px dashed rgba(74, 158, 255, 0.2);
 }
 
 .admin-empty-icon {
@@ -2217,7 +2217,7 @@ select:focus {
 
 .admin-delete-modal-footer {
     padding: 1.5rem 2rem 2rem;
-    border-top: 1px solid rgba(0, 217, 255, 0.1);
+    border-top: 1px solid rgba(74, 158, 255, 0.1);
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -3196,17 +3196,17 @@ fieldset legend {
     background: rgba(74, 158, 255, 0.15);
     top: 8%;
     right: 5%;
-    box-shadow: 0 0 80px rgba(0, 217, 255, 0.4), 0 0 120px rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 80px rgba(74, 158, 255, 0.4), 0 0 120px rgba(107, 182, 255, 0.2);
     animation: cyanPulse 4s ease-in-out infinite, float 6s ease-in-out infinite;
 }
 
 .orb-2 {
     width: 220px;
     height: 220px;
-    background: rgba(0, 255, 255, 0.12);
+    background: rgba(107, 182, 255, 0.12);
     bottom: 12%;
     left: 6%;
-    box-shadow: 0 0 100px rgba(0, 217, 255, 0.3), 0 0 150px rgba(0, 255, 255, 0.15);
+    box-shadow: 0 0 100px rgba(74, 158, 255, 0.3), 0 0 150px rgba(107, 182, 255, 0.15);
     animation: cyanPulse 5s ease-in-out infinite, float 8s ease-in-out infinite reverse;
 }
 
@@ -3227,22 +3227,22 @@ fieldset legend {
 .particle-1 {
     width: 4px;
     height: 4px;
-    background: rgba(0, 217, 255, 0.6);
+    background: rgba(74, 158, 255, 0.6);
     top: 20%;
     right: 15%;
     animation: particleFloat 15s linear infinite;
-    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+    box-shadow: 0 0 10px rgba(74, 158, 255, 0.8);
 }
 
 .particle-2 {
     width: 6px;
     height: 6px;
-    background: rgba(0, 255, 255, 0.5);
+    background: rgba(107, 182, 255, 0.5);
     top: 60%;
     right: 80%;
     animation: particleFloat 20s linear infinite;
     animation-delay: -5s;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+    box-shadow: 0 0 15px rgba(107, 182, 255, 0.6);
 }
 
 .particle-3 {
@@ -3261,7 +3261,7 @@ fieldset legend {
     position: absolute;
     width: 100%;
     height: 100px;
-    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.1), transparent);
     pointer-events: none;
     z-index: 0;
     opacity: 0.3;
@@ -3272,9 +3272,9 @@ fieldset legend {
     animation: waveMotion 8s ease-in-out infinite;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(0, 217, 255, 0.15) 25%, 
-        rgba(0, 255, 255, 0.2) 50%, 
-        rgba(0, 217, 255, 0.15) 75%, 
+        rgba(74, 158, 255, 0.15) 25%, 
+        rgba(107, 182, 255, 0.2) 50%, 
+        rgba(74, 158, 255, 0.15) 75%, 
         transparent 100%);
 }
 
@@ -3672,7 +3672,7 @@ fieldset legend {
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    text-shadow: 0 0 10px rgba(0, 217, 255, 0.6);
+    text-shadow: 0 0 10px rgba(74, 158, 255, 0.6);
 }
 
 .footer-title i {
