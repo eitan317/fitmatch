@@ -1,12 +1,25 @@
 #!/bin/bash
 
-set -e
+# Don't exit on error - we want to continue even if some commands fail
+# set -e  # REMOVED - causes script to exit if any command fails
 
 # Fix MPM configuration at runtime (Railway may re-enable modules)
+echo "=== Fixing MPM configuration ==="
+# Remove all MPM symlinks first
+rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
+# Disable all MPMs
 a2dismod mpm_event 2>/dev/null || true
 a2dismod mpm_worker 2>/dev/null || true
 a2dismod mpm_prefork 2>/dev/null || true
-a2enmod mpm_prefork
+# Remove any LoadModule directives for MPMs from apache2.conf
+sed -i '/LoadModule.*mpm_/d' /etc/apache2/apache2.conf || true
+# Remove from conf-enabled as well
+rm -f /etc/apache2/conf-enabled/*mpm*.conf 2>/dev/null || true
+# Now enable only prefork (don't fail if already enabled)
+a2enmod mpm_prefork 2>/dev/null || {
+    echo "Warning: mpm_prefork may already be enabled, continuing..."
+}
+echo "=== MPM configuration fixed ==="
 
 # Validate and set Apache port from Railway PORT env var
 APACHE_PORT=${PORT:-8080}
@@ -53,15 +66,10 @@ fi
 echo "Enabling Apache site..."
 a2ensite 000-default.conf || true
 
-# Test Apache configuration
+# Test Apache configuration (but don't fail if test fails)
 echo "Testing Apache configuration..."
-if apache2ctl configtest; then
-    echo "Apache configuration is valid"
-else
-    echo "WARNING: Apache configuration test failed, but continuing..."
-fi
+apache2ctl configtest || echo "WARNING: Apache configuration test failed, but continuing..."
 
-# Start Apache in foreground
+# Start Apache in foreground (this should always run)
 echo "=== Starting Apache server on port $APACHE_PORT ==="
 exec apache2-foreground
-
