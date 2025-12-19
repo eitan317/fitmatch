@@ -3,6 +3,17 @@ set -e
 
 echo "=== Starting Apache with Laravel ==="
 
+# DIAGNOSTIC: Check MPM status before any fixes
+echo "=== DIAGNOSTIC: Checking MPM status ==="
+echo "MPM symlinks in mods-enabled:"
+ls -la /etc/apache2/mods-enabled/ | grep mpm_ || echo "None found"
+echo "MPM files in mods-available:"
+ls -la /etc/apache2/mods-available/ | grep mpm_ || echo "None found"
+echo "Apache2.conf LoadModule directives:"
+grep -i "LoadModule.*mpm" /etc/apache2/apache2.conf || echo "None in apache2.conf"
+echo "Checking conf-enabled for MPM configs:"
+ls -la /etc/apache2/conf-enabled/ | grep mpm_ || echo "None found"
+
 # CRITICAL: Fix MPM configuration FIRST, before any Apache operations
 # Remove ALL MPM symlinks manually, then enable ONLY prefork
 echo "Fixing Apache MPM configuration (must be done first)..."
@@ -58,6 +69,13 @@ if [ -f /etc/apache2/sites-available/000-default.conf ]; then
     echo "Updated VirtualHost to use port $APACHE_PORT"
 fi
 
+# CRITICAL: Remove all MPM LoadModule directives from apache2.conf
+echo "Removing MPM LoadModule directives from apache2.conf..."
+sed -i '/LoadModule.*mpm_/d' /etc/apache2/apache2.conf || true
+# Add only prefork LoadModule
+echo "Adding prefork LoadModule to apache2.conf..."
+echo "LoadModule mpm_prefork_module /usr/lib/apache2/modules/mod_mpm_prefork.so" >> /etc/apache2/apache2.conf
+
 # Final MPM verification before starting Apache
 echo "Final MPM verification..."
 MPM_ENABLED=$(ls -1 /etc/apache2/mods-enabled/ | grep "^mpm_" | head -1)
@@ -82,6 +100,13 @@ if apache2ctl configtest; then
 else
     echo "WARNING: Apache configuration test failed, but continuing..."
 fi
+
+# Final diagnostic check before starting Apache
+echo "=== FINAL CHECK: All MPM-related files ==="
+find /etc/apache2 -name "*mpm*" -type f -o -name "*mpm*" -type l 2>/dev/null | head -20
+echo "=== Final apache2.conf MPM check ==="
+grep -i "LoadModule.*mpm" /etc/apache2/apache2.conf || echo "No MPM LoadModule directives (good)"
+echo "=== Attempting to start Apache ==="
 
 # Start Apache in foreground
 echo "=== Starting Apache server ==="

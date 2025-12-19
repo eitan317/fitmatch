@@ -47,6 +47,18 @@ RUN echo "=== Configuring Apache MPM ===" && \
     ls -la /etc/apache2/mods-enabled/ | grep "mpm_" && \
     echo "=== MPM configuration complete ==="
 
+# Create Apache config that forces prefork only
+RUN echo "# Force mpm_prefork only\n\
+LoadModule mpm_prefork_module /usr/lib/apache2/modules/mod_mpm_prefork.so\n\
+" > /etc/apache2/conf-available/force-prefork.conf && \
+    a2enconf force-prefork || true
+
+# Remove all MPM LoadModule directives from apache2.conf
+RUN sed -i '/LoadModule.*mpm_/d' /etc/apache2/apache2.conf || true && \
+    # Verify removal
+    echo "=== Checking apache2.conf for MPM directives ===" && \
+    grep -i "LoadModule.*mpm" /etc/apache2/apache2.conf || echo "No MPM LoadModule directives found (good)"
+
 # Copy Apache config (will be updated at runtime with PORT)
 COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
 
