@@ -51,16 +51,35 @@ EXPOSE 80
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-# Run migrations\n\
-php artisan migrate --force || true\n\
-\n\
 # Update Apache port from environment variable\n\
 export PORT=${PORT:-80}\n\
-sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf\n\
-sed -i "s/:80/:$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
 \n\
-# Start Apache\n\
-apache2-foreground\n\
+# Update ports.conf\n\
+if [ -f /etc/apache2/ports.conf ]; then\n\
+    sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf || echo "Listen $PORT" > /etc/apache2/ports.conf\n\
+else\n\
+    echo "Listen $PORT" > /etc/apache2/ports.conf\n\
+fi\n\
+\n\
+# Update VirtualHost in apache config\n\
+if [ -f /etc/apache2/sites-available/000-default.conf ]; then\n\
+    sed -i "s/<VirtualHost \\*:80>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf\n\
+    sed -i "s/:80/:$PORT/g" /etc/apache2/sites-available/000-default.conf\n\
+fi\n\
+\n\
+# Enable site\n\
+a2ensite 000-default.conf || true\n\
+\n\
+# Clear caches before starting\n\
+php artisan config:clear || true\n\
+php artisan cache:clear || true\n\
+php artisan view:clear || true\n\
+\n\
+# Run migrations (don'\''t fail if DB not ready)\n\
+php artisan migrate --force || echo "Migrations failed, continuing..."\n\
+\n\
+# Start Apache in foreground\n\
+exec apache2-foreground\n\
 ' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
 # Start Apache with migrations
