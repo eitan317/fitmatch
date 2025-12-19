@@ -52,7 +52,10 @@ RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
 # Update Apache port from environment variable\n\
-export PORT=${PORT:-80}\n\
+# Ensure PORT is a number, default to 80 if not set or invalid\n\
+PORT=${PORT:-80}\n\
+PORT=$(echo "$PORT" | grep -E "^[0-9]+$" || echo "80")\n\
+export PORT\n\
 \n\
 # Update ports.conf\n\
 if [ -f /etc/apache2/ports.conf ]; then\n\
@@ -70,6 +73,9 @@ fi\n\
 # Enable site\n\
 a2ensite 000-default.conf || true\n\
 \n\
+# Unset PORT for Laravel commands to avoid conflicts\n\
+unset PORT\n\
+\n\
 # Clear caches before starting\n\
 php artisan config:clear || true\n\
 php artisan cache:clear || true\n\
@@ -77,6 +83,9 @@ php artisan view:clear || true\n\
 \n\
 # Run migrations (don'\''t fail if DB not ready)\n\
 php artisan migrate --force || echo "Migrations failed, continuing..."\n\
+\n\
+# Restore PORT for Apache\n\
+export PORT=${PORT:-80}\n\
 \n\
 # Start Apache in foreground\n\
 exec apache2-foreground\n\
