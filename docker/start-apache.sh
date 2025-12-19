@@ -14,7 +14,7 @@ MPM_COUNT=$(ls -1 /etc/apache2/mods-enabled/ | grep -c "^mpm_" || echo "0")
 if [ "$MPM_COUNT" -gt 1 ]; then
     echo "ERROR: Multiple MPMs still detected! Removing all and enabling prefork only..."
     rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
-    a2enmod mpm_prefork
+    a2enmod mpm_prefork || true
 fi
 echo "MPM modules enabled:"
 ls -la /etc/apache2/mods-enabled/ | grep "mpm_" || echo "No MPM modules (this should not happen)"
@@ -63,11 +63,11 @@ echo "Final MPM verification..."
 MPM_ENABLED=$(ls -1 /etc/apache2/mods-enabled/ | grep "^mpm_" | head -1)
 if [ -z "$MPM_ENABLED" ]; then
     echo "ERROR: No MPM module enabled! Enabling prefork..."
-    a2enmod mpm_prefork
+    a2enmod mpm_prefork || true
 elif [ "$(ls -1 /etc/apache2/mods-enabled/ | grep -c '^mpm_')" -gt 1 ]; then
     echo "ERROR: Multiple MPMs still enabled! Fixing..."
     rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
-    a2enmod mpm_prefork
+    a2enmod mpm_prefork || true
 fi
 echo "MPM module enabled: $(ls -1 /etc/apache2/mods-enabled/ | grep '^mpm_' | head -1)"
 
