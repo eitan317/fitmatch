@@ -59,12 +59,11 @@ RUN sed -i '/LoadModule.*mpm_/d' /etc/apache2/apache2.conf || true && \
     echo "=== Checking apache2.conf for MPM directives ===" && \
     grep -i "LoadModule.*mpm" /etc/apache2/apache2.conf || echo "No MPM LoadModule directives found (good)"
 
-# Copy Apache config (will be updated at runtime with PORT)
-COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
+# Configure Apache DocumentRoot to Laravel's public directory
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-# Copy startup script
-COPY docker/start-apache.sh /usr/local/bin/start-apache.sh
-RUN chmod +x /usr/local/bin/start-apache.sh
+# Copy Apache config first (before updating DocumentRoot)
+COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf
 
 # Copy application files
 COPY . /var/www/html
@@ -84,8 +83,16 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction || true
 # Install Node dependencies and build assets
 RUN npm install && npm run build || true
 
-# Expose port (Railway will set PORT env var dynamically)
-EXPOSE 80
+# Update Apache DocumentRoot in config files
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
+    sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Start Apache using the startup script
-CMD ["/usr/local/bin/start-apache.sh"]
+# Copy and setup entrypoint script (fixes MPM at runtime - Railway re-enables modules)
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Expose port 8080 for Railway
+EXPOSE 8080
+
+# Start Apache via entrypoint
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
