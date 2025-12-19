@@ -23,13 +23,29 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configure Apache MPM FIRST (before any other Apache config)
-# Disable all MPMs first, then enable only prefork (required for mod_php)
+# CRITICAL: Remove ALL MPM symlinks manually, then enable ONLY prefork
 # This prevents "More than one MPM loaded" error
-RUN a2dismod mpm_event mpm_worker 2>/dev/null || true && \
-    a2dismod mpm_prefork 2>/dev/null || true && \
+RUN echo "=== Configuring Apache MPM ===" && \
+    # Remove all MPM symlinks (both .conf and .load files)
+    rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true && \
+    # Disable all MPMs using a2dismod (in case symlinks exist)
+    a2dismod mpm_event mpm_worker 2>/dev/null || true && \
+    # Enable ONLY prefork
     a2enmod mpm_prefork && \
+    # Enable other required modules
     a2enmod rewrite && \
-    a2enmod headers
+    a2enmod headers && \
+    # Verify only one MPM is enabled
+    echo "=== Verifying MPM configuration ===" && \
+    MPM_COUNT=$(ls -1 /etc/apache2/mods-enabled/ 2>/dev/null | grep -c "^mpm_" || echo "0") && \
+    if [ "$MPM_COUNT" -ne 1 ]; then \
+        echo "ERROR: Expected 1 MPM, found $MPM_COUNT. Fixing..."; \
+        rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true; \
+        a2enmod mpm_prefork; \
+    fi && \
+    echo "MPM modules enabled:" && \
+    ls -la /etc/apache2/mods-enabled/ | grep "mpm_" && \
+    echo "=== MPM configuration complete ==="
 
 # Copy Apache config (will be updated at runtime with PORT)
 COPY docker/apache-config.conf /etc/apache2/sites-available/000-default.conf

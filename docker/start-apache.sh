@@ -3,6 +3,22 @@ set -e
 
 echo "=== Starting Apache with Laravel ==="
 
+# CRITICAL: Fix MPM configuration FIRST, before any Apache operations
+# Remove ALL MPM symlinks manually, then enable ONLY prefork
+echo "Fixing Apache MPM configuration (must be done first)..."
+rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
+a2enmod mpm_prefork 2>/dev/null || true
+
+# Verify only one MPM is enabled
+MPM_COUNT=$(ls -1 /etc/apache2/mods-enabled/ | grep -c "^mpm_" || echo "0")
+if [ "$MPM_COUNT" -gt 1 ]; then
+    echo "ERROR: Multiple MPMs still detected! Removing all and enabling prefork only..."
+    rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
+    a2enmod mpm_prefork
+fi
+echo "MPM modules enabled:"
+ls -la /etc/apache2/mods-enabled/ | grep "mpm_" || echo "No MPM modules (this should not happen)"
+
 # Validate and set Apache port from Railway PORT env var
 APACHE_PORT=${PORT:-80}
 if ! [[ "$APACHE_PORT" =~ ^[0-9]+$ ]]; then
@@ -31,11 +47,6 @@ php artisan route:clear || true
 echo "Running migrations..."
 php artisan migrate --force || echo "Migrations failed, continuing..."
 
-# Ensure only mpm_prefork is enabled (fix MPM conflict)
-echo "Verifying Apache MPM configuration..."
-a2dismod mpm_event mpm_worker 2>/dev/null || true
-a2enmod mpm_prefork 2>/dev/null || true
-
 # Update Apache ports.conf to listen on dynamic port
 echo "Configuring Apache to listen on port $APACHE_PORT..."
 echo "Listen $APACHE_PORT" > /etc/apache2/ports.conf
@@ -47,14 +58,18 @@ if [ -f /etc/apache2/sites-available/000-default.conf ]; then
     echo "Updated VirtualHost to use port $APACHE_PORT"
 fi
 
-# Verify only one MPM is loaded (safety check)
-MPM_COUNT=$(apache2ctl -M 2>/dev/null | grep -c "^ mpm_" || echo "0")
-if [ "$MPM_COUNT" -gt 1 ]; then
-    echo "ERROR: Multiple MPMs detected! Fixing..."
-    a2dismod mpm_event mpm_worker 2>/dev/null || true
-    a2enmod mpm_prefork || true
-    apache2ctl -M | grep "^ mpm_"
+# Final MPM verification before starting Apache
+echo "Final MPM verification..."
+MPM_ENABLED=$(ls -1 /etc/apache2/mods-enabled/ | grep "^mpm_" | head -1)
+if [ -z "$MPM_ENABLED" ]; then
+    echo "ERROR: No MPM module enabled! Enabling prefork..."
+    a2enmod mpm_prefork
+elif [ "$(ls -1 /etc/apache2/mods-enabled/ | grep -c '^mpm_')" -gt 1 ]; then
+    echo "ERROR: Multiple MPMs still enabled! Fixing..."
+    rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load 2>/dev/null || true
+    a2enmod mpm_prefork
 fi
+echo "MPM module enabled: $(ls -1 /etc/apache2/mods-enabled/ | grep '^mpm_' | head -1)"
 
 # Enable site
 echo "Enabling Apache site..."
