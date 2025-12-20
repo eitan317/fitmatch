@@ -1196,6 +1196,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Home page (/) should not require login - it's public
+    if (path === "/" || path === "") {
+        // Public home page - no login required
+        return;
+    }
+
     // Other pages: require login
     requireLogin && requireLogin();
 
