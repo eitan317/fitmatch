@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מצא מאמן כושר</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <span class="logo-text">FitMatch</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">דף הבית</a>
+                <a href="trainers.html">מצא מאמן</a>
+                <a href="register.html">הרשמה כמאמן</a>
+                <a href="admin.html" id="admin-link">פאנל מנהל</a>
+                <button type="button" class="nav-btn" onclick="logoutUser()">התנתק</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <h1 class="page-title">מצא מאמן כושר</h1>
+
+        <section class="trainers-filters">
+            <div class="filters-row-main">
+                <!-- Search by name / city -->
+                <div class="filter-block">
+                    <label for="trainerSearchInput">חיפוש</label>
+                    <input
+                        type="text"
+                        id="trainerSearchInput"
+                        placeholder="חפש מאמן לפי שם או עיר..."
+                    />
+                </div>
+
+                <!-- Price range -->
+                <div class="filter-block">
+                    <label>טווח מחיר (לשעה)</label>
+                    <div class="price-range">
+                        <input type="number" id="minPriceFilter" placeholder="מינימום" min="0" />
+                        <span>-</span>
+                        <input type="number" id="maxPriceFilter" placeholder="מקסימום" min="0" />
+                    </div>
+                </div>
+
+                <!-- Training type quick filter (few main types only) -->
+                <div class="filter-block">
+                    <label>סוג אימון</label>
+                    <select id="trainingTypeFilter">
+                        <option value="">כל הסוגים</option>
+                        <option value="weightloss">חיטוב / ירידה במשקל</option>
+                        <option value="gym_basic">חדר כושר</option>
+                        <option value="running">ריצה</option>
+                        <option value="home_bodyweight">אימוני בית</option>
+                        <option value="group">אימונים קבוצתיים</option>
+                        <option value="online">אימונים אונליין</option>
+                        <option value="yoga">יוגה / פילאטיס</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="filter-block">
+                    <label>מיין לפי</label>
+                    <select id="trainerSortSelect">
+                        <option value="default">ברירת מחדל</option>
+                        <option value="rating_desc">דירוג גבוה</option>
+                        <option value="price_asc">מחיר נמוך → גבוה</option>
+                        <option value="price_desc">מחיר גבוה → נמוך</option>
+                        <option value="experience_desc">ותק (שנות ניסיון)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <div id="public-trainers-container" class="trainers-grid">
+            <!-- Approved trainers from localStorage will be loaded here by JavaScript -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        requireLogin();
+        updateNavbarForUser();
+    </script>
+</body>
+</html>
+

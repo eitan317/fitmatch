@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פרופיל מאמן</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <span class="logo-text">FitMatch</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">דף הבית</a>
+                <a href="trainers.html">מצא מאמן</a>
+                <a href="register.html">הרשמה כמאמן</a>
+                <a href="admin.html" id="admin-link">פאנל מנהל</a>
+                <button type="button" class="nav-btn" onclick="logoutUser()">התנתק</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div style="margin-bottom: 20px;">
+            <button type="button" id="back-from-profile-btn" class="btn btn-secondary" onclick="goBackFromProfile()">חזור לרשימת המאמנים</button>
+        </div>
+
+        <div id="trainerProfileContainer">
+            <!-- Trainer profile will be loaded here by JavaScript -->
+            <!-- Structure will include:
+            <div class="profile-cover">
+                <img src="assets/profile-cover.jpg" class="profile-cover-image" alt="רקע אימון כושר">
+            </div>
+            <div class="trainer-profile profile-header-card card">
+                <img src="..." class="profile-avatar-large" alt="...">
+                ...
+            </div>
+            -->
+        </div>
+
+        <section class="profile-section card" id="reviews-section">
+            <h2 class="section-title">ביקורות</h2>
+
+            <div id="reviews-summary"></div>
+
+            <div id="reviews-list" class="reviews-list"></div>
+
+            <div class="review-form">
+                <h3>הוסף ביקורת</h3>
+                <form id="addReviewForm">
+                    <div class="form-group">
+                        <label for="reviewerName">שם:</label>
+                        <input type="text" id="reviewerName" placeholder="השם שלך">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reviewRating">דירוג:</label>
+                        <select id="reviewRating">
+                            <option value="">בחר דירוג</option>
+                            <option value="5">⭐⭐⭐⭐⭐</option>
+                            <option value="4">⭐⭐⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                            <option value="2">⭐⭐</option>
+                            <option value="1">⭐</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reviewText">ביקורת:</label>
+                        <textarea id="reviewText" rows="3" placeholder="כתוב כאן מה דעתך על המאמן..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">שלח ביקורת</button>
+                    <p id="reviewMessage"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        requireLogin();
+        updateNavbarForUser();
+        initTrainerProfilePage();
+    </script>
+</body>
+</html>
+

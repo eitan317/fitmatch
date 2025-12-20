@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פאנל מנהל - בקשות מאמנים</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="initAdminPage()">
+    <header class="site-header">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <span class="logo-text">FitMatch</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">דף הבית</a>
+                <a href="trainers.html">מצא מאמן</a>
+                <a href="register.html">הרשמה כמאמן</a>
+                <a href="admin.html" id="admin-link">פאנל מנהל</a>
+                <button type="button" class="nav-btn" onclick="logoutUser()">התנתק</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <h1 class="page-title">פאנל מנהל – בקשות מאמנים</h1>
+
+        <!-- Access Denied Message (for non-admin users) -->
+        <div id="admin-not-allowed" style="display: none;">
+            <div class="admin-container" style="text-align: center; padding: 40px;">
+                <h2 style="color: #e74c3c; margin-bottom: 20px;">אין לך הרשאה לצפות בעמוד זה.</h2>
+            </div>
+        </div>
+
+        <!-- Admin Wrapper (only visible for admin) -->
+        <div id="admin-wrapper" style="display: none;">
+            <!-- Login Form -->
+            <div id="loginForm" class="form-container">
+                <h2 style="text-align: center; margin-bottom: 20px;">התחברות כמנהל</h2>
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <label for="adminPassword">סיסמה:</label>
+                        <input type="password" id="adminPassword" name="adminPassword" required>
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">התחברות כמנהל</button>
+                </form>
+                <div id="loginError" style="display: none; color: #e74c3c; text-align: center; margin-top: 15px; padding: 10px; background-color: #fadbd8; border-radius: 5px;">
+                    סיסמה שגויה. אנא נסה שוב.
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" style="display: none;">
+                <div style="text-align: left; margin-bottom: 20px;">
+                    <button class="btn btn-secondary" onclick="logoutAdmin()">התנתק</button>
+                </div>
+
+                <div class="admin-container">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">בקשות מאמנים ממתינות</h2>
+                    <div id="pendingTrainersContainer">
+                        <!-- Pending trainers will be loaded here by JavaScript -->
+                    </div>
+
+                    <h2 style="margin-top: 40px; margin-bottom: 20px; color: #2c3e50;">מאמנים מאושרים</h2>
+                    <div id="approvedTrainersContainer">
+                        <!-- Approved trainers will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

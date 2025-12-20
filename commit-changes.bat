@@ -1,0 +1,13 @@
+@echo off
+cd /d "C:\Users\USER\OneDrive\Desktop\fitmatch"
+echo Adding migration file...
+git add database/migrations/2025_12_17_120000_add_status_to_trainers_table.php
+echo Adding PageController...
+git add app/Http/Controllers/PageController.php
+echo Committing changes...
+git commit -m "Add status column to trainers table and make PageController resilient"
+echo Pushing to remote...
+git push
+echo Done!
+pause
+

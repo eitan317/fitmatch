@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מציאת מאמני כושר - דף הבית</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-inner">
+            <div class="nav-logo">
+                <span class="logo-text">FitMatch</span>
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">דף הבית</a>
+                <a href="trainers.html">מצא מאמן</a>
+                <a href="register.html">הרשמה כמאמן</a>
+                <a href="admin.html" id="admin-link">פאנל מנהל</a>
+                <button type="button" class="nav-btn" onclick="logoutUser()">התנתק</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        
+        <div class="hero card">
+            <div class="hero-content">
+                <h1>💪 מצא את מאמן הכושר המושלם עבורך</h1>
+                <p>הפלטפורמה המקשרת בין מאמני כושר מקצועיים לבין מתאמנים חדשים. התחל את המסע שלך לכושר טוב יותר היום!</p>
+                <div class="hero-buttons">
+                    <a href="trainers.html" class="btn">מצא מאמן</a>
+                    <a href="register.html" class="btn btn-success">הירשם כמאמן</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-graphic">
+                    <div class="hero-circle hero-circle-main"></div>
+                    <div class="hero-circle hero-circle-secondary"></div>
+                    <div class="hero-dumbbell">💪</div>
+                    <div class="hero-stat-card">
+                        <div class="hero-stat-label">מאמנים פעילים</div>
+                        <div class="hero-stat-number">+250</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="how-it-works">
+            <h2>איך זה עובד?</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>1. חיפוש מאמן</h3>
+                    <p>מתאמנים מחפשים מאמן לפי אזור והתמחות. ניתן לסנן לפי עיר, סוג אימון ומחיר.</p>
+                </div>
+                <div class="card">
+                    <h3>2. הרשמה למאמנים</h3>
+                    <p>מאמנים נרשמים וממלאים פרופיל מפורט עם פרטי התמחות, ניסיון ומחירים.</p>
+                </div>
+                <div class="card">
+                    <h3>3. אישור איכותי</h3>
+                    <p>המנהל מאשר מאמנים איכותיים בלבד, כך שתוכלו להיות בטוחים שאתם מקבלים שירות מקצועי.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        requireLogin();
+        updateNavbarForUser();
+    </script>
+</body>
+</html>
