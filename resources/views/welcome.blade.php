@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מציאת מאמני כושר - דף הבית</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{ asset('site/style.css') }}?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
+    <link rel="stylesheet" href="/site/style.css?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
 </head>
 <body>
     @include('partials.navbar')
@@ -225,7 +225,7 @@
 
     @include('partials.footer')
 
-    <script src="{{ asset('site/script.js') }}?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}"></script>
+    <script src="/site/script.js?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}"></script>
     <script>
         initTheme && initTheme();
         initNavbarToggle && initNavbarToggle();
