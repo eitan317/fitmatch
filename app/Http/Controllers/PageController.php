@@ -26,11 +26,19 @@ class PageController extends Controller
             $activeTrainers = Trainer::count();
         }
 
+        // Check if reviews table exists (for migration compatibility)
+        $averageRating = 0;
+        $totalReviews = 0;
+        if (Schema::hasTable('reviews')) {
+            $averageRating = round(Review::avg('rating') ?? 0, 1);
+            $totalReviews = Review::count();
+        }
+
         $stats = [
             'active_trainers' => $activeTrainers,
             'satisfied_trainees' => User::count(),
-            'average_rating' => round(Review::avg('rating') ?? 0, 1),
-            'total_reviews' => Review::count(),
+            'average_rating' => $averageRating,
+            'total_reviews' => $totalReviews,
         ];
 
         return view('welcome', compact('stats'));
