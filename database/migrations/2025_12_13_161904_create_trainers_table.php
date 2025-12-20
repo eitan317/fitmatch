@@ -13,12 +13,22 @@ return new class extends Migration
     {
        Schema::create('trainers', function (Blueprint $table) {
     $table->id();
-    $table->string('name');
-    $table->string('specialty');
+            $table->string('owner_email')->nullable();
+            $table->string('full_name');
+            $table->integer('age')->nullable();
+            $table->string('city');
+            $table->string('phone')->nullable();
+            $table->integer('experience_years')->nullable();
+            $table->string('main_specialization')->nullable();
+            $table->decimal('price_per_session', 10, 2)->nullable();
+            $table->json('training_types')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('tiktok')->nullable();
     $table->text('bio')->nullable();
+            $table->string('profile_image_path')->nullable();
+            $table->enum('status', ['pending', 'approved'])->default('pending');
     $table->timestamps();
 });
-
     }
 
     /**

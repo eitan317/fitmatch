@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-<script src="{{ asset('build/js/script.js') }}" defer></script>
-
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">

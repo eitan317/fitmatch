@@ -9,12 +9,12 @@ const TRAINING_TYPE_LABELS = {
     "powerlifting": "פאוורליפטינג",
     "crossfit": "קרוספיט",
     "street_workout": "סטריט וורקאאוט / מתח מקבילים",
-
+    
     // Fat loss / conditioning
     "weightloss": "חיטוב / ירידה במשקל",
     "hiit": "אימוני HIIT",
     "intervals": "אינטרוולים עצימים",
-
+    
     // Mobility / posture / rehab
     "mobility": "מוביליטי וגמישות",
     "yoga": "יוגה",
@@ -22,32 +22,32 @@ const TRAINING_TYPE_LABELS = {
     "physio_rehab": "שיקום / פיזיותרפיה (אם קיים)",
     "back_pain": "אימונים לכאבי גב",
     "postnatal": "נשים אחרי לידה",
-
+    
     // Home / minimal equipment
     "home_bodyweight": "אימוני בית (משקל גוף)",
     "trx": "אימוני TRX",
     "short20": "אימונים קצרים (20 דק׳)",
-
+    
     // Endurance / cardio
     "running": "ריצה",
     "sprints": "ספרינטים",
     "marathon": "הכנה למרתון / חצי מרתון",
     "cycling": "רכיבה על אופניים",
     "swimming": "שחייה",
-
+    
     // Combat sports
     "boxing": "אגרוף",
     "kickboxing": "קיקבוקס",
     "mma": "MMA",
     "kravmaga": "קרב מגע",
-
+    
     // Special formats
     "couple": "אימונים זוגיים",
     "group": "אימונים קבוצתיים",
     "online": "אימונים אונליין (זום)",
     "outdoor": "אימונים בחוץ / בפארק",
     "bootcamp": "בוטקמפ",
-
+    
     // Target population
     "women_only": "נשים בלבד",
     "men_only": "גברים בלבד",
@@ -191,7 +191,7 @@ function getPendingTrainers() {
     try {
         const arr = JSON.parse(raw);
         if (!Array.isArray(arr)) return [];
-
+        
         // Ensure all trainers have ownerEmail and trainingTypes
         let changed = false;
         const trainersWithOwnerEmail = arr.map(trainer => {
@@ -205,12 +205,12 @@ function getPendingTrainers() {
             }
             return trainer;
         });
-
+        
         // Re-save if any ownerEmail fields were added
         if (changed) {
             savePendingTrainers(trainersWithOwnerEmail);
         }
-
+        
         return trainersWithOwnerEmail;
     } catch (e) {
         return [];
@@ -231,7 +231,7 @@ function getApprovedTrainers() {
     try {
         const arr = JSON.parse(raw);
         if (!Array.isArray(arr)) return [];
-
+        
         // Ensure all trainers have IDs, ownerEmail, and trainingTypes
         let changed = false;
         const trainersWithIds = arr.map(trainer => {
@@ -249,12 +249,12 @@ function getApprovedTrainers() {
             }
             return trainer;
         });
-
+        
         // Re-save if any fields were added
         if (changed) {
             saveApprovedTrainers(trainersWithIds);
         }
-
+        
         return trainersWithIds;
     } catch (e) {
         return [];
@@ -294,11 +294,11 @@ function renderStars(averageRating, maxStars = 5) {
     if (averageRating === null || averageRating === undefined) {
         return '<span class="star">☆</span>'.repeat(maxStars);
     }
-
+    
     const fullStars = Math.floor(averageRating);
     const hasHalfStar = averageRating % 1 >= 0.5;
     const emptyStars = maxStars - fullStars - (hasHalfStar ? 1 : 0);
-
+    
     let starsHtml = '';
     for (let i = 0; i < fullStars; i++) {
         starsHtml += '<span class="star filled">★</span>';
@@ -309,7 +309,7 @@ function renderStars(averageRating, maxStars = 5) {
     for (let i = 0; i < emptyStars; i++) {
         starsHtml += '<span class="star">☆</span>';
     }
-
+    
     return starsHtml;
 }
 
@@ -320,52 +320,66 @@ function getCurrentUserEmail() {
 }
 
 // Check if current user can edit a trainer
+// Note: This is now handled server-side, but kept for backward compatibility
 function canEditTrainer(trainer) {
-    const current = getCurrentUserEmail();
-    if (!current) return false;
-    const owner = (trainer.ownerEmail || "").toLowerCase();
-    if (current === owner) return true;
-    // Admin can also edit any trainer:
-    if (current === ADMIN_EMAIL.toLowerCase()) return true;
+    // Permission check is now done server-side
+    // This function is kept for backward compatibility
+    // For client-side checks, you can use data attributes from Blade
+    if (trainer && trainer.canEdit) {
+        return trainer.canEdit;
+    }
     return false;
 }
 
 // Check if current user is admin
+// Note: This is now handled server-side, but kept for backward compatibility
 function isAdmin() {
-    return getCurrentUserEmail() === ADMIN_EMAIL.toLowerCase();
+    // Admin check is now done server-side via User model
+    // This function is kept for backward compatibility
+    return false; // Always return false, server-side handles this
 }
 
+// Require login - redirects to /login if not logged in
+// Note: This is now handled by Laravel auth middleware, but kept for backward compatibility
 function requireLogin() {
-    const currentUserEmail = getCurrentUserEmail();
-
-    if (!currentUserEmail || currentUserEmail === '') {
-        window.location.href = '/login';
-        return false;
-    }
-
+    // Laravel middleware handles this, but we keep the function for compatibility
+    // If called, it will redirect if not authenticated (handled by middleware)
     return true;
 }
 
-
 // Update navbar to hide admin link for non-admin users
+// Note: This is now handled by Blade @auth directives, but kept for backward compatibility
 function updateNavbarForUser() {
-    const adminLink = document.getElementById('admin-link');
-    if (!adminLink) return;
-
-    if (isAdmin()) {
-        adminLink.style.display = '';
-    } else {
-        adminLink.style.display = 'none';
-    }
+    // Navbar is now handled server-side with @auth directives
+    // This function is kept for backward compatibility but does nothing
 }
 
-// Logout user - removes user data and redirects to login
+// Logout user - uses Laravel logout route
 function logoutUser() {
-    localStorage.removeItem('currentUserEmail');
-    localStorage.removeItem('isAdminLoggedIn');
-    window.location.href = '/login';
+    // Create and submit logout form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/logout';
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken.getAttribute('content');
+        form.appendChild(csrfInput);
+    } else {
+        // Fallback: try to get CSRF token from Laravel
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = document.querySelector('input[name="_token"]')?.value || '';
+        form.appendChild(csrfInput);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
 }
-
 
 // Get filtered and sorted trainers
 function getFilteredAndSortedTrainers() {
@@ -464,37 +478,37 @@ function getFilteredAndSortedTrainers() {
 function renderPublicTrainers(filters = {}) {
     const container = document.getElementById('public-trainers-container');
     if (!container) return;
-
+    
     let approvedTrainers = getFilteredAndSortedTrainers();
-
+    
     container.innerHTML = '';
-
+    
     if (!approvedTrainers.length) {
         container.innerHTML = '<div class="no-trainers" style="grid-column: 1 / -1;">לא נמצאו מאמנים בהתאם לסינון.</div>';
         return;
     }
-
+    
     approvedTrainers.forEach(trainer => {
         const card = document.createElement('div');
         card.className = 'trainer-card';
-
+        
         // Profile image
         let profileImg = '';
         if (trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== '') {
             profileImg = `<img src="${trainer.profileImageBase64}" alt="${trainer.fullName}" class="trainer-profile-img">`;
         }
-
+        
         // Default avatar with initials
         const initials = trainer.fullName ? trainer.fullName.split(' ').map(n => n[0]).join('').substring(0, 2) : 'נס';
         const defaultAvatar = `<div class="trainer-avatar" style="display: ${trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== '' ? 'none' : 'flex'};">${initials}</div>`;
-
+        
         // Badges
         let badges = '<div class="trainer-badges">';
         if (trainer.isOnline) badges += '<span class="badge badge-online">אונליין</span>';
         if (trainer.isForTeens) badges += '<span class="badge badge-teens">נוער</span>';
         if (trainer.isForWomen) badges += '<span class="badge badge-women">נשים בלבד</span>';
         badges += '</div>';
-
+        
         // Rating display
         const averageRating = getTrainerAverageRating(trainer);
         let ratingHtml = '';
@@ -508,17 +522,17 @@ function renderPublicTrainers(filters = {}) {
         } else {
             ratingHtml = '<div class="trainer-rating"><div class="rating-text">עדיין אין דירוגים</div></div>';
         }
-
+        
         // Phone cleaning and contact buttons
         let whatsappButton = '';
         let callButton = '';
-
+        
         if (trainer.phone && trainer.phone.trim() !== '') {
             const phoneDigits = trainer.phone.replace(/\D/g, '');
             if (phoneDigits.length > 0) {
                 // WhatsApp button
                 whatsappButton = `<a href="https://wa.me/${phoneDigits}" target="_blank" class="btn btn-primary">ווטסאפ</a>`;
-
+                
                 // Call button
                 callButton = `<a href="tel:${trainer.phone}" class="btn btn-outline">התקשר</a>`;
             } else {
@@ -529,9 +543,7 @@ function renderPublicTrainers(filters = {}) {
             whatsappButton = `<button class="btn btn-primary" onclick="alert('לא נמצא מספר טלפון עבור המאמן.'); return false;">ווטסאפ</button>`;
             callButton = `<button class="btn btn-outline" onclick="alert('לא נמצא מספר טלפון עבור המאמן.'); return false;">התקשר</button>`;
         }
-
-        const priceToShow = trainer.pricePerSession || trainer.price || "";
-
+        
         card.innerHTML = `
             <div class="trainer-card-image">
                 ${profileImg}
@@ -547,14 +559,14 @@ function renderPublicTrainers(filters = {}) {
             </div>
             ${renderTrainingTypeBadges(trainer)}
             ${badges}
-            <div class="price">₪${priceToShow} לאימון</div>
+            <div class="price">₪${trainer.price} לאימון</div>
             <div class="trainer-actions">
                 ${whatsappButton}
                 ${callButton}
                 <button type="button" class="btn btn-secondary" onclick="openTrainerProfileFromList('${trainer.id}')">לצפייה בפרופיל</button>
             </div>
         `;
-
+        
         container.appendChild(card);
     });
 }
@@ -577,7 +589,7 @@ function getProfileReturnTarget() {
 function openTrainerProfile(trainerId) {
     if (!trainerId) return;
     localStorage.setItem("selectedTrainerId", String(trainerId));
-    window.location.href = "/trainer-profile"; // ✅ Laravel route
+    window.location.href = "/trainer-profile";
 }
 
 // Open trainer profile from admin panel
@@ -714,26 +726,26 @@ function initTrainerProfilePage() {
         container.innerHTML = "<p>לא נמצא מאמן להצגה.</p>";
         return;
     }
-
+    
     // Profile image
     let profileImg = '';
     if (trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== '') {
         profileImg = `<img src="${trainer.profileImageBase64}" alt="${trainer.fullName}" class="trainer-profile-large-img">`;
     }
-
+    
     const initials = trainer.fullName ? trainer.fullName.split(' ').map(n => n[0]).join('').substring(0, 2) : 'נס';
     const defaultAvatar = `<div class="trainer-avatar-large" style="display: ${trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== '' ? 'none' : 'flex'};">${initials}</div>`;
-
+    
     // Badges
     let badges = '<div class="trainer-profile-badges">';
     if (trainer.isOnline) badges += '<span class="badge badge-online">אונליין</span>';
     if (trainer.isForTeens) badges += '<span class="badge badge-teens">נוער</span>';
     if (trainer.isForWomen) badges += '<span class="badge badge-women">נשים בלבד</span>';
     badges += '</div>';
-
+    
     // Training types badges
     const trainingTypesHtml = renderTrainingTypeBadges(trainer);
-
+    
     // Social media links
     let socialLinks = '';
     if (trainer.instagram || trainer.tiktok) {
@@ -748,7 +760,7 @@ function initTrainerProfilePage() {
         }
         socialLinks += '</div>';
     }
-
+    
     // WhatsApp and phone links
     let contactButtons = '';
     if (trainer.phone && trainer.phone.trim() !== '') {
@@ -766,11 +778,11 @@ function initTrainerProfilePage() {
     } else {
         contactButtons = '<div class="profile-actions"><p style="color: var(--text-muted);">לא קיים מספר טלפון למאמן זה.</p></div>';
     }
-
+    
     // Rating section
     const averageRating = getTrainerAverageRating(trainer);
     const ratingCount = trainer.ratingCount || 0;
-
+    
     // Render stars based on average rating (RTL: 5 to 1)
     let starsHtml = '';
     for (let i = 5; i >= 1; i--) {
@@ -778,7 +790,7 @@ function initTrainerProfilePage() {
         const starChar = averageRating !== null && i <= Math.round(averageRating) ? '★' : '☆';
         starsHtml += `<span class="${starClass}" data-rating="${i}">${starChar}</span>`;
     }
-
+    
     let ratingSectionHtml = '';
     if (averageRating !== null) {
         const roundedRating = Math.round(averageRating * 10) / 10;
@@ -802,9 +814,7 @@ function initTrainerProfilePage() {
             </div>
         `;
     }
-
-    const priceBig = trainer.pricePerSession || trainer.price || "";
-
+    
     container.innerHTML = `
         <div class="trainer-profile">
             <div class="trainer-profile-header">
@@ -820,33 +830,33 @@ function initTrainerProfilePage() {
                     ${badges}
                 </div>
             </div>
-
+            
             <div class="trainer-profile-details">
-                <div class="price-large">₪${priceBig} לאימון בודד</div>
+                <div class="price-large">₪${trainer.pricePerSession || trainer.price || ""} לאימון בודד</div>
                 ${trainingTypesHtml}
                 ${socialLinks}
-
+                
                 ${trainer.bio ? `<div class="trainer-bio"><h3>אודות המאמן</h3><p>${trainer.bio}</p></div>` : ''}
-
+                
                 ${contactButtons}
-
+                
                 ${ratingSectionHtml}
             </div>
         </div>
     `;
-
+    
     // Initialize star click handlers
     const starRow = container.querySelector('.star-row');
     if (starRow) {
         const stars = starRow.querySelectorAll('.star');
-        stars.forEach((star) => {
+        stars.forEach((star, index) => {
             star.addEventListener('click', function() {
                 const rating = parseInt(this.getAttribute('data-rating'));
                 rateTrainer(trainer.id, rating);
             });
         });
     }
-
+    
     // Add edit button if user can edit this trainer
     if (canEditTrainer(trainer)) {
         const actions = container.querySelector(".profile-actions");
@@ -861,7 +871,7 @@ function initTrainerProfilePage() {
             actions.appendChild(btn);
         }
     }
-
+    
     // Update back button text based on return target
     const backBtn = document.getElementById("back-from-profile-btn");
     if (backBtn) {
@@ -998,11 +1008,11 @@ function rateTrainer(trainerId, rating) {
         alert('שגיאה: לא נמצא מאמן.');
         return;
     }
-
+    
     // Update rating
     trainer.ratingSum = (trainer.ratingSum || 0) + rating;
     trainer.ratingCount = (trainer.ratingCount || 0) + 1;
-
+    
     // Save updated trainer
     if (updateTrainer(trainer)) {
         // Reload the profile page to show updated rating
@@ -1020,12 +1030,32 @@ function initTrainingTypesSelectorOnRegisterPage() {
     const list = document.getElementById("trainingTypesList");
     const summarySpan = document.getElementById("trainingTypesSummary");
 
-    if (!toggle || !dropdown || !searchInput || !list || !summarySpan) return;
+    // Debug: Log missing elements
+    if (!toggle) console.error('Training types dropdown: toggle element not found');
+    if (!dropdown) console.error('Training types dropdown: dropdown element not found');
+    if (!searchInput) console.error('Training types dropdown: searchInput element not found');
+    if (!list) console.error('Training types dropdown: list element not found');
+    if (!summarySpan) console.error('Training types dropdown: summarySpan element not found');
+    
+    if (!toggle || !dropdown || !searchInput || !list || !summarySpan) {
+        console.error('Training types dropdown initialization failed: missing required elements');
+        return;
+    }
+    
+    // Prevent multiple initializations
+    if (dropdown.dataset.initialized === 'true') {
+        console.log('Training types dropdown: Already initialized, skipping...');
+        return;
+    }
+    dropdown.dataset.initialized = 'true';
+    
+    console.log('Training types dropdown: Initializing...');
 
     const options = Array.from(list.querySelectorAll(".training-type-option"));
 
     function updateSummaryText() {
-        const checkedInputs = list.querySelectorAll('input[name="trainingTypes"]:checked');
+        // Support both "trainingTypes" and "training_types[]" for compatibility
+        const checkedInputs = list.querySelectorAll('input[name="trainingTypes"]:checked, input[name="training_types[]"]:checked');
         if (!checkedInputs.length) {
             summarySpan.textContent = "בחר סוגי אימונים...";
             return;
@@ -1047,36 +1077,66 @@ function initTrainingTypesSelectorOnRegisterPage() {
         }
     }
 
-    // Open / close dropdown
-    toggle.addEventListener("click", function (e) {
-        e.stopPropagation();
-        dropdown.classList.toggle("open");
-        if (dropdown.classList.contains("open")) {
-            searchInput.value = "";
-            filterOptions("");
-            searchInput.focus();
-        }
-    });
-
     function closeDropdown() {
         dropdown.classList.remove("open");
     }
 
-    document.addEventListener("click", function () {
-        closeDropdown();
-    });
+    // Open / close dropdown - must be attached before document click listener
+    toggle.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Training types dropdown: Toggle clicked, current state:', dropdown.classList.contains("open"));
+        const wasOpen = dropdown.classList.contains("open");
+        dropdown.classList.toggle("open");
+        const isNowOpen = dropdown.classList.contains("open");
+        console.log('Training types dropdown: New state:', isNowOpen);
+        console.log('Training types dropdown: Dropdown element classes:', dropdown.className);
+        console.log('Training types dropdown: Dropdown computed display:', window.getComputedStyle(dropdown).display);
+        if (isNowOpen) {
+            searchInput.value = "";
+            filterOptions("");
+            // Use setTimeout to ensure dropdown is visible before focusing
+            setTimeout(function() {
+                searchInput.focus();
+                console.log('Training types dropdown: Search input focused');
+            }, 10);
+        } else {
+            console.log('Training types dropdown: Dropdown closed');
+        }
+    }, true); // Use capture phase to ensure this fires first
 
+    // Prevent clicks inside dropdown from closing it
     dropdown.addEventListener("click", function (e) {
         e.stopPropagation();
-    });
+    }, true); // Use capture phase
+
+    // Close dropdown when clicking outside - must be attached after toggle listener
+    // Use a small delay to allow toggle click to process first
+    // Store handler reference to allow removal if needed
+    const outsideClickHandler = function (e) {
+        // Don't close if clicking on toggle or dropdown
+        if (toggle.contains(e.target) || dropdown.contains(e.target)) {
+            return;
+        }
+        closeDropdown();
+    };
+    document.addEventListener("click", outsideClickHandler);
 
     // Search filter
     function filterOptions(query) {
         const q = query.trim().toLowerCase();
+        console.log('Training types dropdown: Filtering options with query:', q);
+        let visibleCount = 0;
         options.forEach(opt => {
             const text = opt.querySelector(".option-label").textContent.toLowerCase();
-            opt.style.display = !q || text.includes(q) ? "flex" : "none";
+            const listItem = opt.closest(".training-type-item"); // מצא את ה-li
+            if (listItem) {
+                const shouldShow = !q || text.includes(q);
+                listItem.style.display = shouldShow ? "flex" : "none";
+                if (shouldShow) visibleCount++;
+            }
         });
+        console.log('Training types dropdown: Visible options after filter:', visibleCount);
     }
 
     searchInput.addEventListener("input", function () {
@@ -1084,36 +1144,25 @@ function initTrainingTypesSelectorOnRegisterPage() {
     });
 
     // Update summary when any checkbox changes
+    // Support both "trainingTypes" and "training_types[]" for compatibility
     list.addEventListener("change", function (e) {
-        if (e.target && e.target.name === "trainingTypes") {
+        if (e.target && (e.target.name === "trainingTypes" || e.target.name === "training_types[]")) {
+            console.log('Training types dropdown: Checkbox changed:', e.target.value, e.target.checked);
             updateSummaryText();
         }
     });
 
     // Initial text
     updateSummaryText();
+    console.log('Training types dropdown: Initialization complete');
 }
 
+// Trainer registration is now handled inline in register page
 // Initialize login page
+// Note: Login is now handled by Laravel Breeze form submission
 function initLoginPage() {
-    const form = document.getElementById("login-form")
-        || document.getElementById("loginForm")
-        || document.querySelector("form#login-form")
-        || document.querySelector("form[id*='login']");
-    if (!form) return;
-
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const emailInput = form.querySelector("#email");
-        const email = emailInput ? emailInput.value.trim().toLowerCase() : "";
-        if (!email) {
-            alert("אנא הזן כתובת דוא\"ל.");
-            return;
-        }
-        localStorage.setItem("currentUserEmail", email);
-        localStorage.removeItem("isAdminLoggedIn");
-        window.location.href = "/";
-    });
+    // Login form submission is handled by Laravel's POST /login route
+    // This function is kept for backward compatibility but does nothing
 }
 
 // Initialize navbar toggle for mobile menu
@@ -1131,64 +1180,49 @@ document.addEventListener('DOMContentLoaded', function() {
     const path = window.location.pathname;
 
     // Theme + navbar first
-    if (typeof initTheme === "function") initTheme();
-    if (typeof updateNavbarForUser === "function") updateNavbarForUser();
-    if (typeof initNavbarToggle === "function") initNavbarToggle();
-
+    initTheme && initTheme();
+    updateNavbarForUser && updateNavbarForUser();
+    initNavbarToggle && initNavbarToggle();
+    
     // Theme toggle button
     const themeBtn = document.getElementById("theme-toggle-button");
     if (themeBtn) {
         themeBtn.addEventListener("click", toggleTheme);
     }
 
-    // Login page: DO NOT call requireLogin here
-    if (path.includes("/login")) {
-        if (typeof initLoginPage === "function") initLoginPage();
+    if (path === "/login" || path.includes("/login")) {
+        // Login page: DO NOT call requireLogin here
+        initLoginPage && initLoginPage();
         return;
     }
 
     // Other pages: require login
-    if (typeof requireLogin === "function") {
-        const ok = requireLogin();
-        if (ok === false) return;
-    }
+    requireLogin && requireLogin();
 
-    if (path.includes("/register")) {
-        if (typeof initTrainingTypesSelectorOnRegisterPage === "function") {
-            initTrainingTypesSelectorOnRegisterPage();
-        }
+    if (path === "/register" || path === "/register-trainer" || path.includes("/register")) {
+        initTrainingTypesSelectorOnRegisterPage && initTrainingTypesSelectorOnRegisterPage();
+    } else if (path === "/admin" || path.includes("/admin")) {
+        initAdminPage && initAdminPage();
+    } else if (path === "/trainers" || path.includes("/trainers")) {
+        requireLogin && requireLogin();
+        // Don't call renderPublicTrainers() - trainers are rendered by Blade template
+        // initTrainersFilters && initTrainersFilters();
+        // renderPublicTrainers && renderPublicTrainers();
         return;
+    } else if (path === "/trainer-profile" || path.includes("/trainer-profile")) {
+        initTrainerProfilePage && initTrainerProfilePage();
+    } else if (path === "/edit-trainer" || path.includes("/edit-trainer")) {
+        initEditTrainerPage && initEditTrainerPage();
     }
-
-    if (path.includes("/admin")) {
-        if (typeof initAdminPage === "function") initAdminPage();
-        return;
-    }
-
-    if (path.includes("/trainers")) {
-        if (typeof initTrainersFilters === "function") initTrainersFilters();
-        if (typeof renderPublicTrainers === "function") renderPublicTrainers();
-
-        // אם אתה עדיין משתמש ב-#trainersGrid (מערכת ישנה) תפעיל רק פה:
-        // loadTrainersPage && loadTrainersPage();
-        return;
-    }
-
-    if (path.includes("/trainer-profile")) {
-        if (typeof initTrainerProfilePage === "function") initTrainerProfilePage();
-        return;
-    }
-
-    // ✅ חשוב: לא להריץ loadTrainersPage() בכל עמוד
+    
+    // Trainers page functionality
+    loadTrainersPage();
 });
 
 // Initialize admin page
 function initAdminPage() {
     // First, require login
-    if (typeof requireLogin === "function") {
-        const ok = requireLogin();
-        if (ok === false) return;
-    }
+    requireLogin && requireLogin();
 
     const adminWrapper = document.getElementById('admin-wrapper');
     const adminNotAllowed = document.getElementById('admin-not-allowed');
@@ -1198,6 +1232,7 @@ function initAdminPage() {
 
     // Check if user is admin
     if (!isAdmin()) {
+        // User is not admin - hide admin wrapper, show access denied message
         if (adminWrapper) adminWrapper.style.display = 'none';
         if (adminNotAllowed) {
             adminNotAllowed.style.display = 'block';
@@ -1206,23 +1241,28 @@ function initAdminPage() {
         return;
     }
 
+    // User is admin - show admin wrapper, hide access denied message
     if (adminWrapper) adminWrapper.style.display = 'block';
     if (adminNotAllowed) adminNotAllowed.style.display = 'none';
 
     if (!loginForm || !adminPanel) return;
 
+    // Check if admin is logged in (password login)
     const isLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
 
     if (isLoggedIn) {
+        // Show admin panel, hide login form
         loginForm.style.display = 'none';
         adminPanel.style.display = 'block';
         renderPendingTrainers();
         renderApprovedTrainers && renderApprovedTrainers();
     } else {
+        // Show login form, hide admin panel
         loginForm.style.display = 'block';
         adminPanel.style.display = 'none';
     }
 
+    // Handle login form submission (only attach once)
     if (adminLoginForm && !adminLoginForm.dataset.listenerAttached) {
         adminLoginForm.dataset.listenerAttached = 'true';
         adminLoginForm.addEventListener('submit', function(e) {
@@ -1233,10 +1273,12 @@ function initAdminPage() {
             const loginError = document.getElementById('loginError');
 
             if (password === ADMIN_PASSWORD) {
+                // Correct password
                 localStorage.setItem('isAdminLoggedIn', 'true');
                 if (loginError) loginError.style.display = 'none';
-                initAdminPage();
+                initAdminPage(); // Re-initialize to show admin panel
             } else {
+                // Wrong password
                 if (loginError) loginError.style.display = 'block';
                 const passwordInput = document.getElementById('adminPassword');
                 if (passwordInput) passwordInput.value = '';
@@ -1269,6 +1311,7 @@ function renderPendingTrainers() {
         const card = document.createElement("div");
         card.className = "admin-trainer-card";
 
+        // Profile image
         let imageHtml = "";
         if (trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== "") {
             imageHtml = `<img src="${trainer.profileImageBase64}" class="admin-avatar" alt="${trainer.fullName || ""}" />`;
@@ -1299,6 +1342,21 @@ function renderPendingTrainers() {
     });
 }
 
+// Toggle pending trainer details
+function togglePendingDetails(trainerId) {
+    const el = document.getElementById("pending-extra-" + trainerId);
+    if (!el) {
+        console.warn("pending extra element not found for trainer:", trainerId);
+        return;
+    }
+
+    if (el.style.display === "none" || el.style.display === "") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+}
+
 // Render approved trainers
 function renderApprovedTrainers() {
     const container = document.getElementById("approvedTrainersContainer");
@@ -1317,6 +1375,7 @@ function renderApprovedTrainers() {
         const card = document.createElement("div");
         card.className = "admin-trainer-card approved";
 
+        // Profile image
         let imageHtml = "";
         if (trainer.profileImageBase64 && trainer.profileImageBase64.trim() !== "") {
             imageHtml = `<img src="${trainer.profileImageBase64}" class="admin-avatar" alt="${trainer.fullName || ""}" />`;
@@ -1331,9 +1390,9 @@ function renderApprovedTrainers() {
                 </div>
             </div>
             <div class="admin-trainer-details">
-                <div>שנות ניסיון: ${trainer.experienceYears || trainer.experience || ""}</div>
-                <div>התמחות: ${trainer.mainSpecialization || trainer.specialization || ""}</div>
-                <div>מחיר לאימון: ₪${trainer.pricePerSession || trainer.price || ""}</div>
+                <div>שנות ניסיון: ${trainer.experienceYears || ""}</div>
+                <div>התמחות: ${trainer.mainSpecialization || ""}</div>
+                <div>מחיר לאימון: ₪${trainer.pricePerSession || ""}</div>
             </div>
             <div class="admin-trainer-actions">
                 <button type="button" class="btn btn-outline danger" onclick="deleteTrainer('${trainer.id}')">מחק</button>
@@ -1361,6 +1420,7 @@ function approveTrainer(trainerId) {
     savePendingTrainers(pending);
     saveApprovedTrainers(approved);
 
+    // Re-render lists after change
     renderPendingTrainers();
     renderApprovedTrainers && renderApprovedTrainers();
 }
@@ -1391,84 +1451,129 @@ function deleteTrainer(trainerId) {
     approved.splice(index, 1);
     saveApprovedTrainers(approved);
 
+    // Re-render admin lists if on admin page
     renderApprovedTrainers && renderApprovedTrainers();
     renderPublicTrainers && renderPublicTrainers();
 }
 
-// =======================
-// מערכת ישנה - השארתי כמו אצלך (לא מופעלת אוטומטית)
-// אם אתה צריך אותה, תקרא loadTrainersPage() רק בעמוד /trainers
-// =======================
+// Delete approved trainer
+function deleteApprovedTrainer(trainerId) {
+    if (!confirm('האם אתה בטוח שברצונך למחוק מאמן זה?')) {
+        return;
+    }
+    
+    let approvedTrainers = getApprovedTrainers();
+    
+    const trainerIndex = approvedTrainers.findIndex(t => t.id === trainerId);
+    
+    if (trainerIndex !== -1) {
+        approvedTrainers.splice(trainerIndex, 1);
+        saveApprovedTrainers(approvedTrainers);
+        
+        // Re-render approved list
+        renderApprovedTrainers();
+    }
+}
 
+// Load trainers page
 function loadTrainersPage() {
     const trainersGrid = document.getElementById('trainersGrid');
     const searchBtn = document.getElementById('searchBtn');
-
+    
     if (!trainersGrid) return;
-
+    
+    // Example trainers (static)
     let trainers = [
-        { name: 'דני כהן', city: 'תל אביב', experience: 8, specializations: ['חיטוב', 'כושר כללי'], price: 150, verified: true, id: 1 },
-        { name: 'שרה לוי', city: 'רמת גן', experience: 5, specializations: ['נשים בלבד', 'יוגה'], price: 120, verified: true, id: 2 },
-        { name: 'מיכאל דוד', city: 'חיפה', experience: 12, specializations: ['עלייה במסה', 'כוח'], price: 180, verified: false, id: 3 }
+        {
+            name: 'דני כהן',
+            city: 'תל אביב',
+            experience: 8,
+            specializations: ['חיטוב', 'כושר כללי'],
+            price: 150,
+            verified: true,
+            id: 1
+        },
+        {
+            name: 'שרה לוי',
+            city: 'רמת גן',
+            experience: 5,
+            specializations: ['נשים בלבד', 'יוגה'],
+            price: 120,
+            verified: true,
+            id: 2
+        },
+        {
+            name: 'מיכאל דוד',
+            city: 'חיפה',
+            experience: 12,
+            specializations: ['עלייה במסה', 'כוח'],
+            price: 180,
+            verified: false,
+            id: 3
+        }
     ];
-
+    
+    // Add approved trainers from localStorage
     const approvedTrainers = getApprovedTrainers();
     approvedTrainers.forEach(trainer => {
         trainers.push({
             name: trainer.fullName,
             city: trainer.city,
-            experience: trainer.experience || trainer.experienceYears,
-            specializations: [trainer.specialization || trainer.mainSpecialization],
-            price: trainer.price || trainer.pricePerSession,
+            experience: trainer.experience,
+            specializations: [trainer.specialization],
+            price: trainer.price,
             verified: true,
             id: trainer.id
         });
     });
-
+    
+    // Render trainers
     renderTrainers(trainers);
-
+    
+    // Search functionality
     if (searchBtn) {
         searchBtn.addEventListener('click', function() {
             const cityFilter = document.getElementById('cityFilter').value;
             const specializationFilter = document.getElementById('specializationFilter').value;
-
+            
             let filtered = trainers;
-
+            
             if (cityFilter && cityFilter !== 'all') {
                 filtered = filtered.filter(t => t.city === cityFilter);
             }
-
+            
             if (specializationFilter && specializationFilter !== 'all') {
-                filtered = filtered.filter(t =>
+                filtered = filtered.filter(t => 
                     t.specializations.some(s => s === specializationFilter)
                 );
             }
-
+            
             renderTrainers(filtered);
         });
     }
 }
 
+// Render trainer cards
 function renderTrainers(trainers) {
     const trainersGrid = document.getElementById('trainersGrid');
     if (!trainersGrid) return;
-
+    
     trainersGrid.innerHTML = '';
-
+    
     if (trainers.length === 0) {
         trainersGrid.innerHTML = '<div class="no-trainers">לא נמצאו מאמנים התואמים לחיפוש</div>';
         return;
     }
-
+    
     trainers.forEach(trainer => {
         const card = document.createElement('div');
         card.className = 'trainer-card';
-
+        
         let verifiedBadge = '';
         if (trainer.verified) {
             verifiedBadge = '<div class="verified-badge">מאמן מאומת</div>';
         }
-
+        
         card.innerHTML = `
             ${verifiedBadge}
             <h3>${trainer.name}</h3>
@@ -1480,11 +1585,90 @@ function renderTrainers(trainers) {
             <div class="price">₪${trainer.price} לאימון</div>
             <button class="btn" onclick="contactTrainer('${trainer.name}')">צור קשר</button>
         `;
-
+        
         trainersGrid.appendChild(card);
     });
 }
 
+// Contact trainer function
 function contactTrainer(trainerName) {
     alert('יצירת קשר עם המאמן תתווסף בהמשך.');
 }
+
+// Counter animation for stats section
+function animateCounter(element, target, duration = 2000) {
+    const start = 0;
+    const increment = target / (duration / 16); // 60fps
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            element.textContent = target % 1 === 0 ? Math.floor(target) : target.toFixed(1);
+            clearInterval(timer);
+        } else {
+            element.textContent = current % 1 === 0 ? Math.floor(current) : current.toFixed(1);
+        }
+    }, 16);
+}
+
+// Initialize stats counter animation with Intersection Observer
+function initStatsCounter() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    
+    if (statNumbers.length === 0) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.dataset.animated) {
+                const target = parseFloat(entry.target.dataset.target);
+                entry.target.dataset.animated = 'true';
+                animateCounter(entry.target, target);
+            }
+        });
+    }, {
+        threshold: 0.5
+    });
+    
+    statNumbers.forEach(stat => {
+        observer.observe(stat);
+    });
+}
+
+// Initialize fade-in animations with Intersection Observer
+function initFadeInAnimations() {
+    const fadeElements = document.querySelectorAll('.fade-in, .card, .feature-card, .stat-card');
+    
+    if (fadeElements.length === 0) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    entry.target.classList.add('visible');
+                }, index * 100); // Staggered animation
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+    
+    fadeElements.forEach(element => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
+        observer.observe(element);
+    });
+}
+
+// Smooth scroll behavior
+document.documentElement.style.scrollBehavior = 'smooth';
+
+// Initialize animations on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initStatsCounter();
+    initFadeInAnimations();
+});
+

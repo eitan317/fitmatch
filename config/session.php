@@ -18,7 +18,10 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    // Default to 'file' to work without database
+    // If SESSION_DRIVER=database is set in Railway but DB is unavailable,
+    // remove SESSION_DRIVER from Railway Variables or set SESSION_DRIVER=file
+    'driver' => env('SESSION_DRIVER', 'file'),
 
     /*
     |--------------------------------------------------------------------------
