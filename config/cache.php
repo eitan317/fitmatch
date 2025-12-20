@@ -15,7 +15,10 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE', 'database'),
+    // Default to 'file' to work without database
+    // If CACHE_STORE=database is set in Railway but DB is unavailable,
+    // remove CACHE_STORE from Railway Variables or set CACHE_STORE=file
+    'default' => env('CACHE_STORE', 'file'),
 
     /*
     |--------------------------------------------------------------------------

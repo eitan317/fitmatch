@@ -7,6 +7,11 @@ use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\PageController;
 
+// Health check endpoint for Railway (DB-independent)
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
+
 Route::get('/', [PageController::class, 'welcome'])->name('welcome');
 
 // Public pages routes
