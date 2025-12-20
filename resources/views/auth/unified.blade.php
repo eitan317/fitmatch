@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>התחברות והרשמה - FitMatch</title>
-    <link rel="stylesheet" href="{{ asset('site/style.css') }}">
+    <link rel="stylesheet" href="/site/style.css?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
 </head>
 <body>
     @include('partials.navbar')
@@ -155,7 +155,7 @@
         </div>
     </main>
 
-    <script src="{{ asset('site/script.js') }}"></script>
+    <script src="/site/script.js?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}"></script>
     <script>
         // Initialize theme and navbar
         if (typeof initTheme === 'function') initTheme();
