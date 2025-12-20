@@ -41,6 +41,7 @@
 
             <!-- Login Tab Content -->
             <div class="auth-tab-content {{ $activeTab === 'login' ? 'active' : '' }}" id="content-login">
+                @if(config('services.google.client_id'))
                 <!-- Google Login Button -->
                 <div style="margin-bottom: 30px; text-align: center;">
                     <a href="{{ route('google.login') }}" class="btn btn-primary google-auth-button" style="display: inline-flex; align-items: center; gap: 10px; padding: 0.75rem 1.5rem;">
@@ -57,6 +58,7 @@
                 <div class="auth-divider">
                     <span>או</span>
                 </div>
+                @endif
 
                 <!-- Login Form -->
                 <form method="POST" action="{{ route('login') }}" id="login-form">
@@ -95,6 +97,7 @@
 
             <!-- Register Tab Content -->
             <div class="auth-tab-content {{ $activeTab === 'register' ? 'active' : '' }}" id="content-register">
+                @if(config('services.google.client_id'))
                 <!-- Google Register Button -->
                 <div style="margin-bottom: 30px; text-align: center;">
                     <a href="{{ route('google.login') }}" class="btn btn-primary google-auth-button" style="display: inline-flex; align-items: center; gap: 10px; padding: 0.75rem 1.5rem;">
@@ -111,6 +114,7 @@
                 <div class="auth-divider">
                     <span>או</span>
                 </div>
+                @endif
 
                 <!-- Register Form -->
                 <form method="POST" action="{{ route('register') }}" id="register-form">
@@ -231,4 +235,3 @@
     </script>
 </body>
 </html>
-
