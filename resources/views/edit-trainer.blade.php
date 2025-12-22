@@ -13,6 +13,40 @@
         <h1>עריכת פרופיל מאמן</h1>
         <p>עדכן את הפרטים שלך ושמור.</p>
 
+        @php
+            $currentTrainer = \App\Models\Trainer::where('owner_email', Auth::user()->email)->first();
+        @endphp
+
+        @if($currentTrainer)
+            <div class="form-message {{ $currentTrainer->status === 'active' ? 'success' : ($currentTrainer->status === 'pending_payment' ? 'error' : 'warning') }}" style="margin-bottom: 2rem; padding: 1rem; border-radius: 10px;">
+                @if($currentTrainer->status === 'trial')
+                    <h3 style="margin-top: 0;"><i class="fas fa-hourglass-half"></i> חודש ניסיון</h3>
+                    <p>אתה כעת בחודש ניסיון. לאחר {{ $currentTrainer->trial_ends_at ? $currentTrainer->trial_ends_at->diffForHumans() : '30 יום' }} תתבקש לשלם 20₪ בביט.</p>
+                    @if($currentTrainer->trial_ends_at)
+                        <p><strong>תאריך סיום ניסיון:</strong> {{ $currentTrainer->trial_ends_at->format('d/m/Y') }}</p>
+                    @endif
+                @elseif($currentTrainer->status === 'pending_payment')
+                    <h3 style="margin-top: 0;"><i class="fas fa-money-bill-wave"></i> נדרש תשלום</h3>
+                    <p><strong>יש לשלם 20₪ בביט כדי להמשיך להציג את הפרופיל שלך באתר.</strong></p>
+                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <p style="margin: 0.5rem 0;"><strong>סכום:</strong> 20₪</p>
+                        <p style="margin: 0.5rem 0;"><strong>אמצעי תשלום:</strong> Bit בלבד</p>
+                        <p style="margin: 0.5rem 0;"><strong>מספר Bit:</strong> 0527020113</p>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.9;">לאחר התשלום, שלח הודעה למנהל המערכת לאישור.</p>
+                    </div>
+                @elseif($currentTrainer->status === 'blocked')
+                    <h3 style="margin-top: 0;"><i class="fas fa-ban"></i> חשבון חסום</h3>
+                    <p>החשבון שלך נחסם. אנא צור קשר עם מנהל המערכת למידע נוסף.</p>
+                @elseif($currentTrainer->status === 'active')
+                    <h3 style="margin-top: 0;"><i class="fas fa-check-circle"></i> חשבון פעיל</h3>
+                    <p>החשבון שלך פעיל והפרופיל שלך מוצג באתר.</p>
+                    @if($currentTrainer->last_payment_at)
+                        <p><strong>תאריך תשלום אחרון:</strong> {{ $currentTrainer->last_payment_at->format('d/m/Y') }}</p>
+                    @endif
+                @endif
+            </div>
+        @endif
+
         <form id="edit-trainer-form">
             <div class="form-group">
                 <label for="edit-fullName">שם מלא *</label>

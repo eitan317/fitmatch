@@ -73,7 +73,7 @@
                             <div class="admin-stat-label">סה"כ מאמנים</div>
                             <div class="admin-stat-trend">
                                 <i class="fas fa-info-circle"></i>
-                                <span>{{ $stats['approved_trainers'] }} מאושרים, {{ $stats['pending_trainers'] }} ממתינים</span>
+                                <span>{{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון</span>
                             </div>
                         </div>
                     </div>
@@ -83,8 +83,8 @@
                             <i class="fas fa-clock" style="color: #ffc107;"></i>
                         </div>
                         <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['pending_trainers']) }}</div>
-                            <div class="admin-stat-label">בקשות ממתינות</div>
+                            <div class="admin-stat-value">{{ number_format($stats['pending_payment_trainers']) }}</div>
+                            <div class="admin-stat-label">ממתינים לתשלום</div>
                             <div class="admin-stat-trend">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <span>דורש טיפול</span>
@@ -97,11 +97,25 @@
                             <i class="fas fa-check-circle" style="color: #28a745;"></i>
                         </div>
                         <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['approved_trainers']) }}</div>
-                            <div class="admin-stat-label">מאמנים מאושרים</div>
+                            <div class="admin-stat-value">{{ number_format($stats['active_trainers']) }}</div>
+                            <div class="admin-stat-label">מאמנים פעילים</div>
                             <div class="admin-stat-trend">
                                 <i class="fas fa-check"></i>
                                 <span>פעילים בפלטפורמה</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                            <i class="fas fa-hourglass-half" style="color: var(--primary);"></i>
+                        </div>
+                        <div class="admin-stat-content">
+                            <div class="admin-stat-value">{{ number_format($stats['trial_trainers']) }}</div>
+                            <div class="admin-stat-label">בחודש ניסיון</div>
+                            <div class="admin-stat-trend">
+                                <i class="fas fa-info-circle"></i>
+                                <span>30 יום חינם</span>
                             </div>
                         </div>
                     </div>
@@ -360,7 +374,7 @@
                                 </div>
                                 <div class="admin-trainer-status-badge admin-trainer-status-approved">
                                     <i class="fas fa-check-circle"></i>
-                                    מאושר
+                                    פעיל
                                 </div>
                             </div>
 
@@ -405,8 +419,8 @@
                             <div class="admin-empty-icon">
                                 <i class="fas fa-users"></i>
                             </div>
-                            <h3 class="admin-empty-title">אין מאמנים מאושרים</h3>
-                            <p class="admin-empty-description">עדיין לא אושרו מאמנים בפלטפורמה</p>
+                            <h3 class="admin-empty-title">אין מאמנים פעילים</h3>
+                            <p class="admin-empty-description">עדיין לא יש מאמנים פעילים בפלטפורמה</p>
                         </div>
                     @endforelse
                 </div>

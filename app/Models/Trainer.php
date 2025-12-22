@@ -27,6 +27,10 @@ class Trainer extends Model
         'status',
         'subscription_plan_id',
         'subscription_status',
+        'trial_started_at',
+        'trial_ends_at',
+        'last_payment_at',
+        'approved_by_admin',
     ];
 
     protected $casts = [
@@ -34,6 +38,10 @@ class Trainer extends Model
         'age' => 'integer',
         'experience_years' => 'integer',
         'price_per_session' => 'decimal:2',
+        'trial_started_at' => 'datetime',
+        'trial_ends_at' => 'datetime',
+        'last_payment_at' => 'datetime',
+        'approved_by_admin' => 'boolean',
     ];
 
     /**
@@ -157,5 +165,52 @@ class Trainer extends Model
         }
 
         return $result;
+    }
+
+    /**
+     * Check if trainer is in trial period.
+     */
+    public function isTrial(): bool
+    {
+        return $this->status === 'trial';
+    }
+
+    /**
+     * Check if trainer is pending payment.
+     */
+    public function isPendingPayment(): bool
+    {
+        return $this->status === 'pending_payment';
+    }
+
+    /**
+     * Check if trainer is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Check if trial period has expired.
+     */
+    public function isTrialExpired(): bool
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isPast();
+    }
+
+    /**
+     * Get status message in Hebrew.
+     */
+    public function getStatusMessage(): string
+    {
+        return match ($this->status) {
+            'trial' => 'אתה בחודש ניסיון – לאחר סיום החודש יש לשלם 20₪ בביט',
+            'pending_payment' => 'יש לשלם 20₪ בביט. מספר Bit: 0527020113',
+            'active' => 'החשבון פעיל',
+            'blocked' => 'חשבון חסום',
+            'pending' => 'ממתין לאישור',
+            default => 'סטטוס לא מוגדר',
+        };
     }
 }

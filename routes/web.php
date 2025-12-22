@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/trainers', [AdminTrainerController::class, 'index'])->name('trainers.index');
     Route::post('/trainers/{trainer}/approve', [AdminTrainerController::class, 'approve'])->name('trainers.approve');
+    Route::post('/trainers/{trainer}/approve-payment', [AdminTrainerController::class, 'approvePayment'])->name('trainers.approve-payment');
     Route::post('/trainers/{trainer}/reject', [AdminTrainerController::class, 'reject'])->name('trainers.reject');
     Route::delete('/trainers/{trainer}', [AdminTrainerController::class, 'destroy'])->name('trainers.destroy');
 });

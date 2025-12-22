@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class TrainerController extends Controller
 {
     /**
-     * Display a listing of all trainers (pending and approved).
+     * Display a listing of all trainers with new status system.
      */
     public function index()
     {
@@ -17,8 +17,11 @@ class TrainerController extends Controller
         $stats = [
             'total_users' => \App\Models\User::count(),
             'total_trainers' => Trainer::count(),
+            'trial_trainers' => Trainer::where('status', 'trial')->count(),
+            'pending_payment_trainers' => Trainer::where('status', 'pending_payment')->count(),
+            'active_trainers' => Trainer::where('status', 'active')->count(),
+            'blocked_trainers' => Trainer::where('status', 'blocked')->count(),
             'pending_trainers' => Trainer::where('status', 'pending')->count(),
-            'approved_trainers' => Trainer::where('status', 'approved')->count(),
             'total_reviews' => \App\Models\Review::count(),
             'average_rating' => \App\Models\Review::avg('rating') ?? 0,
             'trainers_this_month' => Trainer::whereMonth('created_at', now()->month)
@@ -27,18 +30,26 @@ class TrainerController extends Controller
             'trainers_last_7_days' => Trainer::where('created_at', '>=', now()->subDays(7))->count(),
         ];
 
-        // Get trainers
-        $pendingTrainers = Trainer::where('status', 'pending')
+        // Get trainers by status
+        $trialTrainers = Trainer::where('status', 'trial')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $approvedTrainers = Trainer::where('status', 'approved')
+        $pendingPaymentTrainers = Trainer::where('status', 'pending_payment')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $activeTrainers = Trainer::where('status', 'active')
             ->with('reviews')
             ->orderBy('created_at', 'desc')
             ->limit(50) // Limit for performance
             ->get();
 
-        return view('admin', compact('stats', 'pendingTrainers', 'approvedTrainers'));
+        $pendingTrainers = Trainer::where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers'));
     }
 
     /**
@@ -46,10 +57,34 @@ class TrainerController extends Controller
      */
     public function approve(Trainer $trainer)
     {
-        $trainer->update(['status' => 'approved']);
+        $trainer->update([
+            'status' => 'active',
+            'approved_by_admin' => true,
+            'last_payment_at' => now(),
+        ]);
 
         return redirect()->route('admin.trainers.index')
             ->with('success', 'המאמן אושר בהצלחה.');
+    }
+
+    /**
+     * Approve payment and activate trainer (for pending_payment status).
+     */
+    public function approvePayment(Trainer $trainer)
+    {
+        if ($trainer->status !== 'pending_payment') {
+            return redirect()->route('admin.trainers.index')
+                ->with('error', 'ניתן לאשר תשלום רק למאמנים בסטטוס pending_payment.');
+        }
+
+        $trainer->update([
+            'status' => 'active',
+            'approved_by_admin' => true,
+            'last_payment_at' => now(),
+        ]);
+
+        return redirect()->route('admin.trainers.index')
+            ->with('success', 'התשלום אושר והמאמן הופעל בהצלחה.');
     }
 
     /**

@@ -18,7 +18,7 @@ class TrainerController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Trainer::where('status', 'approved')
+        $query = Trainer::where('status', 'active')
             ->with(['reviews', 'subscriptionPlan'])
             ->orderBy('created_at', 'desc');
 
@@ -126,7 +126,10 @@ class TrainerController extends Controller
             'tiktok' => $validated['tiktok'] ?? null,
             'bio' => $validated['bio'] ?? null,
             'profile_image_path' => $profileImagePath,
-            'status' => 'pending',
+            'status' => 'trial',
+            'trial_started_at' => now(),
+            'trial_ends_at' => now()->addDays(30),
+            'approved_by_admin' => false,
         ];
 
         // Don't include 'name' field - we use 'full_name' instead
@@ -135,9 +138,9 @@ class TrainerController extends Controller
 
         $trainer = Trainer::create($trainerData);
 
-        // Redirect to subscription selection
-        return redirect()->route('subscriptions.choose')
-            ->with('success', 'פרטי המאמן נשמרו. אנא בחר תכנית מנוי להמשך.');
+        // Redirect to home with success message
+        return redirect()->route('trainers.index')
+            ->with('success', 'שמתך הושלמה בהצלחה! אתה כעת בחודש ניסיון. לאחר 30 יום תתבקש לשלם 20₪ בביט.');
     }
 
     /**
@@ -145,7 +148,7 @@ class TrainerController extends Controller
      */
     public function show(Trainer $trainer)
     {
-        if ($trainer->status !== 'approved') {
+        if ($trainer->status !== 'active') {
             abort(404);
         }
 

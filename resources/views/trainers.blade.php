@@ -52,7 +52,7 @@
                         </optgroup>
                         
                         <optgroup label="🔥 חיטוב וכושר">
-                            <option value="weightloss" {{ request('training_type') == 'weightloss' ? 'selected' : '' }}>חיטוב / ירידה במשקל</option>
+                        <option value="weightloss" {{ request('training_type') == 'weightloss' ? 'selected' : '' }}>חיטוב / ירידה במשקל</option>
                             <option value="hiit" {{ request('training_type') == 'hiit' ? 'selected' : '' }}>אימוני HIIT</option>
                             <option value="intervals" {{ request('training_type') == 'intervals' ? 'selected' : '' }}>אינטרוולים עצימים</option>
                             <option value="bootcamp" {{ request('training_type') == 'bootcamp' ? 'selected' : '' }}>בוטקמפ</option>
@@ -74,7 +74,7 @@
                         </optgroup>
                         
                         <optgroup label="🏃 אירובי וסיבולת">
-                            <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
+                        <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
                             <option value="sprints" {{ request('training_type') == 'sprints' ? 'selected' : '' }}>ספרינטים</option>
                             <option value="marathon" {{ request('training_type') == 'marathon' ? 'selected' : '' }}>הכנה למרתון</option>
                             <option value="cycling" {{ request('training_type') == 'cycling' ? 'selected' : '' }}>רכיבה על אופניים</option>
@@ -90,7 +90,7 @@
                         
                         <optgroup label="👥 פורמטים מיוחדים">
                             <option value="couple" {{ request('training_type') == 'couple' ? 'selected' : '' }}>אימונים זוגיים</option>
-                            <option value="group" {{ request('training_type') == 'group' ? 'selected' : '' }}>אימונים קבוצתיים</option>
+                        <option value="group" {{ request('training_type') == 'group' ? 'selected' : '' }}>אימונים קבוצתיים</option>
                             <option value="online" {{ request('training_type') == 'online' ? 'selected' : '' }}>אימונים אונליין (זום)</option>
                             <option value="outdoor" {{ request('training_type') == 'outdoor' ? 'selected' : '' }}>אימונים בחוץ / בפארק</option>
                         </optgroup>
