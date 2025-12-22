@@ -7,8 +7,8 @@
         <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
         <nav class="nav-links" id="navLinks">
             <a href="/">דף הבית</a>
+            <a href="/trainers">מצא מאמן</a>
             @auth
-                <a href="/trainers">מצא מאמן</a>
                 <a href="/register-trainer">הרשמה כמאמן</a>
                 @if(Auth::user()->isAdmin())
                     <a href="/admin/trainers" id="admin-link">פאנל מנהל</a>

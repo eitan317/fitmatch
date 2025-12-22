@@ -30,11 +30,13 @@ Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->
 // Auth routes are handled by Laravel Breeze in routes/auth.php
 // The routes are loaded in bootstrap/app.php
 
+// Public trainer routes - anyone can view trainers without authentication
+Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
+Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name('trainers.show');
+
 // Protected routes - require authentication
 Route::middleware('auth')->group(function () {
-    // Trainer routes
-    Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
-    Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name('trainers.show');
+    // Trainer registration and management routes
     Route::get('/register-trainer', [TrainerController::class, 'create'])->name('trainers.create');
     Route::post('/register-trainer', [TrainerController::class, 'store'])->name('trainers.store');
     Route::get('/trainer/choose-plan', [TrainerController::class, 'choosePlan'])->name('trainers.choose-plan');

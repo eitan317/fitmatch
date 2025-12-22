@@ -222,7 +222,7 @@
                             </li>
                             <li style="padding: 0.75rem 0; border-bottom: 1px solid rgba(148,163,184,0.2);">
                                 <i class="fas fa-check" style="color: var(--primary); margin-left: 0.75rem;"></i>
-                                הפרופיל שלך לא יוצג במהלך הניסיון
+                                הפרופיל שלך יוצג כמו מנוי רגיל במהלך הניסיון
                             </li>
                             <li style="padding: 0.75rem 0; border-bottom: 1px solid rgba(148,163,184,0.2);">
                                 <i class="fas fa-check" style="color: var(--primary); margin-left: 0.75rem;"></i>

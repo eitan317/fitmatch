@@ -18,7 +18,8 @@ class TrainerController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Trainer::where('status', 'active')
+        // Show active trainers and trial trainers (trial is like a demo of paid subscription)
+        $query = Trainer::whereIn('status', ['active', 'trial'])
             ->with(['reviews', 'subscriptionPlan'])
             ->orderBy('created_at', 'desc');
 
@@ -217,7 +218,8 @@ class TrainerController extends Controller
      */
     public function show(Trainer $trainer)
     {
-        if ($trainer->status !== 'active') {
+        // Allow viewing active and trial trainers (trial is like a demo of paid subscription)
+        if (!in_array($trainer->status, ['active', 'trial'])) {
             abort(404);
         }
 

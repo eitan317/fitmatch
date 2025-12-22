@@ -114,6 +114,7 @@
                     @endforelse
                 </div>
 
+                @auth
                 <div class="review-form">
                     <h3>הוסף ביקורת</h3>
                     <form action="{{ route('reviews.store', $trainer) }}" method="POST">
@@ -153,6 +154,12 @@
                         @endif
                     </form>
                 </div>
+                @else
+                <div class="review-form" style="background: rgba(148, 163, 184, 0.1); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <h3>הוסף ביקורת</h3>
+                    <p style="margin-bottom: 1rem;">על מנת לכתוב ביקורת, אנא <a href="{{ route('login') }}" style="color: var(--primary); text-decoration: underline;">התחבר</a> או <a href="{{ route('register') }}" style="color: var(--primary); text-decoration: underline;">הירשם</a></p>
+                </div>
+                @endauth
             </div>
         </div>
     </main>
