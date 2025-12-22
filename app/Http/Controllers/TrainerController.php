@@ -138,9 +138,19 @@ class TrainerController extends Controller
 
         $trainer = Trainer::create($trainerData);
 
-        // Redirect to home with success message
-        return redirect()->route('trainers.index')
-            ->with('success', 'שמתך הושלמה בהצלחה! אתה כעת בחודש ניסיון. לאחר 30 יום תתבקש לשלם 20₪ בביט.');
+        // Redirect to trial info page
+        return redirect()->route('trainers.trial-info')
+            ->with('success', 'ההרשמה הושלמה בהצלחה!');
+    }
+
+    /**
+     * Display trial info and payment instructions for the authenticated trainer.
+     */
+    public function trialInfo()
+    {
+        $trainer = Trainer::where('owner_email', Auth::user()->email)->firstOrFail();
+        
+        return view('trainer-trial-info', compact('trainer'));
     }
 
     /**

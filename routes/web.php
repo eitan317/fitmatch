@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name('trainers.show');
     Route::get('/register-trainer', [TrainerController::class, 'create'])->name('trainers.create');
     Route::post('/register-trainer', [TrainerController::class, 'store'])->name('trainers.store');
+    Route::get('/trainer/trial-info', [TrainerController::class, 'trialInfo'])->name('trainers.trial-info');
     Route::get('/edit-trainer/{trainer}', [TrainerController::class, 'edit'])->name('trainers.edit');
     Route::post('/edit-trainer/{trainer}', [TrainerController::class, 'update'])->name('trainers.update');
 

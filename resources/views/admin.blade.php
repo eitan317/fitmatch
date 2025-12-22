@@ -174,7 +174,15 @@
                                     </div>
                                 @endif
                                 <div class="admin-trainer-identity-info">
-                                    <h3 class="admin-trainer-name">{{ $trainer->full_name }}</h3>
+                                    <h3 class="admin-trainer-name">
+                                        {{ $trainer->full_name }}
+                                        @if($trainer->status === 'pending_payment' || ($trainer->status === 'trial' && $trainer->trial_ends_at && $trainer->trial_ends_at->isPast()))
+                                            <span style="color: #dc3545; font-size: 0.85rem; margin-right: 0.5rem; font-weight: normal;">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                לא שילם
+                                            </span>
+                                        @endif
+                                    </h3>
                                     <div class="admin-trainer-meta">
                                         <span class="admin-trainer-location">
                                             <i class="fas fa-map-marker-alt"></i>
