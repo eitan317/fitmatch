@@ -9,17 +9,11 @@
                     הפלטפורמה המובילה לחיבור בין מאמני כושר מקצועיים למתאמנים. התחל את המסע שלך לכושר טוב יותר היום!
                 </p>
                 <div class="footer-social">
-                    <a href="#" class="social-icon" aria-label="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
                     <a href="https://www.instagram.com/fitmatch.co.il/" target="_blank" class="social-icon" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" class="social-icon" aria-label="Twitter">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a href="#" class="social-icon" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
+                    <a href="https://www.tiktok.com/@fitmatch912" target="_blank" class="social-icon" aria-label="TikTok">
+                        <i class="fab fa-tiktok"></i>
                     </a>
                 </div>
             </div>
