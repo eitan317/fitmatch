@@ -126,9 +126,7 @@ class TrainerController extends Controller
             'tiktok' => $validated['tiktok'] ?? null,
             'bio' => $validated['bio'] ?? null,
             'profile_image_path' => $profileImagePath,
-            'status' => 'trial',
-            'trial_started_at' => now(),
-            'trial_ends_at' => now()->addDays(30),
+            'status' => 'pending',
             'approved_by_admin' => false,
         ];
 
@@ -138,9 +136,70 @@ class TrainerController extends Controller
 
         $trainer = Trainer::create($trainerData);
 
-        // Redirect to trial info page
-        return redirect()->route('trainers.trial-info')
-            ->with('success', 'ההרשמה הושלמה בהצלחה!');
+        // Redirect to choose plan page
+        return redirect()->route('trainers.choose-plan')
+            ->with('success', 'ההרשמה הושלמה בהצלחה! בחר את האופציה המתאימה לך');
+    }
+
+    /**
+     * Display plan choice page (pay now or trial).
+     */
+    public function choosePlan()
+    {
+        $trainer = Trainer::where('owner_email', Auth::user()->email)->firstOrFail();
+        
+        // Check if trainer has already used trial period
+        $hasUsedTrial = $trainer->trial_ends_at !== null;
+        
+        return view('trainer-choose-plan', compact('trainer', 'hasUsedTrial'));
+    }
+
+    /**
+     * Store the trainer's plan choice (pay now or trial).
+     */
+    public function storePlanChoice(Request $request)
+    {
+        $validated = $request->validate([
+            'choice' => 'required|in:pay_now,trial',
+        ]);
+        
+        $trainer = Trainer::where('owner_email', Auth::user()->email)->firstOrFail();
+        
+        // Security check: if already used trial, don't allow trial again
+        if ($validated['choice'] === 'trial' && $trainer->trial_ends_at !== null) {
+            return redirect()->back()
+                ->with('error', 'לא ניתן לבחור חודש ניסיון פעם נוספת. יש לשלם כדי להמשיך.');
+        }
+        
+        if ($validated['choice'] === 'pay_now') {
+            // Chose to pay now
+            $trainer->update([
+                'status' => 'pending_payment',
+            ]);
+            
+            return redirect()->route('trainers.payment-info')
+                ->with('success', 'יש לשלם 20₪ דרך Bit כדי להמשיך');
+        } else {
+            // Chose trial period
+            $trainer->update([
+                'status' => 'trial',
+                'trial_started_at' => now(),
+                'trial_ends_at' => now()->addDays(30),
+            ]);
+            
+            return redirect()->route('trainers.trial-info')
+                ->with('success', 'חודש הניסיון החל בהצלחה!');
+        }
+    }
+
+    /**
+     * Display payment info page for pending payment.
+     */
+    public function paymentInfo()
+    {
+        $trainer = Trainer::where('owner_email', Auth::user()->email)->firstOrFail();
+        
+        return view('trainer-payment-info', compact('trainer'));
     }
 
     /**
