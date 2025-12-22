@@ -70,6 +70,27 @@ body {
     font-size: 16px;
 }
 
+/* Global responsive fixes - prevent horizontal scroll */
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Images and videos - responsive */
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+img {
+    display: block;
+}
+
+video {
+    width: 100%;
+    height: auto;
+}
+
 /* Typography Hierarchy */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
@@ -185,12 +206,16 @@ a:not(.btn):not(.nav-links a):hover {
     max-width: 1120px;
     margin: 0 auto;
     padding: 1rem 1.25rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .container {
     max-width: 1120px;
     margin: 0 auto;
     padding: 1rem 1.25rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 h1, .hero-title {
@@ -1213,6 +1238,7 @@ input[type="tel"],
 textarea,
 select {
     width: 100%;
+    max-width: 100%;
     border-radius: 10px;
     border: 1px solid #4b5563;
     padding: 0.4rem 0.6rem;
@@ -1221,6 +1247,7 @@ select {
     color: var(--text-main);
     transition: all 0.2s ease;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -3065,6 +3092,8 @@ fieldset legend {
 .filter-block input,
 .filter-block select {
     min-width: 140px;
+    max-width: 100%;
+    width: 100%;
     padding: 0.4rem 0.6rem;
     border-radius: 10px;
     border: 1px solid #4b5563;
@@ -3072,6 +3101,7 @@ fieldset legend {
     transition: all 0.2s ease;
     background-color: #0b1120;
     color: var(--text-main);
+    box-sizing: border-box;
 }
 
 .filter-block input:focus,
@@ -3084,7 +3114,15 @@ fieldset legend {
 .price-range {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.price-range input {
+    flex: 1;
+    min-width: 80px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .price-range span {
@@ -3308,11 +3346,29 @@ fieldset legend {
     .filters-row-main {
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
+    }
+
+    .filter-block {
+        width: 100%;
+        max-width: 100%;
     }
 
     .filter-block input,
     .filter-block select {
         width: 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
+
+    .price-range {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .price-range input {
+        flex: 1;
+        min-width: 100px;
     }
 
     .hero {
@@ -3370,6 +3426,29 @@ fieldset legend {
 
     .trainers-filters {
         padding: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-container {
+        padding: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ensure all form elements are responsive */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Flex rows should wrap on mobile */
+    .filters-row,
+    .filters-row-main {
+        flex-wrap: wrap !important;
     }
 }
 
