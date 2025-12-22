@@ -73,7 +73,13 @@
                             <div class="admin-stat-label">סה"כ מאמנים</div>
                             <div class="admin-stat-trend">
                                 <i class="fas fa-info-circle"></i>
-                                <span>{{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון</span>
+                                <span>
+                                    @if($stats['active_trainers'] > 0 || $stats['trial_trainers'] > 0)
+                                        {{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון
+                                    @else
+                                        אין מאמנים פעילים
+                                    @endif
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -125,12 +131,21 @@
                             <i class="fas fa-star" style="color: var(--primary);"></i>
                         </div>
                         <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['average_rating'], 1) }}</div>
-                            <div class="admin-stat-label">דירוג ממוצע</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-chart-line"></i>
-                                <span>מתוך {{ number_format($stats['total_reviews']) }} ביקורות</span>
-                            </div>
+                            @if($stats['total_reviews'] > 0)
+                                <div class="admin-stat-value">{{ number_format($stats['average_rating'], 1) }}</div>
+                                <div class="admin-stat-label">דירוג ממוצע</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>מתוך {{ number_format($stats['total_reviews']) }} ביקורות</span>
+                                </div>
+                            @else
+                                <div class="admin-stat-value">-</div>
+                                <div class="admin-stat-label">דירוג ממוצע</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>אין ביקורות עדיין</span>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -144,6 +159,20 @@
                             <div class="admin-stat-trend">
                                 <i class="fas fa-arrow-up"></i>
                                 <span>{{ $stats['trainers_last_7_days'] }} ב-7 ימים האחרונים</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card">
+                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                            <i class="fas fa-eye" style="color: var(--primary);"></i>
+                        </div>
+                        <div class="admin-stat-content">
+                            <div class="admin-stat-value">{{ number_format($stats['total_page_views']) }}</div>
+                            <div class="admin-stat-label">צפיות באתר</div>
+                            <div class="admin-stat-trend">
+                                <i class="fas fa-chart-line"></i>
+                                <span>{{ $stats['page_views_today'] }} היום, {{ $stats['page_views_this_month'] }} החודש</span>
                             </div>
                         </div>
                     </div>
@@ -385,6 +414,10 @@
                                             <span class="admin-trainer-location">
                                                 <i class="fas fa-map-marker-alt"></i>
                                                 {{ $trainer->city }}
+                                            </span>
+                                            <span class="admin-trainer-date">
+                                                <i class="fas fa-calendar"></i>
+                                                נרשם ב-{{ $trainer->created_at->format('d/m/Y') }}
                                             </span>
                                         </div>
                                     </div>

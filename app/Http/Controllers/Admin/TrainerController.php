@@ -15,24 +15,39 @@ class TrainerController extends Controller
     public function index()
     {
         // Platform Statistics
+        $totalReviews = \App\Models\Review::count();
         $stats = [
             'total_users' => \App\Models\User::count(),
             'total_trainers' => Trainer::count(),
-            'trial_trainers' => Trainer::where('status', 'trial')->count(),
+            'trial_trainers' => Trainer::where('status', 'trial')->where('approved_by_admin', true)->count(),
             'pending_payment_trainers' => Trainer::where('status', 'pending_payment')->count(),
-            'active_trainers' => Trainer::where('status', 'active')->count(),
+            'active_trainers' => Trainer::where('status', 'active')->where('approved_by_admin', true)->count(),
             'blocked_trainers' => Trainer::where('status', 'blocked')->count(),
             'pending_trainers' => Trainer::where('status', 'pending')->count(),
-            'total_reviews' => \App\Models\Review::count(),
-            'average_rating' => \App\Models\Review::avg('rating') ?? 0,
+            'total_reviews' => $totalReviews,
+            'average_rating' => $totalReviews > 0 ? round(\App\Models\Review::avg('rating'), 1) : 0,
             'trainers_this_month' => Trainer::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count(),
             'trainers_last_7_days' => Trainer::where('created_at', '>=', now()->subDays(7))->count(),
         ];
 
-        // Get trainers by status
+        // Add page views statistics if PageView model exists
+        if (\Illuminate\Support\Facades\Schema::hasTable('page_views')) {
+            $stats['total_page_views'] = \App\Models\PageView::count();
+            $stats['page_views_today'] = \App\Models\PageView::whereDate('viewed_at', today())->count();
+            $stats['page_views_this_month'] = \App\Models\PageView::whereMonth('viewed_at', now()->month)
+                ->whereYear('viewed_at', now()->year)
+                ->count();
+        } else {
+            $stats['total_page_views'] = 0;
+            $stats['page_views_today'] = 0;
+            $stats['page_views_this_month'] = 0;
+        }
+
+        // Get trainers by status - only approved trainers
         $trialTrainers = Trainer::where('status', 'trial')
+            ->where('approved_by_admin', true)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -41,6 +56,7 @@ class TrainerController extends Controller
             ->get();
 
         $activeTrainers = Trainer::where('status', 'active')
+            ->where('approved_by_admin', true)
             ->with('reviews')
             ->orderBy('created_at', 'desc')
             ->get();

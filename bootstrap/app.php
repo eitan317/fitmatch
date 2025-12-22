@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
+        
+        // Add TrackPageViews middleware to web group
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackPageViews::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
