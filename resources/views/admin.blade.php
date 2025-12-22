@@ -338,20 +338,20 @@
                 @endforelse
             </section>
 
-            <!-- Approved Trainers Section -->
+            <!-- Active Trainers Section -->
             <section class="admin-section">
                 <div class="admin-section-header">
                     <div>
-                        <h2 class="admin-section-title">מאמנים מאושרים</h2>
+                        <h2 class="admin-section-title">מאמנים פעילים</h2>
                         <p class="admin-section-subtitle">מאמנים פעילים בפלטפורמה</p>
                     </div>
                     <div class="admin-section-badge admin-section-badge-success">
-                        {{ $stats['approved_trainers'] }} מאושרים
+                        {{ $stats['active_trainers'] }} פעילים
                     </div>
                 </div>
 
                 <div class="admin-approved-trainers-grid">
-                    @forelse($approvedTrainers as $trainer)
+                    @forelse($activeTrainers as $trainer)
                         <div class="admin-trainer-card admin-trainer-card-approved">
                             <div class="admin-trainer-card-header">
                                 <div class="admin-trainer-identity">
