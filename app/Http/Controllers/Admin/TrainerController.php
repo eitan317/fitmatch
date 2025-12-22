@@ -176,5 +176,37 @@ class TrainerController extends Controller
                 ->with('error', 'אירעה שגיאה במחיקת המאמן: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Delete all active/trial trainers (cleanup).
+     */
+    public function cleanupAll()
+    {
+        try {
+            $trainers = Trainer::whereIn('status', ['active', 'trial'])->get();
+            $count = $trainers->count();
+            
+            if ($count === 0) {
+                return redirect()->route('admin.trainers.index')
+                    ->with('info', 'לא נמצאו מאמנים למחיקה.');
+            }
+
+            $ids = $trainers->pluck('id')->toArray();
+
+            DB::transaction(function () use ($ids) {
+                DB::table('reviews')->whereIn('trainer_id', $ids)->delete();
+                DB::table('trainers')->whereIn('id', $ids)->delete();
+            });
+
+            \Log::info("Deleted {$count} trainers in cleanup");
+
+            return redirect()->route('admin.trainers.index')
+                ->with('success', "נמחקו {$count} מאמנים בהצלחה מהמערכת.");
+        } catch (\Exception $e) {
+            \Log::error('Error in cleanup: ' . $e->getMessage());
+            return redirect()->route('admin.trainers.index')
+                ->with('error', 'אירעה שגיאה במחיקה. אנא נסה שוב.');
+        }
+    }
 }
 

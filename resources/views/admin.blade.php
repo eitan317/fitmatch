@@ -353,8 +353,17 @@
                         <h2 class="admin-section-title">מאמנים פעילים</h2>
                         <p class="admin-section-subtitle">מאמנים פעילים בפלטפורמה</p>
                     </div>
-                    <div class="admin-section-badge admin-section-badge-success">
-                        {{ $stats['active_trainers'] }} פעילים
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div class="admin-section-badge admin-section-badge-success">
+                            {{ $stats['active_trainers'] }} פעילים
+                        </div>
+                        <form action="{{ route('admin.trainers.cleanup-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ אתה בטוח שברצונך למחוק את כל המאמנים הפעילים והניסיון? פעולה זו לא ניתנת לביטול!');">
+                            @csrf
+                            <button type="submit" class="admin-btn admin-btn-danger" style="white-space: nowrap;">
+                                <i class="fas fa-trash-alt"></i>
+                                מחק הכל
+                            </button>
+                        </form>
                     </div>
                 </div>
 
