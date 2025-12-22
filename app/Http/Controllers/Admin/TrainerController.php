@@ -43,7 +43,6 @@ class TrainerController extends Controller
         $activeTrainers = Trainer::where('status', 'active')
             ->with('reviews')
             ->orderBy('created_at', 'desc')
-            ->limit(50) // Limit for performance
             ->get();
 
         $pendingTrainers = Trainer::where('status', 'pending')
