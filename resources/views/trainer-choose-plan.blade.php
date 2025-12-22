@@ -6,6 +6,88 @@
     <title>בחר תכנית - FitMatch</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/site/style.css">
+    <style>
+        /* Mobile Responsive Styles for Choose Plan Page */
+        @media (max-width: 768px) {
+            /* Grid layouts - single column */
+            .plan-options-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+            
+            /* Trainer info grid - single column */
+            .trainer-info-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Plan cards padding */
+            .plan-card {
+                padding: 1.5rem !important;
+            }
+            
+            /* Badge positioning - move inside card */
+            .plan-badge {
+                top: 10px !important;
+                right: 15px !important;
+            }
+            
+            /* Icons size */
+            .plan-icon {
+                font-size: 2rem !important;
+            }
+            
+            /* Price size */
+            .plan-price {
+                font-size: 1.75rem !important;
+            }
+            
+            /* Title size */
+            .plan-title {
+                font-size: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Plan cards padding - even smaller */
+            .plan-card {
+                padding: 1rem !important;
+            }
+            
+            /* Grid gap */
+            .plan-options-grid {
+                gap: 1rem !important;
+            }
+            
+            .trainer-info-grid {
+                gap: 0.75rem !important;
+            }
+            
+            /* Icons - smaller */
+            .plan-icon {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Prices - smaller */
+            .plan-price {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Titles - smaller */
+            .plan-title {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Page title */
+            .page-title {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Description text */
+            .form-container p[style*="font-size: 1.1rem"] {
+                font-size: 1rem !important;
+            }
+        }
+    </style>
 </head>
 <body>
     @include('partials.navbar')
@@ -42,7 +124,7 @@
                     <i class="fas fa-user"></i>
                     פרטי המאמן
                 </h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="trainer-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                     <div>
                         <strong>שם מלא:</strong> {{ $trainer->full_name }}
                     </div>
@@ -60,22 +142,22 @@
             </div>
 
             <!-- Plan Options -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+            <div class="plan-options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
                 
                 <!-- Pay Now Option -->
-                <div style="background: var(--bg-card); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(40, 167, 69, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 32px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)';">
-                    <div style="position: absolute; top: -15px; right: 20px; background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
+                <div class="plan-card" style="background: var(--bg-card); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(40, 167, 69, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 32px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)';">
+                    <div class="plan-badge" style="position: absolute; top: -15px; right: 20px; background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
                         מומלץ
                     </div>
                     
                     <div style="text-align: center; margin-bottom: 2rem;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">
+                        <div class="plan-icon" style="font-size: 3rem; margin-bottom: 1rem;">
                             <i class="fas fa-credit-card" style="color: #28a745;"></i>
                         </div>
-                        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-main);">
+                        <h2 class="plan-title" style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-main);">
                             תשלום עכשיו
                         </h2>
-                        <div style="font-size: 2.5rem; font-weight: bold; color: #28a745; margin-bottom: 0.5rem;">
+                        <div class="plan-price" style="font-size: 2.5rem; font-weight: bold; color: #28a745; margin-bottom: 0.5rem;">
                             20 ₪
                         </div>
                         <p style="color: var(--text-muted); font-size: 0.9rem;">
@@ -112,19 +194,19 @@
 
                 <!-- Trial Option -->
                 @if(!$hasUsedTrial)
-                <div style="background: var(--bg-card); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(0, 217, 255, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 32px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)';">
-                    <div style="position: absolute; top: -15px; right: 20px; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
+                <div class="plan-card" style="background: var(--bg-card); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(0, 217, 255, 0.3); box-shadow: 0 8px 24px rgba(0,0,0,0.2); position: relative; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 32px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)';">
+                    <div class="plan-badge" style="position: absolute; top: -15px; right: 20px; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">
                         חינם
                     </div>
                     
                     <div style="text-align: center; margin-bottom: 2rem;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">
+                        <div class="plan-icon" style="font-size: 3rem; margin-bottom: 1rem;">
                             <i class="fas fa-hourglass-half" style="color: var(--primary);"></i>
                         </div>
-                        <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-main);">
+                        <h2 class="plan-title" style="font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-main);">
                             חודש ניסיון
                         </h2>
-                        <div style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">
+                        <div class="plan-price" style="font-size: 2.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">
                             0 ₪
                         </div>
                         <p style="color: var(--text-muted); font-size: 0.9rem;">
@@ -164,8 +246,8 @@
                 </div>
                 @else
                 <!-- Trial Already Used Message -->
-                <div style="background: rgba(148, 163, 184, 0.1); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(148, 163, 184, 0.3); text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">
+                <div class="plan-card" style="background: rgba(148, 163, 184, 0.1); border-radius: 20px; padding: 2.5rem; border: 2px solid rgba(148, 163, 184, 0.3); text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="plan-icon" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">
                         <i class="fas fa-lock"></i>
                     </div>
                     <h3 style="color: var(--text-muted); margin-bottom: 0.5rem;">

@@ -6,6 +6,52 @@
     <title>חודש ניסיון - FitMatch</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/site/style.css">
+    <style>
+        /* Mobile Responsive Styles for Trial Info Page */
+        @media (max-width: 768px) {
+            /* Info cards padding */
+            .trial-info-card {
+                padding: 1.5rem !important;
+            }
+            
+            /* Price size */
+            .trial-price {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Phone number */
+            .trial-phone {
+                font-size: 1.1rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Info cards padding - even smaller */
+            .trial-info-card {
+                padding: 1rem !important;
+            }
+            
+            /* Price size */
+            .trial-price {
+                font-size: 1.1rem !important;
+            }
+            
+            /* Phone number */
+            .trial-phone {
+                font-size: 1rem !important;
+            }
+            
+            /* Page title */
+            .page-title {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Description text */
+            .form-container p[style*="font-size: 1.1rem"] {
+                font-size: 1rem !important;
+            }
+        }
+    </style>
 </head>
 <body>
     @include('partials.navbar')
@@ -25,7 +71,7 @@
                     חודש ניסיון חינם
                 </h1>
 
-                <div style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(74, 158, 255, 0.1)); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(0, 217, 255, 0.3);">
+                <div class="trial-info-card" style="background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(74, 158, 255, 0.1)); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(0, 217, 255, 0.3);">
                     <h2 style="color: var(--primary); margin-bottom: 1rem;">
                         <i class="fas fa-user"></i>
                         פרטי המאמן
@@ -57,7 +103,7 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(255, 193, 7, 0.1); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(255, 193, 7, 0.3);">
+                <div class="trial-info-card" style="background: rgba(255, 193, 7, 0.1); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(255, 193, 7, 0.3);">
                     <h2 style="color: #ffc107; margin-bottom: 1rem;">
                         <i class="fas fa-gift"></i>
                         חודש ניסיון חינם
@@ -70,12 +116,12 @@
                     </p>
                 </div>
 
-                <div style="background: rgba(40, 167, 69, 0.1); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(40, 167, 69, 0.3);">
+                <div class="trial-info-card" style="background: rgba(40, 167, 69, 0.1); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid rgba(40, 167, 69, 0.3);">
                     <h2 style="color: #28a745; margin-bottom: 1rem;">
                         <i class="fas fa-money-bill-wave"></i>
                         תשלום לאחר חודש הניסיון
                     </h2>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #28a745; margin-bottom: 1rem;">
+                    <div class="trial-price" style="font-size: 1.5rem; font-weight: bold; color: #28a745; margin-bottom: 1rem;">
                         20 ₪ לחודש
                     </div>
                     <p style="margin-bottom: 1.5rem;">
@@ -93,7 +139,7 @@
                             </div>
                             <div>
                                 <strong>מספר Bit:</strong> 
-                                <span style="color: var(--primary); font-weight: bold; font-size: 1.2rem;">0527020113</span>
+                                <span class="trial-phone" style="color: var(--primary); font-weight: bold; font-size: 1.2rem;">0527020113</span>
                             </div>
                             <div>
                                 <strong>סכום:</strong> 20 ₪ לחודש
@@ -102,7 +148,7 @@
                     </div>
                 </div>
 
-                <div style="background: rgba(148, 163, 184, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid rgba(148, 163, 184, 0.3);">
+                <div class="trial-info-card" style="background: rgba(148, 163, 184, 0.1); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid rgba(148, 163, 184, 0.3);">
                     <h3 style="margin-bottom: 1rem;">
                         <i class="fas fa-info-circle"></i>
                         מה קורה עכשיו?
