@@ -19,7 +19,9 @@ class TrainerController extends Controller
     public function index(Request $request)
     {
         // Show active trainers and trial trainers (trial is like a demo of paid subscription)
+        // Only show trainers approved by admin
         $query = Trainer::whereIn('status', ['active', 'trial'])
+            ->where('approved_by_admin', true)
             ->with(['reviews', 'subscriptionPlan'])
             ->orderBy('created_at', 'desc');
 
@@ -173,23 +175,23 @@ class TrainerController extends Controller
         }
         
         if ($validated['choice'] === 'pay_now') {
-            // Chose to pay now
+            // Chose to pay now - save choice, status remains 'pending' until admin approval
             $trainer->update([
-                'status' => 'pending_payment',
+                'plan_choice' => 'pay_now',
+                // status remains 'pending'
             ]);
             
             return redirect()->route('trainers.payment-info')
-                ->with('success', 'יש לשלם 20₪ דרך Bit כדי להמשיך');
+                ->with('success', 'יש לשלם 20₪ דרך Bit כדי להמשיך. הבקשה ממתינה לאישור מנהל.');
         } else {
-            // Chose trial period
+            // Chose trial period - save choice, status remains 'pending' until admin approval
             $trainer->update([
-                'status' => 'trial',
-                'trial_started_at' => now(),
-                'trial_ends_at' => now()->addDays(30),
+                'plan_choice' => 'trial',
+                // status remains 'pending' - will be changed to 'trial' only after admin approval
             ]);
             
             return redirect()->route('trainers.trial-info')
-                ->with('success', 'חודש הניסיון החל בהצלחה!');
+                ->with('success', 'הבחירה נשמרה. ממתין לאישור מנהל.');
         }
     }
 

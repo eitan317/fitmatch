@@ -57,11 +57,24 @@ class TrainerController extends Controller
      */
     public function approve(Trainer $trainer)
     {
-        $trainer->update([
-            'status' => 'active',
+        $updateData = [
             'approved_by_admin' => true,
             'last_payment_at' => now(),
-        ]);
+        ];
+        
+        // Check the trainer's plan choice and set status accordingly
+        if ($trainer->plan_choice === 'trial') {
+            $updateData['status'] = 'trial';
+            $updateData['trial_started_at'] = now();
+            $updateData['trial_ends_at'] = now()->addDays(30);
+        } elseif ($trainer->plan_choice === 'pay_now') {
+            $updateData['status'] = 'pending_payment';
+        } else {
+            // If no choice was made, set default to 'active'
+            $updateData['status'] = 'active';
+        }
+        
+        $trainer->update($updateData);
 
         return redirect()->route('admin.trainers.index')
             ->with('success', 'המאמן אושר בהצלחה.');

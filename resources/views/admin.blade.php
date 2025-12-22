@@ -350,7 +350,7 @@
             <section class="admin-section">
                 <div class="admin-section-header">
                     <div>
-                        <h2 class="admin-section-title">מאמנים פעילים</h2>
+                        <h2 class="admin-section-title">מאמנים פעילים ({{ count($activeTrainers) }})</h2>
                         <p class="admin-section-subtitle">מאמנים פעילים בפלטפורמה</p>
                     </div>
                     <div style="display: flex; gap: 1rem; align-items: center;">

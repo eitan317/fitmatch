@@ -31,6 +31,7 @@ class Trainer extends Model
         'trial_ends_at',
         'last_payment_at',
         'approved_by_admin',
+        'plan_choice',
     ];
 
     protected $casts = [
