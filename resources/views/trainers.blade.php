@@ -42,13 +42,66 @@
                     <label>סוג אימון</label>
                     <select id="training_type" name="training_type">
                         <option value="">כל הסוגים</option>
-                        <option value="weightloss" {{ request('training_type') == 'weightloss' ? 'selected' : '' }}>חיטוב / ירידה במשקל</option>
-                        <option value="gym_basic" {{ request('training_type') == 'gym_basic' ? 'selected' : '' }}>חדר כושר</option>
-                        <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
-                        <option value="home_bodyweight" {{ request('training_type') == 'home_bodyweight' ? 'selected' : '' }}>אימוני בית</option>
-                        <option value="group" {{ request('training_type') == 'group' ? 'selected' : '' }}>אימונים קבוצתיים</option>
-                        <option value="online" {{ request('training_type') == 'online' ? 'selected' : '' }}>אימונים אונליין</option>
-                        <option value="yoga" {{ request('training_type') == 'yoga' ? 'selected' : '' }}>יוגה / פילאטיס</option>
+                        
+                        <optgroup label="🏋️ חדר כושר וכוח">
+                            <option value="gym_basic" {{ request('training_type') == 'gym_basic' ? 'selected' : '' }}>חדר כושר בסיסי</option>
+                            <option value="hypertrophy" {{ request('training_type') == 'hypertrophy' ? 'selected' : '' }}>מסת שריר</option>
+                            <option value="powerlifting" {{ request('training_type') == 'powerlifting' ? 'selected' : '' }}>פאוורליפטינג</option>
+                            <option value="crossfit" {{ request('training_type') == 'crossfit' ? 'selected' : '' }}>קרוספיט</option>
+                            <option value="street_workout" {{ request('training_type') == 'street_workout' ? 'selected' : '' }}>סטריט וורקאאוט / מתח מקבילים</option>
+                        </optgroup>
+                        
+                        <optgroup label="🔥 חיטוב וכושר">
+                            <option value="weightloss" {{ request('training_type') == 'weightloss' ? 'selected' : '' }}>חיטוב / ירידה במשקל</option>
+                            <option value="hiit" {{ request('training_type') == 'hiit' ? 'selected' : '' }}>אימוני HIIT</option>
+                            <option value="intervals" {{ request('training_type') == 'intervals' ? 'selected' : '' }}>אינטרוולים עצימים</option>
+                            <option value="bootcamp" {{ request('training_type') == 'bootcamp' ? 'selected' : '' }}>בוטקמפ</option>
+                        </optgroup>
+                        
+                        <optgroup label="🧘 גמישות ושיקום">
+                            <option value="mobility" {{ request('training_type') == 'mobility' ? 'selected' : '' }}>מוביליטי וגמישות</option>
+                            <option value="yoga" {{ request('training_type') == 'yoga' ? 'selected' : '' }}>יוגה</option>
+                            <option value="pilates" {{ request('training_type') == 'pilates' ? 'selected' : '' }}>פילאטיס</option>
+                            <option value="physio_rehab" {{ request('training_type') == 'physio_rehab' ? 'selected' : '' }}>שיקום / פיזיותרפיה</option>
+                            <option value="back_pain" {{ request('training_type') == 'back_pain' ? 'selected' : '' }}>אימונים לכאבי גב</option>
+                            <option value="postnatal" {{ request('training_type') == 'postnatal' ? 'selected' : '' }}>נשים אחרי לידה</option>
+                        </optgroup>
+                        
+                        <optgroup label="🏠 אימוני בית">
+                            <option value="home_bodyweight" {{ request('training_type') == 'home_bodyweight' ? 'selected' : '' }}>אימוני בית (משקל גוף)</option>
+                            <option value="trx" {{ request('training_type') == 'trx' ? 'selected' : '' }}>אימוני TRX</option>
+                            <option value="short20" {{ request('training_type') == 'short20' ? 'selected' : '' }}>אימונים קצרים (20 דק׳)</option>
+                        </optgroup>
+                        
+                        <optgroup label="🏃 אירובי וסיבולת">
+                            <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
+                            <option value="sprints" {{ request('training_type') == 'sprints' ? 'selected' : '' }}>ספרינטים</option>
+                            <option value="marathon" {{ request('training_type') == 'marathon' ? 'selected' : '' }}>הכנה למרתון</option>
+                            <option value="cycling" {{ request('training_type') == 'cycling' ? 'selected' : '' }}>רכיבה על אופניים</option>
+                            <option value="swimming" {{ request('training_type') == 'swimming' ? 'selected' : '' }}>שחייה</option>
+                        </optgroup>
+                        
+                        <optgroup label="🥊 קרב מגע">
+                            <option value="boxing" {{ request('training_type') == 'boxing' ? 'selected' : '' }}>אגרוף</option>
+                            <option value="kickboxing" {{ request('training_type') == 'kickboxing' ? 'selected' : '' }}>קיקבוקס</option>
+                            <option value="mma" {{ request('training_type') == 'mma' ? 'selected' : '' }}>MMA</option>
+                            <option value="kravmaga" {{ request('training_type') == 'kravmaga' ? 'selected' : '' }}>קרב מגע</option>
+                        </optgroup>
+                        
+                        <optgroup label="👥 פורמטים מיוחדים">
+                            <option value="couple" {{ request('training_type') == 'couple' ? 'selected' : '' }}>אימונים זוגיים</option>
+                            <option value="group" {{ request('training_type') == 'group' ? 'selected' : '' }}>אימונים קבוצתיים</option>
+                            <option value="online" {{ request('training_type') == 'online' ? 'selected' : '' }}>אימונים אונליין (זום)</option>
+                            <option value="outdoor" {{ request('training_type') == 'outdoor' ? 'selected' : '' }}>אימונים בחוץ / בפארק</option>
+                        </optgroup>
+                        
+                        <optgroup label="👨‍👩‍👧‍👦 אוכלוסיות יעד">
+                            <option value="women_only" {{ request('training_type') == 'women_only' ? 'selected' : '' }}>נשים בלבד</option>
+                            <option value="men_only" {{ request('training_type') == 'men_only' ? 'selected' : '' }}>גברים בלבד</option>
+                            <option value="teens" {{ request('training_type') == 'teens' ? 'selected' : '' }}>נוער</option>
+                            <option value="kids" {{ request('training_type') == 'kids' ? 'selected' : '' }}>ילדים</option>
+                            <option value="seniors" {{ request('training_type') == 'seniors' ? 'selected' : '' }}>גיל שלישי</option>
+                        </optgroup>
                     </select>
                 </div>
 
