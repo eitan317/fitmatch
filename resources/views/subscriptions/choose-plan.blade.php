@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בחירת תכנית מנוי - FitMatch</title>
-    <link rel="stylesheet" href="{{ asset('site/style.css') }}">
+    <link rel="stylesheet" href="/site/style.css">
 </head>
 <body>
     @include('partials.navbar')
@@ -53,7 +53,7 @@
         </div>
     </main>
 
-    <script src="{{ asset('site/script.js') }}"></script>
+    <script src="/site/script.js"></script>
     <script>
         if (typeof initTheme === 'function') initTheme();
         if (typeof initNavbarToggle === 'function') initNavbarToggle();

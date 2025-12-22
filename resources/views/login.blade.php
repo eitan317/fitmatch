@@ -28,7 +28,7 @@
     <a href="/">חזרה לדף הבית</a>
 </p>
 
-<script src="{{ asset('site/script.js') }}"></cript>
+<script src="/site/script.js"></script>
 
 </body>
 </html>
