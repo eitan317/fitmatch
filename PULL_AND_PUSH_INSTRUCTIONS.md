@@ -32,7 +32,9 @@ git push origin main
 
 אם תתבקש להכניס credentials:
 - **Username**: `eitan317`
-- **Password**: `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`
+- **Password**: השתמש ב-GitHub Personal Access Token שלך (לא סיסמה רגילה!)
+  - ליצירת token: GitHub → Settings → Developer settings → Personal access tokens → Generate new token
+  - הרשאות נדרשות: `repo` (full control of private repositories)
 
 ---
 
