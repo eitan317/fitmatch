@@ -27,6 +27,7 @@
                         <a href="/trainers" class="btn">מצא מאמן</a>
                         <a href="/register-trainer" class="btn btn-success">הירשם כמאמן</a>
                     @else
+                        <a href="/trainers" class="btn">מצא מאמן</a>
                         <a href="/login" class="btn">התחבר כדי להתחיל</a>
                         <a href="{{ route('register') }}" class="btn btn-success">הירשם</a>
                     @endauth
@@ -215,6 +216,7 @@
                         <a href="/trainers" class="btn btn-large">מצא מאמן עכשיו</a>
                         <a href="/register-trainer" class="btn btn-large btn-outline-white">הירשם כמאמן</a>
                     @else
+                        <a href="/trainers" class="btn btn-large">מצא מאמן עכשיו</a>
                         <a href="/login" class="btn btn-large">התחבר כדי להתחיל</a>
                         <a href="{{ route('register') }}" class="btn btn-large btn-outline-white">הירשם עכשיו</a>
                     @endauth

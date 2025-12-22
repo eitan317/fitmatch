@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Trainer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TrainerController extends Controller
 {
@@ -92,15 +93,39 @@ class TrainerController extends Controller
      */
     public function reject(Trainer $trainer)
     {
-        // Delete profile image if exists
-        if ($trainer->profile_image_path) {
-            \Storage::disk('public')->delete($trainer->profile_image_path);
+        try {
+            $trainerName = $trainer->full_name;
+            $trainerId = $trainer->id;
+
+            // Use DB transaction to ensure all deletions succeed
+            DB::transaction(function () use ($trainer) {
+                // Delete related reviews first
+                $trainer->reviews()->delete();
+
+                // Delete profile image if exists
+                if ($trainer->profile_image_path) {
+                    try {
+                        \Storage::disk('public')->delete($trainer->profile_image_path);
+                    } catch (\Exception $e) {
+                        \Log::warning('Failed to delete trainer profile image: ' . $e->getMessage());
+                    }
+                }
+
+                // Force delete the trainer (will work even if soft deletes are enabled)
+                $trainer->forceDelete();
+            });
+
+            \Log::info("Trainer rejected and deleted successfully: ID {$trainerId}, Name: {$trainerName}");
+
+            return redirect()->route('admin.trainers.index')
+                ->with('success', 'המאמן נדחה ונמחק.');
+        } catch (\Exception $e) {
+            \Log::error('Error rejecting trainer: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return redirect()->route('admin.trainers.index')
+                ->with('error', 'אירעה שגיאה בדחיית המאמן. אנא נסה שוב.');
         }
-
-        $trainer->delete();
-
-        return redirect()->route('admin.trainers.index')
-            ->with('success', 'המאמן נדחה ונמחק.');
     }
 
     /**
@@ -110,22 +135,27 @@ class TrainerController extends Controller
     {
         try {
             $trainerName = $trainer->full_name;
+            $trainerId = $trainer->id;
 
-            // Delete profile image if exists
-            if ($trainer->profile_image_path) {
-                try {
-                    \Storage::disk('public')->delete($trainer->profile_image_path);
-                } catch (\Exception $e) {
-                    // Log error but continue with deletion
-                    \Log::warning('Failed to delete trainer profile image: ' . $e->getMessage());
+            // Use DB transaction to ensure all deletions succeed
+            DB::transaction(function () use ($trainer) {
+                // Delete related reviews first
+                $trainer->reviews()->delete();
+
+                // Delete profile image if exists
+                if ($trainer->profile_image_path) {
+                    try {
+                        \Storage::disk('public')->delete($trainer->profile_image_path);
+                    } catch (\Exception $e) {
+                        \Log::warning('Failed to delete trainer profile image: ' . $e->getMessage());
+                    }
                 }
-            }
 
-            // Delete related reviews (cascade should handle this, but we'll be explicit)
-            $trainer->reviews()->delete();
+                // Force delete the trainer (will work even if soft deletes are enabled)
+                $trainer->forceDelete();
+            });
 
-            // Delete the trainer record
-            $trainer->delete();
+            \Log::info("Trainer deleted successfully: ID {$trainerId}, Name: {$trainerName}");
 
             return redirect()->route('admin.trainers.index')
                 ->with('success', 'המאמן "' . $trainerName . '" נמחק בהצלחה מהמערכת.');
