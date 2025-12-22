@@ -97,9 +97,14 @@ class TrainerController extends Controller
             $trainerId = $trainer->id;
 
             // Use DB transaction to ensure all deletions succeed
-            DB::transaction(function () use ($trainer) {
-                // Delete related reviews first
-                $trainer->reviews()->delete();
+            DB::transaction(function () use ($trainer, $trainerId) {
+                // Force delete related reviews first (use forceDelete to ensure complete removal)
+                $trainer->reviews()->each(function ($review) {
+                    $review->forceDelete();
+                });
+
+                // Also try direct DB delete as backup
+                DB::table('reviews')->where('trainer_id', $trainerId)->delete();
 
                 // Delete profile image if exists
                 if ($trainer->profile_image_path) {
@@ -110,8 +115,8 @@ class TrainerController extends Controller
                     }
                 }
 
-                // Force delete the trainer (will work even if soft deletes are enabled)
-                $trainer->forceDelete();
+                // Force delete the trainer using DB statement to bypass any constraints
+                DB::table('trainers')->where('id', $trainerId)->delete();
             });
 
             \Log::info("Trainer rejected and deleted successfully: ID {$trainerId}, Name: {$trainerName}");
@@ -137,9 +142,14 @@ class TrainerController extends Controller
             $trainerId = $trainer->id;
 
             // Use DB transaction to ensure all deletions succeed
-            DB::transaction(function () use ($trainer) {
-                // Delete related reviews first
-                $trainer->reviews()->delete();
+            DB::transaction(function () use ($trainer, $trainerId) {
+                // Force delete related reviews first (use forceDelete to ensure complete removal)
+                $trainer->reviews()->each(function ($review) {
+                    $review->forceDelete();
+                });
+
+                // Also try direct DB delete as backup
+                DB::table('reviews')->where('trainer_id', $trainerId)->delete();
 
                 // Delete profile image if exists
                 if ($trainer->profile_image_path) {
@@ -150,8 +160,8 @@ class TrainerController extends Controller
                     }
                 }
 
-                // Force delete the trainer (will work even if soft deletes are enabled)
-                $trainer->forceDelete();
+                // Force delete the trainer using DB statement to bypass any constraints
+                DB::table('trainers')->where('id', $trainerId)->delete();
             });
 
             \Log::info("Trainer deleted successfully: ID {$trainerId}, Name: {$trainerName}");
@@ -163,7 +173,7 @@ class TrainerController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return redirect()->route('admin.trainers.index')
-                ->with('error', 'אירעה שגיאה במחיקת המאמן. אנא נסה שוב.');
+                ->with('error', 'אירעה שגיאה במחיקת המאמן: ' . $e->getMessage());
         }
     }
 }
