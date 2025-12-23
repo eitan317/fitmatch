@@ -547,5 +547,6 @@ use Illuminate\Support\Facades\Storage;
             }
         });
     </script>
+    @include('partials.cookie-consent')
 </body>
 </html>

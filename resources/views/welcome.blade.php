@@ -227,6 +227,7 @@
     </main>
 
     @include('partials.footer')
+    @include('partials.cookie-consent')
 
     <script src="/site/script.js?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}"></script>
     <script>

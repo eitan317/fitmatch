@@ -136,6 +136,7 @@
     </main>
 
     @include('partials.footer')
+    @include('partials.cookie-consent')
 
     <script src="/site/script.js"></script>
     <script>
