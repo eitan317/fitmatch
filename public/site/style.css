@@ -3329,7 +3329,7 @@ fieldset legend {
     font-size: 0.9rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
-    color: #111827;
+    color: var(--text-main);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     opacity: 0.9;
@@ -3450,6 +3450,11 @@ fieldset legend {
     .filters-row-main {
         flex-wrap: wrap !important;
     }
+
+    /* Increase form section title size on tablet/mobile */
+    .form-section-title {
+        font-size: 1.25rem;
+    }
 }
 
 /* Responsive Styles - Mobile (640px and below) */
@@ -3534,6 +3539,11 @@ fieldset legend {
     .hero-circle-main {
         width: 180px;
         height: 180px;
+    }
+
+    /* Increase form section title size on small mobile */
+    .form-section-title {
+        font-size: 1.4rem;
     }
 
     .hero-circle-secondary {

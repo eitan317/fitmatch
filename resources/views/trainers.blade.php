@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -118,7 +121,7 @@
                 <div class="trainer-card">
                     <div class="trainer-card-image">
                         @if($trainer->profile_image_path)
-                            <img src="{{ asset('storage/' . $trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-profile-img">
+                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-profile-img">
                         @else
                             <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @endif
