@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
     <title>פאנל מנהל - FitMatch</title>
     <link rel="stylesheet" href="/site/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    @include('partials.schema-ld')
 </head>
 <body class="admin-dashboard-body">
     @include('partials.navbar')

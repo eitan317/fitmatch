@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>טופס הרשמה למאמני כושר</title>
     <link rel="stylesheet" href="/site/style.css">
+    @include('partials.schema-ld')
 </head>
 <body>
     @include('partials.navbar')

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>התחברות והרשמה - FitMatch</title>
     <link rel="stylesheet" href="/site/style.css?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
+    @include('partials.schema-ld')
 </head>
 <body>
     @include('partials.navbar')
