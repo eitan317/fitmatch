@@ -138,11 +138,6 @@
                 <h2 class="form-section-title">📸 פרטים נוספים</h2>
 
                 <div class="form-group">
-                    <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                    <input type="file" id="profile_image" name="profile_image" accept="image/*">
-                </div>
-
-                <div class="form-group">
                     <label for="instagram">אינסטגרם (אופציונלי)</label>
                     <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
                 </div>

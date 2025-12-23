@@ -13,6 +13,42 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Schema.org JSON-LD Structured Data -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "Organization",
+                    "name": "FitMatch",
+                    "url": "https://fitmatch-production-8912.up.railway.app",
+                    "email": "fitmatchcoil@gmail.com",
+                    "telephone": "+972527020113",
+                    "areaServed": {
+                        "@type": "Country",
+                        "name": "Israel"
+                    },
+                    "sameAs": [
+                        "https://www.instagram.com/fitmatch"
+                    ]
+                },
+                {
+                    "@type": "WebSite",
+                    "name": "FitMatch",
+                    "url": "https://fitmatch-production-8912.up.railway.app",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": {
+                            "@type": "EntryPoint",
+                            "urlTemplate": "https://fitmatch-production-8912.up.railway.app/trainers?search={search_term_string}"
+                        },
+                        "query-input": "required name=search_term_string"
+                    }
+                }
+            ]
+        }
+        </script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">

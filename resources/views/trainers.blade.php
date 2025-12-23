@@ -121,11 +121,7 @@ use Illuminate\Support\Facades\Storage;
             @forelse($trainers as $trainer)
                 <div class="trainer-card">
                     <div class="trainer-card-image">
-                        @if($trainer->profile_image_path)
-                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-profile-img">
-                        @else
-                            <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
-                        @endif
+                        <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
                     </div>
                     <div class="trainer-card-header">
                         <div class="trainer-info">

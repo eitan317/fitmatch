@@ -179,10 +179,6 @@
                         <i class="fas fa-home"></i>
                         חזור לדף הבית
                     </a>
-                    <a href="{{ route('trainers.edit', $trainer) }}" class="btn btn-secondary" style="margin: 0.5rem;">
-                        <i class="fas fa-edit"></i>
-                        ערוך פרופיל
-                    </a>
                 </div>
             </div>
         </div>

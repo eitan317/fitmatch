@@ -43,8 +43,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/trainer/choose-plan', [TrainerController::class, 'storePlanChoice'])->name('trainers.store-plan-choice');
     Route::get('/trainer/trial-info', [TrainerController::class, 'trialInfo'])->name('trainers.trial-info');
     Route::get('/trainer/payment-info', [TrainerController::class, 'paymentInfo'])->name('trainers.payment-info');
-    Route::get('/edit-trainer/{trainer}', [TrainerController::class, 'edit'])->name('trainers.edit');
-    Route::post('/edit-trainer/{trainer}', [TrainerController::class, 'update'])->name('trainers.update');
 
     // Review routes
     Route::post('/trainers/{trainer}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
@@ -72,6 +70,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/trainers/{trainer}/reject', [AdminTrainerController::class, 'reject'])->name('trainers.reject');
     Route::delete('/trainers/{trainer}', [AdminTrainerController::class, 'destroy'])->name('trainers.destroy');
     Route::post('/trainers/cleanup-all', [AdminTrainerController::class, 'cleanupAll'])->name('trainers.cleanup-all');
+    Route::get('/trainers/{trainer}/edit', [AdminTrainerController::class, 'edit'])->name('trainers.edit');
+    Route::post('/trainers/{trainer}/update', [AdminTrainerController::class, 'update'])->name('trainers.update');
 });
 
 // Legacy routes for backward compatibility

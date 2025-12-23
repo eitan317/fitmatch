@@ -135,15 +135,6 @@ class TrainerController extends Controller
                 // Also try direct DB delete as backup
                 DB::table('reviews')->where('trainer_id', $trainerId)->delete();
 
-                // Delete profile image if exists
-                if ($trainer->profile_image_path) {
-                    try {
-                        \Storage::disk('public')->delete($trainer->profile_image_path);
-                    } catch (\Exception $e) {
-                        \Log::warning('Failed to delete trainer profile image: ' . $e->getMessage());
-                    }
-                }
-
                 // Force delete the trainer using DB statement to bypass any constraints
                 DB::table('trainers')->where('id', $trainerId)->delete();
             });
@@ -179,15 +170,6 @@ class TrainerController extends Controller
 
                 // Also try direct DB delete as backup
                 DB::table('reviews')->where('trainer_id', $trainerId)->delete();
-
-                // Delete profile image if exists
-                if ($trainer->profile_image_path) {
-                    try {
-                        \Storage::disk('public')->delete($trainer->profile_image_path);
-                    } catch (\Exception $e) {
-                        \Log::warning('Failed to delete trainer profile image: ' . $e->getMessage());
-                    }
-                }
 
                 // Force delete the trainer using DB statement to bypass any constraints
                 DB::table('trainers')->where('id', $trainerId)->delete();
@@ -236,6 +218,55 @@ class TrainerController extends Controller
             return redirect()->route('admin.trainers.index')
                 ->with('error', 'אירעה שגיאה במחיקה. אנא נסה שוב.');
         }
+    }
+
+    /**
+     * Show the form for editing the specified trainer.
+     */
+    public function edit(Trainer $trainer)
+    {
+        return view('edit-trainer', compact('trainer'));
+    }
+
+    /**
+     * Update the specified trainer in storage.
+     */
+    public function update(Request $request, Trainer $trainer)
+    {
+        $validated = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'age' => 'nullable|integer|min:18|max:120',
+            'city' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:255',
+            'experience_years' => 'nullable|integer|min:0',
+            'main_specialization' => 'nullable|string|max:255',
+            'price_per_session' => 'nullable|numeric|min:0',
+            'training_types' => 'nullable|array',
+            'instagram' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+        ], [
+            'age.min' => 'הגיל המינימלי המותר הוא 18',
+            'age.integer' => 'הגיל חייב להיות מספר שלם',
+        ]);
+
+        // Validate training types count based on subscription plan
+        if ($trainer->subscription_plan_id) {
+            $plan = $trainer->subscriptionPlan;
+            if ($plan && $plan->max_training_types !== null) {
+                $trainingTypesCount = count($validated['training_types'] ?? []);
+                if ($trainingTypesCount > $plan->max_training_types) {
+                    return redirect()->back()
+                        ->withErrors(['training_types' => "תכנית המנוי מאפשרת עד {$plan->max_training_types} סוגי אימונים בלבד."])
+                        ->withInput();
+                }
+            }
+        }
+
+        $trainer->update($validated);
+
+        return redirect()->route('admin.trainers.index')
+            ->with('success', 'המאמן עודכן בהצלחה.');
     }
 }
 
