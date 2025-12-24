@@ -69,5 +69,6 @@
             </main>
         </div>
         @include('partials.cookie-consent')
+        @include('partials.accessibility-panel')
     </body>
 </html>

@@ -166,6 +166,7 @@ use Illuminate\Support\Facades\Storage;
 
     @include('partials.footer')
     @include('partials.cookie-consent')
+    @include('partials.accessibility-panel')
 
     <script src="/site/script.js"></script>
     <script>

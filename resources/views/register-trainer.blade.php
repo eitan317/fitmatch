@@ -290,6 +290,7 @@
             setTimeout(initializePage, 50);
         }
     </script>
+    @include('partials.accessibility-panel')
 </body>
 </html>
 

@@ -548,5 +548,6 @@ use Illuminate\Support\Facades\Storage;
         });
     </script>
     @include('partials.cookie-consent')
+    @include('partials.accessibility-panel')
 </body>
 </html>
