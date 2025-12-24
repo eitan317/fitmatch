@@ -219,7 +219,7 @@
             initRegistrationSlider();
         }
         
-        // Registration Slider Functionality
+        // Registration Slider Functionality - IMPROVED
         function initRegistrationSlider() {
             const slider = document.getElementById('registrationSlider');
             const dots = document.querySelectorAll('.slider-dot');
@@ -234,8 +234,10 @@
             
             // Update active dot
             function updateDots(index) {
+                // Clamp index to valid range
+                const validIndex = Math.max(0, Math.min(index, totalSlides - 1));
                 dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === index);
+                    dot.classList.toggle('active', i === validIndex);
                 });
             }
             
@@ -243,6 +245,7 @@
             function getCurrentSlideIndex() {
                 const scrollLeft = slider.scrollLeft;
                 const slideWidth = slider.clientWidth;
+                if (slideWidth === 0) return 0; // Prevent division by zero
                 return Math.round(scrollLeft / slideWidth);
             }
             
@@ -251,6 +254,7 @@
                 if (index < 0 || index >= totalSlides) return;
                 currentSlide = index;
                 const slideWidth = slider.clientWidth;
+                if (slideWidth === 0) return; // Prevent errors
                 slider.scrollTo({
                     left: index * slideWidth,
                     behavior: 'smooth'
@@ -258,29 +262,43 @@
                 updateDots(index);
             }
             
-            // Update dots on scroll (debounced)
-            let scrollTimeout;
-            slider.addEventListener('scroll', function() {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(function() {
+            // Update dots on scroll - improved with scrollend support
+            if ('onscrollend' in window) {
+                // Use scrollend event if available (modern browsers)
+                slider.addEventListener('scrollend', function() {
                     const index = getCurrentSlideIndex();
                     if (index !== currentSlide) {
                         currentSlide = index;
                         updateDots(index);
                     }
-                }, 100);
-            });
+                });
+            } else {
+                // Fallback: debounced scroll listener
+                let scrollTimeout;
+                slider.addEventListener('scroll', function() {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(function() {
+                        const index = getCurrentSlideIndex();
+                        if (index !== currentSlide) {
+                            currentSlide = index;
+                            updateDots(index);
+                        }
+                    }, 150);
+                });
+            }
             
             // Arrow navigation
             if (prevBtn) {
                 prevBtn.addEventListener('click', function() {
-                    scrollToSlide(currentSlide - 1);
+                    const currentIndex = getCurrentSlideIndex();
+                    scrollToSlide(currentIndex - 1);
                 });
             }
             
             if (nextBtn) {
                 nextBtn.addEventListener('click', function() {
-                    scrollToSlide(currentSlide + 1);
+                    const currentIndex = getCurrentSlideIndex();
+                    scrollToSlide(currentIndex + 1);
                 });
             }
             
@@ -296,7 +314,8 @@
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimeout);
                 resizeTimeout = setTimeout(function() {
-                    scrollToSlide(currentSlide);
+                    const currentIndex = getCurrentSlideIndex();
+                    scrollToSlide(currentIndex);
                 }, 250);
             });
             

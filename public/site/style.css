@@ -1274,15 +1274,46 @@ button[type="submit"]:hover,
     position: relative;
 }
 
-/* Form container with slider - prevent overflow */
+/* Form container with slider - FIXED FOR MOBILE */
 .form-container .trainer-registration-slider-wrapper {
     width: 100%;
     max-width: 100%;
-    overflow: hidden;
+    /* REMOVED overflow: hidden - זה חוסם את הגלילה! */
     margin-left: -2.5rem;
     margin-right: -2.5rem;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
+}
+
+/* Mobile: Allow full viewport width */
+@media (max-width: 768px) {
+    .form-container .trainer-registration-slider-wrapper {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        width: calc(100% + 2rem);
+    }
+    
+    .form-container .trainer-registration-slider {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+    }
+}
+
+@media (max-width: 480px) {
+    .form-container .trainer-registration-slider-wrapper {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        width: calc(100% + 1.5rem);
+    }
+    
+    .form-container .trainer-registration-slider {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+    }
 }
 
 /* Make all form cards not clip children by default */
@@ -2925,13 +2956,13 @@ fieldset legend {
     border-radius: 1px;
 }
 
-/* Trainer Registration Slider - Instagram Style */
+/* Trainer Registration Slider - Instagram Style - COMPLETE FIX */
 .trainer-registration-slider-wrapper {
     position: relative;
     width: 100%;
     max-width: 100%;
     margin: 0 auto 2rem;
-    overflow: hidden;
+    /* REMOVED overflow: hidden - זה חוסם את הגלילה! */
 }
 
 .trainer-registration-slider {
@@ -2946,6 +2977,12 @@ fieldset legend {
     width: 100%;
     max-width: 100%;
     position: relative;
+    overscroll-behavior-x: contain;
+    scroll-padding: 0;
+    /* הוספתי: מונע רועד בטלפון */
+    will-change: scroll-position;
+    /* הוספתי: smooth scrolling בטלפון */
+    -webkit-overflow-scrolling: touch;
 }
 
 .trainer-registration-slider::-webkit-scrollbar {
@@ -2954,18 +2991,25 @@ fieldset legend {
 
 .registration-slide {
     scroll-snap-align: start;
+    scroll-snap-stop: always;
     flex-shrink: 0;
-    width: 100%;
-    max-width: 100%;
+    width: 100vw; /* שינוי: viewport width במקום 100% */
+    max-width: 100vw;
+    min-width: 100vw; /* מבטיח שכל slide לוקח 100% viewport */
     box-sizing: border-box;
     padding: 1.5rem 1.75rem;
     margin-bottom: 0;
+    /* הוספתי: מונע רועד */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .registration-slide .form-card {
     margin-bottom: 0;
     height: 100%;
     min-height: auto;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Slider Dots Pagination */
@@ -3059,6 +3103,9 @@ fieldset legend {
     
     .registration-slide {
         padding: 1.25rem 1rem;
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
     }
     
     .slider-dots {
@@ -3088,6 +3135,9 @@ fieldset legend {
 @media (max-width: 480px) {
     .registration-slide {
         padding: 1rem 0.75rem;
+        width: 100vw;
+        min-width: 100vw;
+        max-width: 100vw;
     }
     
     .trainer-registration-slider-wrapper {
@@ -3121,13 +3171,19 @@ fieldset legend {
     }
 }
 
-/* Ensure no horizontal overflow on mobile */
+/* Ensure no horizontal overflow on mobile - FIXED */
 @media (max-width: 480px) {
     .trainer-registration-slider-wrapper,
-    .trainer-registration-slider,
-    .registration-slide {
+    .trainer-registration-slider {
         max-width: 100%;
-        overflow-x: hidden;
+        /* REMOVED overflow-x: hidden - זה חוסם את הגלילה! */
+    }
+    
+    .registration-slide {
+        max-width: 100vw;
+        width: 100vw;
+        min-width: 100vw;
+        /* REMOVED overflow-x: hidden */
     }
     
     .registration-slide * {
@@ -3143,13 +3199,13 @@ fieldset legend {
     }
 }
 
-/* Prevent layout shifts */
-.trainer-registration-slider-wrapper {
-    contain: layout style paint;
-}
-
-.registration-slide {
-    contain: layout style;
+/* Desktop: Fix width to container */
+@media (min-width: 769px) {
+    .registration-slide {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+    }
 }
 
 /* Responsive */
@@ -3754,12 +3810,19 @@ fieldset legend {
         box-sizing: border-box;
     }
     
-    /* Slider wrapper adjustments for mobile */
+    /* Slider wrapper adjustments for mobile - FIXED */
     .form-container .trainer-registration-slider-wrapper {
         margin-left: -1rem;
         margin-right: -1rem;
         padding-left: 1rem;
         padding-right: 1rem;
+        width: calc(100% + 2rem);
+        /* REMOVED overflow: hidden */
+    }
+    
+    .form-container .trainer-registration-slider {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
     }
 
     /* Ensure all form elements are responsive */
@@ -3846,12 +3909,19 @@ fieldset legend {
 
 /* Responsive Styles - Small Mobile (480px and below) */
 @media (max-width: 480px) {
-    /* Slider wrapper adjustments for 480px */
+    /* Slider wrapper adjustments for 480px - FIXED */
     .form-container .trainer-registration-slider-wrapper {
         margin-left: -0.75rem;
         margin-right: -0.75rem;
         padding-left: 0.75rem;
         padding-right: 0.75rem;
+        width: calc(100% + 1.5rem);
+        /* REMOVED overflow: hidden */
+    }
+    
+    .form-container .trainer-registration-slider {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
     }
     
     .page-container,
