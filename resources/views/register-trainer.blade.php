@@ -32,151 +32,129 @@
         <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container">
             @csrf
             
-            <!-- Slider Wrapper -->
-            <div class="trainer-registration-slider-wrapper">
-                <!-- Arrow Navigation (Desktop Only) -->
-                <button type="button" class="slider-arrow slider-arrow-prev" aria-label="קודם">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <button type="button" class="slider-arrow slider-arrow-next" aria-label="הבא">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
+            <!-- Section 1: Personal Details -->
+            <div class="form-card">
+                <h2 class="form-section-title">📋 פרטים אישיים</h2>
                 
-                <!-- Horizontal Slider Container -->
-                <div class="trainer-registration-slider" id="registrationSlider">
-                    <!-- Slide 1: Personal Details -->
-                    <div class="registration-slide form-card">
-                        <h2 class="form-section-title">📋 פרטים אישיים</h2>
-                        
-                        <div class="form-group">
-                            <label for="full_name">שם מלא *</label>
-                            <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" required>
-                        </div>
+                <div class="form-group">
+                    <label for="full_name">שם מלא *</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" required>
+                </div>
 
-                        <div class="form-group">
-                            <label for="age">גיל</label>
-                            <input type="number" id="age" name="age" min="18" max="120" value="{{ old('age') }}">
-                        </div>
+                <div class="form-group">
+                    <label for="age">גיל</label>
+                    <input type="number" id="age" name="age" min="18" max="120" value="{{ old('age') }}">
+                </div>
 
-                        <div class="form-group">
-                            <label for="city">עיר *</label>
-                            <input type="text" id="city" name="city" value="{{ old('city') }}" required>
-                        </div>
+                <div class="form-group">
+                    <label for="city">עיר *</label>
+                    <input type="text" id="city" name="city" value="{{ old('city') }}" required>
+                </div>
 
-                        <div class="form-group">
-                            <label for="phone">טלפון</label>
-                            <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="050-1234567">
-                        </div>
+                <div class="form-group">
+                    <label for="phone">טלפון</label>
+                    <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="050-1234567">
+                </div>
 
-                        <div class="form-group">
-                            <label for="experience_years">שנות ניסיון</label>
-                            <input type="number" id="experience_years" name="experience_years" min="0" max="60" value="{{ old('experience_years') }}">
-                        </div>
+                <div class="form-group">
+                    <label for="experience_years">שנות ניסיון</label>
+                    <input type="number" id="experience_years" name="experience_years" min="0" max="60" value="{{ old('experience_years') }}">
+                </div>
 
-                        <div class="form-group">
-                            <label for="main_specialization">התמחות עיקרית</label>
-                            <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
-                        </div>
+                <div class="form-group">
+                    <label for="main_specialization">התמחות עיקרית</label>
+                    <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
+                </div>
+            </div>
+
+            <!-- Section 2: Training Types -->
+            <div class="form-card training-types-card">
+                <div class="form-section-title">💪 סוגי אימונים</div>
+                <p class="form-section-subtitle">סוגי אימונים שאתה מציע (אפשר לבחור כמה)</p>
+
+                <div class="training-types-select">
+                    <div class="training-types-toggle" id="trainingTypesToggle">
+                        <span id="trainingTypesSummary">בחר סוגי אימונים...</span>
+                        <span class="training-types-chevron">▾</span>
                     </div>
 
-                    <!-- Slide 2: Training Types -->
-                    <div class="registration-slide form-card training-types-card">
-                        <div class="form-section-title">💪 סוגי אימונים</div>
-                        <p class="form-section-subtitle">סוגי אימונים שאתה מציע (אפשר לבחור כמה)</p>
+                    <div class="training-types-dropdown" id="trainingTypesDropdown">
+                        <input
+                            type="text"
+                            id="trainingTypesSearch"
+                            class="training-types-search"
+                            placeholder="חפש סוג אימון (למשל: חיטוב, ריצה, יוגה...)"
+                        />
 
-                        <div class="training-types-select">
-                            <div class="training-types-toggle" id="trainingTypesToggle">
-                                <span id="trainingTypesSummary">בחר סוגי אימונים...</span>
-                                <span class="training-types-chevron">▾</span>
-                            </div>
-
-                            <div class="training-types-dropdown" id="trainingTypesDropdown">
-                                <input
-                                    type="text"
-                                    id="trainingTypesSearch"
-                                    class="training-types-search"
-                                    placeholder="חפש סוג אימון (למשל: חיטוב, ריצה, יוגה...)"
-                                />
-
-                                <ul class="training-types-options" id="trainingTypesList">
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">חדר כושר בסיסי</span><input type="checkbox" name="training_types[]" value="gym_basic"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">מסת שריר</span><input type="checkbox" name="training_types[]" value="hypertrophy"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">פאוורליפטינג</span><input type="checkbox" name="training_types[]" value="powerlifting"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרוספיט</span><input type="checkbox" name="training_types[]" value="crossfit"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">סטריט וורקאאוט / מתח מקבילים</span><input type="checkbox" name="training_types[]" value="street_workout"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">חיטוב / ירידה במשקל</span><input type="checkbox" name="training_types[]" value="weightloss"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני HIIT</span><input type="checkbox" name="training_types[]" value="hiit"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אינטרוולים עצימים</span><input type="checkbox" name="training_types[]" value="intervals"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">מוביליטי וגמישות</span><input type="checkbox" name="training_types[]" value="mobility"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">יוגה</span><input type="checkbox" name="training_types[]" value="yoga"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">פילאטיס</span><input type="checkbox" name="training_types[]" value="pilates"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">שיקום / פיזיותרפיה</span><input type="checkbox" name="training_types[]" value="physio_rehab"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים לכאבי גב</span><input type="checkbox" name="training_types[]" value="back_pain"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים אחרי לידה</span><input type="checkbox" name="training_types[]" value="postnatal"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני בית (משקל גוף)</span><input type="checkbox" name="training_types[]" value="home_bodyweight"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני TRX</span><input type="checkbox" name="training_types[]" value="trx"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קצרים (20 דק׳)</span><input type="checkbox" name="training_types[]" value="short20"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">ריצה</span><input type="checkbox" name="training_types[]" value="running"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">ספרינטים</span><input type="checkbox" name="training_types[]" value="sprints"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">הכנה למרתון</span><input type="checkbox" name="training_types[]" value="marathon"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">רכיבה על אופניים</span><input type="checkbox" name="training_types[]" value="cycling"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">שחייה</span><input type="checkbox" name="training_types[]" value="swimming"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אגרוף</span><input type="checkbox" name="training_types[]" value="boxing"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">קיקבוקס</span><input type="checkbox" name="training_types[]" value="kickboxing"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">MMA</span><input type="checkbox" name="training_types[]" value="mma"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרב מגע</span><input type="checkbox" name="training_types[]" value="kravmaga"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים זוגיים</span><input type="checkbox" name="training_types[]" value="couple"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קבוצתיים</span><input type="checkbox" name="training_types[]" value="group"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים אונליין (זום)</span><input type="checkbox" name="training_types[]" value="online"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים בחוץ / בפארק</span><input type="checkbox" name="training_types[]" value="outdoor"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">בוטקמפ</span><input type="checkbox" name="training_types[]" value="bootcamp"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים בלבד</span><input type="checkbox" name="training_types[]" value="women_only"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">גברים בלבד</span><input type="checkbox" name="training_types[]" value="men_only"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">נוער</span><input type="checkbox" name="training_types[]" value="teens"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">ילדים</span><input type="checkbox" name="training_types[]" value="kids"></label></li>
-                                    <li class="training-type-item"><label class="training-type-option"><span class="option-label">גיל שלישי</span><input type="checkbox" name="training_types[]" value="seniors"></label></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 3: Pricing -->
-                    <div class="registration-slide form-card pricing-card">
-                        <h2 class="form-section-title">💰 תמחור</h2>
-
-                        <div class="form-group">
-                            <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
-                            <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
-                        </div>
-                    </div>
-
-                    <!-- Slide 4: Additional Details -->
-                    <div class="registration-slide form-card">
-                        <h2 class="form-section-title">📸 פרטים נוספים</h2>
-
-                        <div class="form-group">
-                            <label for="instagram">אינסטגרם (אופציונלי)</label>
-                            <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="tiktok">טיקטוק (אופציונלי)</label>
-                            <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok') }}">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bio">תיאור קצר (אופציונלי)</label>
-                            <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
-                        </div>
+                        <ul class="training-types-options" id="trainingTypesList">
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">חדר כושר בסיסי</span><input type="checkbox" name="training_types[]" value="gym_basic"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">מסת שריר</span><input type="checkbox" name="training_types[]" value="hypertrophy"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">פאוורליפטינג</span><input type="checkbox" name="training_types[]" value="powerlifting"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרוספיט</span><input type="checkbox" name="training_types[]" value="crossfit"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">סטריט וורקאאוט / מתח מקבילים</span><input type="checkbox" name="training_types[]" value="street_workout"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">חיטוב / ירידה במשקל</span><input type="checkbox" name="training_types[]" value="weightloss"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני HIIT</span><input type="checkbox" name="training_types[]" value="hiit"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אינטרוולים עצימים</span><input type="checkbox" name="training_types[]" value="intervals"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">מוביליטי וגמישות</span><input type="checkbox" name="training_types[]" value="mobility"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">יוגה</span><input type="checkbox" name="training_types[]" value="yoga"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">פילאטיס</span><input type="checkbox" name="training_types[]" value="pilates"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">שיקום / פיזיותרפיה</span><input type="checkbox" name="training_types[]" value="physio_rehab"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים לכאבי גב</span><input type="checkbox" name="training_types[]" value="back_pain"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים אחרי לידה</span><input type="checkbox" name="training_types[]" value="postnatal"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני בית (משקל גוף)</span><input type="checkbox" name="training_types[]" value="home_bodyweight"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני TRX</span><input type="checkbox" name="training_types[]" value="trx"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קצרים (20 דק׳)</span><input type="checkbox" name="training_types[]" value="short20"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ריצה</span><input type="checkbox" name="training_types[]" value="running"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ספרינטים</span><input type="checkbox" name="training_types[]" value="sprints"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">הכנה למרתון</span><input type="checkbox" name="training_types[]" value="marathon"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">רכיבה על אופניים</span><input type="checkbox" name="training_types[]" value="cycling"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">שחייה</span><input type="checkbox" name="training_types[]" value="swimming"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אגרוף</span><input type="checkbox" name="training_types[]" value="boxing"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קיקבוקס</span><input type="checkbox" name="training_types[]" value="kickboxing"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">MMA</span><input type="checkbox" name="training_types[]" value="mma"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרב מגע</span><input type="checkbox" name="training_types[]" value="kravmaga"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים זוגיים</span><input type="checkbox" name="training_types[]" value="couple"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קבוצתיים</span><input type="checkbox" name="training_types[]" value="group"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים אונליין (זום)</span><input type="checkbox" name="training_types[]" value="online"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים בחוץ / בפארק</span><input type="checkbox" name="training_types[]" value="outdoor"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">בוטקמפ</span><input type="checkbox" name="training_types[]" value="bootcamp"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים בלבד</span><input type="checkbox" name="training_types[]" value="women_only"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">גברים בלבד</span><input type="checkbox" name="training_types[]" value="men_only"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נוער</span><input type="checkbox" name="training_types[]" value="teens"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ילדים</span><input type="checkbox" name="training_types[]" value="kids"></label></li>
+                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">גיל שלישי</span><input type="checkbox" name="training_types[]" value="seniors"></label></li>
+                        </ul>
                     </div>
                 </div>
-                
-                <!-- Dots Pagination -->
-                <div class="slider-dots" id="sliderDots">
-                    <button type="button" class="slider-dot active" data-slide="0" aria-label=" slide 1"></button>
-                    <button type="button" class="slider-dot" data-slide="1" aria-label=" slide 2"></button>
-                    <button type="button" class="slider-dot" data-slide="2" aria-label=" slide 3"></button>
-                    <button type="button" class="slider-dot" data-slide="3" aria-label=" slide 4"></button>
+            </div>
+
+            <!-- Section 3: Pricing -->
+            <div class="form-card pricing-card">
+                <h2 class="form-section-title">💰 תמחור</h2>
+
+                <div class="form-group">
+                    <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
+                    <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
+                </div>
+            </div>
+
+            <!-- Section 4: Additional Details -->
+            <div class="form-card">
+                <h2 class="form-section-title">📸 פרטים נוספים</h2>
+
+                <div class="form-group">
+                    <label for="instagram">אינסטגרם (אופציונלי)</label>
+                    <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="tiktok">טיקטוק (אופציונלי)</label>
+                    <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok') }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">תיאור קצר (אופציונלי)</label>
+                    <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
                 </div>
             </div>
 
@@ -215,112 +193,7 @@
                 }, 100);
             }
             
-            // Initialize registration slider
-            initRegistrationSlider();
-        }
-        
-        // Registration Slider Functionality - IMPROVED
-        function initRegistrationSlider() {
-            const slider = document.getElementById('registrationSlider');
-            const dots = document.querySelectorAll('.slider-dot');
-            const prevBtn = document.querySelector('.slider-arrow-prev');
-            const nextBtn = document.querySelector('.slider-arrow-next');
-            
-            if (!slider || !dots.length) return;
-            
-            const slides = slider.querySelectorAll('.registration-slide');
-            const totalSlides = slides.length;
-            let currentSlide = 0;
-            
-            // Update active dot
-            function updateDots(index) {
-                // Clamp index to valid range
-                const validIndex = Math.max(0, Math.min(index, totalSlides - 1));
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === validIndex);
-                });
-            }
-            
-            // Get current slide index based on scroll position
-            function getCurrentSlideIndex() {
-                const scrollLeft = slider.scrollLeft;
-                const slideWidth = slider.clientWidth;
-                if (slideWidth === 0) return 0; // Prevent division by zero
-                return Math.round(scrollLeft / slideWidth);
-            }
-            
-            // Scroll to specific slide
-            function scrollToSlide(index) {
-                if (index < 0 || index >= totalSlides) return;
-                currentSlide = index;
-                const slideWidth = slider.clientWidth;
-                if (slideWidth === 0) return; // Prevent errors
-                slider.scrollTo({
-                    left: index * slideWidth,
-                    behavior: 'smooth'
-                });
-                updateDots(index);
-            }
-            
-            // Update dots on scroll - improved with scrollend support
-            if ('onscrollend' in window) {
-                // Use scrollend event if available (modern browsers)
-                slider.addEventListener('scrollend', function() {
-                    const index = getCurrentSlideIndex();
-                    if (index !== currentSlide) {
-                        currentSlide = index;
-                        updateDots(index);
-                    }
-                });
-            } else {
-                // Fallback: debounced scroll listener
-                let scrollTimeout;
-                slider.addEventListener('scroll', function() {
-                    clearTimeout(scrollTimeout);
-                    scrollTimeout = setTimeout(function() {
-                        const index = getCurrentSlideIndex();
-                        if (index !== currentSlide) {
-                            currentSlide = index;
-                            updateDots(index);
-                        }
-                    }, 150);
-                });
-            }
-            
-            // Arrow navigation
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    const currentIndex = getCurrentSlideIndex();
-                    scrollToSlide(currentIndex - 1);
-                });
-            }
-            
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    const currentIndex = getCurrentSlideIndex();
-                    scrollToSlide(currentIndex + 1);
-                });
-            }
-            
-            // Dot navigation
-            dots.forEach((dot, index) => {
-                dot.addEventListener('click', function() {
-                    scrollToSlide(index);
-                });
-            });
-            
-            // Update on resize
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(function() {
-                    const currentIndex = getCurrentSlideIndex();
-                    scrollToSlide(currentIndex);
-                }, 250);
-            });
-            
-            // Initial update
-            updateDots(0);
+            // REMOVED: initRegistrationSlider() - הסליידר הוסר
         }
         
         // Ensure DOM is ready before initializing
