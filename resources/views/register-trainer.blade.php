@@ -32,10 +32,8 @@
         <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container">
             @csrf
             
-            <!-- Horizontal Slider Container for Mobile -->
-            <div class="registration-slider-container">
-                <!-- Section 1: Personal Details -->
-                <div class="form-card registration-slide">
+            <!-- Section 1: Personal Details -->
+            <div class="form-card">
                 <h2 class="form-section-title">📋 פרטים אישיים</h2>
                 
                 <div class="form-group">
@@ -69,8 +67,8 @@
                 </div>
             </div>
 
-                <!-- Section 2: Training Types -->
-                <div class="form-card training-types-card registration-slide">
+            <!-- Section 2: Training Types -->
+            <div class="form-card training-types-card">
                 <div class="form-section-title">💪 סוגי אימונים</div>
                 <p class="form-section-subtitle">סוגי אימונים שאתה מציע (אפשר לבחור כמה)</p>
 
@@ -130,8 +128,8 @@
                 </div>
             </div>
 
-                <!-- Section 3: Pricing -->
-                <div class="form-card pricing-card registration-slide">
+            <!-- Section 3: Pricing -->
+            <div class="form-card pricing-card">
                 <h2 class="form-section-title">💰 תמחור</h2>
 
                 <div class="form-group">
@@ -140,8 +138,8 @@
                 </div>
             </div>
 
-                <!-- Section 4: Additional Details -->
-                <div class="form-card registration-slide">
+            <!-- Section 4: Additional Details -->
+            <div class="form-card">
                 <h2 class="form-section-title">📸 פרטים נוספים</h2>
 
                 <div class="form-group">
@@ -157,7 +155,6 @@
                 <div class="form-group">
                     <label for="bio">תיאור קצר (אופציונלי)</label>
                     <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
-                </div>
                 </div>
             </div>
 
