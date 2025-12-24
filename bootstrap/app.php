@@ -20,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
         
-        // Add TrackPageViews middleware to web group
+        // Add TrackPageViews and SetLocale middleware to web group
         $middleware->web(append: [
             \App\Http\Middleware\TrackPageViews::class,
+            \App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

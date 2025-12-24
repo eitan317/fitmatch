@@ -1185,6 +1185,47 @@ function initNavbarToggle() {
 
     toggle.addEventListener("click", function () {
         links.classList.toggle("nav-open");
+        // Close language menu when opening nav
+        const languageMenu = document.getElementById('languageMenu');
+        if (languageMenu) {
+            languageMenu.classList.remove('active');
+        }
+    });
+    
+    // Close nav when clicking outside on mobile
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (!toggle.contains(e.target) && !links.contains(e.target)) {
+                links.classList.remove('nav-open');
+            }
+        }
+    });
+}
+
+// Language Selector Toggle
+function initLanguageSelector() {
+    const languageToggle = document.getElementById('languageToggle');
+    const languageMenu = document.getElementById('languageMenu');
+    
+    if (!languageToggle || !languageMenu) return;
+    
+    languageToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        languageMenu.classList.toggle('active');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!languageToggle.contains(e.target) && !languageMenu.contains(e.target)) {
+            languageMenu.classList.remove('active');
+        }
+    });
+    
+    // Close on escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && languageMenu.classList.contains('active')) {
+            languageMenu.classList.remove('active');
+        }
     });
 }
 
@@ -1195,6 +1236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initTheme && initTheme();
     updateNavbarForUser && updateNavbarForUser();
     initNavbarToggle && initNavbarToggle();
+    initLanguageSelector && initLanguageSelector();
     
     // Theme toggle button
     const themeBtn = document.getElementById("theme-toggle-button");

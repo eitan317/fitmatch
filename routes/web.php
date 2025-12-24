@@ -6,6 +6,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\LanguageController;
 
 // Health check endpoint for Railway (DB-independent)
 Route::get('/health', function () {
@@ -25,6 +26,9 @@ Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 // Google Auth routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
+
+// Language switching
+Route::get('/language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
 // Public routes
 // Auth routes are handled by Laravel Breeze in routes/auth.php
