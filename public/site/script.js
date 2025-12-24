@@ -1105,8 +1105,12 @@ function initTrainingTypesSelectorOnRegisterPage() {
     }, true); // Use capture phase to ensure this fires first
 
     // Prevent clicks inside dropdown from closing it
+    // BUT: Don't block touch events that might be for scrolling
     dropdown.addEventListener("click", function (e) {
-        e.stopPropagation();
+        // Only stop propagation for actual clicks, not touch moves
+        if (e.type === 'click') {
+            e.stopPropagation();
+        }
     }, true); // Use capture phase
 
     // Close dropdown when clicking outside - must be attached after toggle listener

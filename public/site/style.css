@@ -1287,6 +1287,8 @@ button[type="submit"]:hover,
     overflow: visible;
     position: relative;
     scroll-behavior: smooth;
+    /* Critical: Allow touch scrolling in both directions */
+    touch-action: pan-y pan-x;
 }
 
 
@@ -1311,6 +1313,100 @@ button[type="submit"]:hover,
     position: relative;
     z-index: 1;
     overflow: visible !important; /* Force visible - no scroll containers */
+}
+
+/* Registration Slider - Mobile-Friendly Horizontal Scroll */
+.registration-slider-container {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    width: 100%;
+    /* Critical: Allow both horizontal swipe AND vertical scroll */
+    touch-action: pan-y pan-x;
+    /* Remove scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative;
+    /* Ensure no parent blocks touch */
+    -webkit-tap-highlight-color: transparent;
+}
+
+.registration-slider-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.registration-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-sizing: border-box;
+    /* Ensure vertical scroll works inside slide */
+    overflow-y: visible;
+    overflow-x: visible;
+    /* Allow touch events */
+    touch-action: pan-y pan-x;
+    pointer-events: auto;
+    /* Remove margin-bottom from form-card when inside slider */
+    margin-bottom: 0;
+}
+
+/* Form card inside slider should not have bottom margin */
+.registration-slide .form-card {
+    margin-bottom: 0;
+}
+
+/* Desktop: Show cards vertically, no horizontal scroll */
+@media (min-width: 769px) {
+    .registration-slider-container {
+        display: block;
+        overflow-x: visible;
+        overflow-y: visible;
+        scroll-snap-type: none;
+    }
+    
+    .registration-slide {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+        max-width: 100%;
+        scroll-snap-align: none;
+    }
+}
+
+/* Mobile: Ensure proper touch behavior */
+@media (max-width: 768px) {
+    .registration-slider-container {
+        /* Force horizontal scroll on mobile */
+        overflow-x: auto;
+        overflow-y: visible;
+        /* Smooth momentum scrolling */
+        -webkit-overflow-scrolling: touch;
+        /* Critical: Allow both directions */
+        touch-action: pan-y pan-x;
+    }
+    
+    .registration-slide {
+        /* Each slide takes full width */
+        flex: 0 0 100%;
+        width: 100%;
+        min-width: 100%;
+        /* Ensure no height constraints block scroll */
+        min-height: auto;
+    }
+    
+    /* Ensure form container doesn't block touch */
+    .form-container {
+        overflow: visible;
+        touch-action: pan-y pan-x;
+    }
 }
 
 .form-group {
