@@ -65,7 +65,8 @@ body {
     background-image: 
         radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.05) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(107, 182, 255, 0.04) 0%, transparent 50%);
-    background-attachment: fixed;
+    /* שינוי: scroll במקום fixed - משפר ביצועי גלילה במובייל */
+    background-attachment: scroll;
     color: var(--text-main);
     font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     direction: rtl;
@@ -79,6 +80,8 @@ body {
     overflow-y: auto; /* Only body should scroll vertically */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    /* הוספתי: מונע scroll chaining */
+    overscroll-behavior-y: contain;
     font-size: 16px;
 }
 
@@ -224,6 +227,11 @@ a:not(.btn):not(.nav-links a):hover {
     width: 100%;
     box-sizing: border-box;
     overflow: visible !important; /* Force visible - no scroll containers */
+    /* הוספתי: וידוא גלילה חלקה */
+    position: relative;
+    /* הוספתי: שיפור ביצועים - hardware acceleration */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 .container {
@@ -1289,6 +1297,10 @@ button[type="submit"]:hover,
     scroll-behavior: smooth;
     /* Smooth vertical scroll only */
     touch-action: pan-y;
+    /* הוספתי: מונע scroll chaining */
+    overscroll-behavior-y: contain;
+    /* הוספתי: שיפור ביצועים */
+    will-change: scroll-position;
 }
 
 
@@ -1301,6 +1313,9 @@ button[type="submit"]:hover,
     scroll-behavior: smooth;
     /* Smooth vertical scrolling */
     touch-action: pan-y;
+    /* הוספתי: שיפור ביצועים - hardware acceleration */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 }
 
 /* Training types card should be on top of other cards */
