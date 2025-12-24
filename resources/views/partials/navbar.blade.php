@@ -7,7 +7,7 @@
         
         <!-- Language Selector -->
         <div class="language-selector">
-            <button class="language-btn" id="languageToggle" aria-label="בחירת שפה">
+            <button class="language-btn" id="languageToggle" aria-label="{{ __('messages.select_language') }}">
                 <i class="fas fa-globe"></i>
                 <span class="current-lang">{{ strtoupper(session('locale', 'he')) }}</span>
             </button>
@@ -33,12 +33,12 @@
         
         <button class="nav-toggle" id="navToggle" aria-label="פתיחת תפריט">☰</button>
         <nav class="nav-links" id="navLinks">
-            <a href="/">דף הבית</a>
-            <a href="/trainers">מצא מאמן</a>
+            <a href="/">{{ __('messages.home') }}</a>
+            <a href="/trainers">{{ __('messages.find_trainer') }}</a>
             @auth
-                <a href="/register-trainer">הרשמה כמאמן</a>
+                <a href="/register-trainer">{{ __('messages.register_as_trainer') }}</a>
                 @if(Auth::user()->isAdmin())
-                    <a href="/admin/trainers" id="admin-link">פאנל מנהל</a>
+                    <a href="/admin/trainers" id="admin-link">{{ __('messages.admin_panel') }}</a>
                 @endif
                 <div class="nav-user-section">
                     @if(Auth::user()->avatar)
@@ -51,18 +51,18 @@
                     <span class="nav-user-name">{{ Auth::user()->name }}</span>
                     <form action="{{ route('logout') }}" method="POST" class="nav-logout-form">
                         @csrf
-                        <button type="submit" class="nav-btn">התנתק</button>
+                        <button type="submit" class="nav-btn">{{ __('messages.logout') }}</button>
                     </form>
                 </div>
             @else
                 <div class="nav-auth-section">
                     <a href="/login" class="nav-auth-btn nav-login-btn">
                         <i class="fas fa-sign-in-alt"></i>
-                        התחברות
+                        {{ __('messages.login') }}
                     </a>
                     <a href="{{ route('register') }}" class="nav-auth-btn nav-register-btn">
                         <i class="fas fa-user-plus"></i>
-                        הרשמה
+                        {{ __('messages.register') }}
                     </a>
                 </div>
             @endauth

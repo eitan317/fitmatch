@@ -21,16 +21,16 @@
         
         <div class="hero card">
             <div class="hero-content">
-                <h1>מצא את מאמן הכושר המושלם עבורך</h1>
-                <p>הפלטפורמה המקשרת בין מאמני כושר מקצועיים לבין מתאמנים חדשים. התחל את המסע שלך לכושר טוב יותר היום!</p>
+                <h1>{{ __('messages.find_perfect_trainer') }}</h1>
+                <p>{{ __('messages.platform_description') }}</p>
                 <div class="hero-buttons">
                     @auth
-                        <a href="/trainers" class="btn">מצא מאמן</a>
-                        <a href="/register-trainer" class="btn btn-success">הירשם כמאמן</a>
+                        <a href="/trainers" class="btn">{{ __('messages.find_trainer_btn') }}</a>
+                        <a href="/register-trainer" class="btn btn-success">{{ __('messages.register_as_trainer_btn') }}</a>
                     @else
-                        <a href="/trainers" class="btn">מצא מאמן</a>
-                        <a href="/login" class="btn">התחבר כדי להתחיל</a>
-                        <a href="{{ route('register') }}" class="btn btn-success">הירשם</a>
+                        <a href="/trainers" class="btn">{{ __('messages.find_trainer_btn') }}</a>
+                        <a href="/login" class="btn">{{ __('messages.login_to_start') }}</a>
+                        <a href="{{ route('register') }}" class="btn btn-success">{{ __('messages.register_btn') }}</a>
                     @endauth
                 </div>
             </div>
@@ -40,7 +40,7 @@
                     <div class="hero-circle hero-circle-secondary"></div>
                     <div class="hero-dumbbell">💪</div>
                     <div class="hero-stat-card">
-                        <div class="hero-stat-label">מאמנים פעילים</div>
+                        <div class="hero-stat-label">{{ __('messages.active_trainers') }}</div>
                         <div class="hero-stat-number">+{{ $stats['active_trainers'] }}</div>
                     </div>
                 </div>

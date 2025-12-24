@@ -17,8 +17,20 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Get locale from session, default to 'he'
         $locale = Session::get('locale', 'he');
+        
+        // Validate locale
+        $supportedLocales = ['he', 'ar', 'ru', 'en'];
+        if (!in_array($locale, $supportedLocales)) {
+            $locale = 'he';
+        }
+        
+        // Set the application locale
         App::setLocale($locale);
+        
+        // Also set it in config for consistency
+        config(['app.locale' => $locale]);
         
         return $next($request);
     }
