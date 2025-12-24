@@ -228,9 +228,7 @@ a:not(.btn):not(.nav-links a):hover {
     overflow: visible !important; /* Force visible - no scroll containers */
     /* הוספתי: וידוא גלילה חלקה */
     position: relative;
-    /* הוספתי: שיפור ביצועים - hardware acceleration */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    /* הסרתי: transform: translateZ(0) - גורם לבעיות scroll */
 }
 
 .container {
@@ -1297,8 +1295,7 @@ button[type="submit"]:hover,
     /* Smooth vertical scroll only */
     touch-action: pan-y;
     /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" */
-    /* הוספתי: שיפור ביצועים */
-    will-change: scroll-position;
+    /* הסרתי: will-change: scroll-position - גורם לבעיות */
 }
 
 
@@ -1311,9 +1308,7 @@ button[type="submit"]:hover,
     scroll-behavior: smooth;
     /* Smooth vertical scrolling */
     touch-action: pan-y;
-    /* הוספתי: שיפור ביצועים - hardware acceleration */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    /* הסרתי: transform: translateZ(0) - גורם לבעיות scroll */
 }
 
 /* Training types card should be on top of other cards */
