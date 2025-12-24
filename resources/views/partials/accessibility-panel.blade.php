@@ -96,6 +96,9 @@
             <div id="accessibility-announce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         </div>
     </div>
+    
+    <!-- Overlay for mobile -->
+    <div id="accessibility-overlay" class="accessibility-overlay"></div>
 </div>
 
 <style>
@@ -125,12 +128,18 @@
     transition: all 0.3s ease;
     position: relative;
     z-index: 10001;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .accessibility-toggle:hover {
     background: var(--primary-dark, #3A8EEF);
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(74, 158, 255, 0.5);
+}
+
+.accessibility-toggle:active {
+    transform: translateY(0);
 }
 
 .accessibility-toggle:focus {
@@ -142,21 +151,45 @@
     font-size: 1.2rem;
 }
 
+/* Overlay for mobile */
+.accessibility-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.accessibility-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
 /* Panel Menu */
 .accessibility-menu {
-    position: absolute;
-    bottom: 70px;
-    left: 0;
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    right: auto;
     background: var(--bg-card, #0d2329);
     border: 2px solid var(--border-soft, rgba(74, 158, 255, 0.2));
     border-radius: 16px;
     padding: 1.5rem;
     min-width: 320px;
     max-width: 400px;
+    max-height: calc(100vh - 120px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
     display: none;
     animation: slideUp 0.3s ease;
+    overflow-y: auto;
+    z-index: 10000;
+    -webkit-overflow-scrolling: touch;
 }
 
 .accessibility-menu.active {
@@ -166,7 +199,7 @@
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -207,11 +240,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .accessibility-close:hover {
     background: rgba(74, 158, 255, 0.1);
     color: var(--text-main, #ffffff);
+}
+
+.accessibility-close:active {
+    transform: scale(0.95);
 }
 
 .accessibility-close:focus {
@@ -263,6 +302,8 @@
     justify-content: center;
     gap: 0.5rem;
     transition: all 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .accessibility-btn:hover {
@@ -271,13 +312,13 @@
     transform: translateY(-1px);
 }
 
+.accessibility-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
 .accessibility-btn:focus {
     outline: 2px solid var(--primary, #4A9EFF);
     outline-offset: 2px;
-}
-
-.accessibility-btn:active {
-    transform: translateY(0);
 }
 
 /* Toggle Switch */
@@ -292,6 +333,8 @@
     width: 60px;
     height: 30px;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .toggle-label input[type="checkbox"] {
@@ -399,6 +442,13 @@ body.font-xxlarge {
     border-width: 0;
 }
 
+/* Prevent body scroll when menu is open on mobile */
+body.accessibility-menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .accessibility-panel {
@@ -416,9 +466,14 @@ body.font-xxlarge {
     }
 
     .accessibility-menu {
-        min-width: 280px;
-        max-width: calc(100vw - 30px);
-        bottom: 60px;
+        position: fixed;
+        bottom: 70px;
+        left: 15px;
+        right: 15px;
+        min-width: auto;
+        max-width: none;
+        width: calc(100% - 30px);
+        max-height: calc(100vh - 100px);
         padding: 1.25rem;
     }
 
@@ -442,13 +497,38 @@ body.font-xxlarge {
         width: 50px;
         height: 50px;
         justify-content: center;
+        border-radius: 50%;
     }
 
     .accessibility-menu {
-        min-width: calc(100vw - 20px);
+        bottom: 65px;
         left: 10px;
         right: 10px;
-        bottom: 65px;
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 90px);
+        padding: 1rem;
+        border-radius: 12px;
+    }
+
+    .accessibility-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .accessibility-label {
+        font-size: 0.95rem;
+    }
+
+    .accessibility-btn {
+        padding: 0.65rem 0.85rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .accessibility-menu {
+        max-height: calc(100vh - 80px);
+        bottom: 60px;
     }
 }
 </style>
@@ -463,6 +543,7 @@ body.font-xxlarge {
     const menu = document.getElementById('accessibility-menu');
     const closeBtn = document.getElementById('accessibility-close');
     const announce = document.getElementById('accessibility-announce');
+    const overlay = document.getElementById('accessibility-overlay');
 
     // Font size controls
     const fontDecrease = document.getElementById('font-decrease');
@@ -472,6 +553,11 @@ body.font-xxlarge {
     // Toggles
     const highContrastToggle = document.getElementById('high-contrast-toggle');
     const focusIndicatorToggle = document.getElementById('focus-indicator-toggle');
+
+    // Check if mobile
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
 
     // Announce to screen readers
     function announceToScreenReader(message) {
@@ -495,28 +581,62 @@ body.font-xxlarge {
         const highContrast = localStorage.getItem('accessibility-high-contrast') === 'true';
         if (highContrast) {
             document.body.classList.add('high-contrast');
-            highContrastToggle.checked = true;
+            if (highContrastToggle) highContrastToggle.checked = true;
         }
 
         // Focus indicator
         const focusIndicator = localStorage.getItem('accessibility-focus-indicator') === 'true';
         if (focusIndicator) {
             document.body.classList.add('enhanced-focus');
-            focusIndicatorToggle.checked = true;
+            if (focusIndicatorToggle) focusIndicatorToggle.checked = true;
         }
     }
 
     // Toggle menu
     function toggleMenu() {
         const isOpen = menu.classList.contains('active');
-        menu.classList.toggle('active');
-        toggle.setAttribute('aria-expanded', !isOpen);
         
         if (!isOpen) {
+            // Open menu
+            menu.classList.add('active');
+            if (overlay) overlay.classList.add('active');
+            toggle.setAttribute('aria-expanded', 'true');
+            
+            // Prevent body scroll on mobile
+            if (isMobile()) {
+                const scrollY = window.scrollY;
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollY}px`;
+                document.body.style.width = '100%';
+                document.body.classList.add('accessibility-menu-open');
+            }
+            
             announceToScreenReader('פאנל נגישות נפתח');
         } else {
-            announceToScreenReader('פאנל נגישות נסגר');
+            // Close menu
+            closeMenu();
         }
+    }
+
+    // Close menu
+    function closeMenu() {
+        menu.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
+        
+        // Restore body scroll on mobile
+        if (isMobile() && document.body.classList.contains('accessibility-menu-open')) {
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.classList.remove('accessibility-menu-open');
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
+        }
+        
+        announceToScreenReader('פאנל נגישות נסגר');
     }
 
     // Font size functions
@@ -541,26 +661,47 @@ body.font-xxlarge {
 
     // Event listeners
     if (toggle) {
-        toggle.addEventListener('click', toggleMenu);
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleMenu();
+        });
     }
 
     if (closeBtn) {
-        closeBtn.addEventListener('click', toggleMenu);
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeMenu();
+        });
+    }
+
+    // Close menu when clicking overlay
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeMenu();
+        });
     }
 
     // Close menu when clicking outside
     document.addEventListener('click', function(e) {
         if (menu && menu.classList.contains('active')) {
             if (!panel.contains(e.target)) {
-                menu.classList.remove('active');
-                toggle.setAttribute('aria-expanded', 'false');
+                closeMenu();
             }
         }
     });
 
+    // Prevent menu close when clicking inside menu
+    if (menu) {
+        menu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
     // Font size controls
     if (fontDecrease) {
-        fontDecrease.addEventListener('click', function() {
+        fontDecrease.addEventListener('click', function(e) {
+            e.stopPropagation();
             if (currentFontIndex > 0) {
                 setFontSize(fontSizes[currentFontIndex - 1]);
             }
@@ -568,13 +709,15 @@ body.font-xxlarge {
     }
 
     if (fontReset) {
-        fontReset.addEventListener('click', function() {
+        fontReset.addEventListener('click', function(e) {
+            e.stopPropagation();
             setFontSize('normal');
         });
     }
 
     if (fontIncrease) {
-        fontIncrease.addEventListener('click', function() {
+        fontIncrease.addEventListener('click', function(e) {
+            e.stopPropagation();
             if (currentFontIndex < fontSizes.length - 1) {
                 setFontSize(fontSizes[currentFontIndex + 1]);
             }
@@ -615,10 +758,18 @@ body.font-xxlarge {
     document.addEventListener('keydown', function(e) {
         // Close menu with Escape
         if (e.key === 'Escape' && menu && menu.classList.contains('active')) {
-            menu.classList.remove('active');
-            toggle.setAttribute('aria-expanded', 'false');
-            toggle.focus();
-            announceToScreenReader('פאנל נגישות נסגר');
+            closeMenu();
+            if (toggle) toggle.focus();
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (!isMobile() && document.body.classList.contains('accessibility-menu-open')) {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.classList.remove('accessibility-menu-open');
         }
     });
 
@@ -630,4 +781,3 @@ body.font-xxlarge {
     }
 })();
 </script>
-
