@@ -1083,8 +1083,7 @@ function initTrainingTypesSelectorOnRegisterPage() {
 
     // Open / close dropdown - must be attached before document click listener
     toggle.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+        // הסרתי: e.preventDefault() ו-e.stopPropagation() - חוסמים את הגלילה
         console.log('Training types dropdown: Toggle clicked, current state:', dropdown.classList.contains("open"));
         const wasOpen = dropdown.classList.contains("open");
         dropdown.classList.toggle("open");
@@ -1142,6 +1141,15 @@ function initTrainingTypesSelectorOnRegisterPage() {
     searchInput.addEventListener("input", function () {
         filterOptions(this.value);
     });
+
+    // Close dropdown when scrolling - passive listener to not block scrolling
+    document.addEventListener('scroll', function() {
+        if (dropdown && dropdown.classList.contains('open')) {
+            // סגירת dropdown כשגוללים - רק אם הגלילה היא של ה-body
+            // לא נסגור אם הגלילה היא בתוך element אחר (אבל אין scroll containers נפרדים יותר)
+            closeDropdown();
+        }
+    }, { passive: true }); // passive: true - לא חוסם את הגלילה
 
     // Update summary when any checkbox changes
     // Support both "trainingTypes" and "training_types[]" for compatibility

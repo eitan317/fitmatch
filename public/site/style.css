@@ -1274,6 +1274,7 @@ button[type="submit"]:hover,
     padding: 2.5rem;
     overflow: visible;
     position: relative;
+    scroll-behavior: smooth;
 }
 
 
@@ -1283,6 +1284,7 @@ button[type="submit"]:hover,
     overflow: visible;
     padding: 1.5rem 1.75rem;
     margin-bottom: 1.25rem;
+    scroll-behavior: smooth;
 }
 
 /* Training types card should be on top of other cards */
@@ -3069,8 +3071,8 @@ fieldset legend {
     list-style: none;
     margin: 0;
     padding: 0.15rem 0 0;
-    max-height: 220px;
-    overflow-y: auto;
+    /* הסרתי: max-height ו-overflow-y: auto - יוצרים scroll container נפרד */
+    /* הגלילה תהיה של ה-body - רציפה וחלקה */
 }
 
 .training-type-item {
