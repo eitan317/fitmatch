@@ -1325,6 +1325,301 @@ button[type="submit"]:hover,
     overflow: visible !important; /* Force visible - no scroll containers */
 }
 
+/* ============================================
+   REGISTRATION PROGRESS INDICATOR
+   ============================================ */
+
+.registration-progress {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    overflow: visible;
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+#progressPercentage {
+    color: var(--primary);
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(74, 158, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.progress-section-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex: 1;
+    min-width: 120px;
+}
+
+.progress-section-item .section-status-icon {
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.progress-section-item.completed .section-status-icon {
+    color: #28a745;
+    content: "✓";
+}
+
+.progress-section-item.in-progress .section-status-icon {
+    color: var(--primary);
+}
+
+.progress-section-item.not-started .section-status-icon {
+    color: var(--text-muted);
+}
+
+/* ============================================
+   ACCORDION SECTIONS
+   ============================================ */
+
+.accordion-section {
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-soft);
+    margin-bottom: 1.25rem;
+    overflow: visible;
+    position: relative;
+}
+
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.75rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    overflow: visible;
+}
+
+.accordion-header:hover {
+    background: rgba(74, 158, 255, 0.05);
+}
+
+.accordion-header:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+    border-radius: 12px;
+}
+
+.accordion-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.accordion-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+}
+
+.accordion-section .section-status-icon {
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    color: var(--text-muted);
+    min-width: 1.2rem;
+    text-align: center;
+}
+
+.accordion-section.active .section-status-icon,
+.accordion-section.completed .section-status-icon {
+    color: var(--primary);
+}
+
+.accordion-chevron {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+    line-height: 1;
+}
+
+.accordion-section.active .accordion-chevron {
+    transform: rotate(180deg);
+    color: var(--primary);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 1.75rem;
+}
+
+.accordion-section.active .accordion-content {
+    max-height: 3000px;
+    padding: 0 1.75rem 1.5rem 1.75rem;
+}
+
+.accordion-content .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.accordion-content .form-section-subtitle {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* Sticky Submit Button */
+.sticky-submit {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 100;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+/* ============================================
+   RESPONSIVE STYLES - ACCORDION & PROGRESS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .registration-progress {
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .progress-text {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .progress-sections {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .progress-section-item {
+        min-width: auto;
+        font-size: 0.85rem;
+    }
+    
+    .accordion-header {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .accordion-title {
+        font-size: 1.25rem;
+    }
+    
+    .accordion-content {
+        padding: 0 1.5rem;
+    }
+    
+    .accordion-section.active .accordion-content {
+        padding: 0 1.5rem 1.25rem 1.5rem;
+    }
+    
+    .sticky-submit {
+        bottom: 0.5rem;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .registration-progress {
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .progress-text {
+        font-size: 0.85rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .progress-bar-container {
+        height: 6px;
+    }
+    
+    .progress-sections {
+        gap: 0.5rem;
+    }
+    
+    .progress-section-item {
+        font-size: 0.8rem;
+    }
+    
+    .progress-section-item .section-status-icon {
+        font-size: 1rem;
+    }
+    
+    .accordion-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    .accordion-header-left {
+        gap: 0.5rem;
+    }
+    
+    .accordion-title {
+        font-size: 1.1rem;
+    }
+    
+    .accordion-section .section-status-icon {
+        font-size: 1rem;
+    }
+    
+    .accordion-chevron {
+        font-size: 1.25rem;
+    }
+    
+    .accordion-content {
+        padding: 0 1.25rem;
+    }
+    
+    .accordion-section.active .accordion-content {
+        padding: 0 1.25rem 1rem 1.25rem;
+    }
+    
+    .sticky-submit {
+        bottom: 0.25rem;
+        margin-top: 1.25rem;
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
+}
 
 .form-group {
     margin-bottom: 1.5rem;

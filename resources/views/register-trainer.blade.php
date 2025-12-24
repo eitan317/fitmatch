@@ -29,12 +29,48 @@
             </div>
         @endif
 
-        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container">
+        <!-- Progress Indicator -->
+        <div class="registration-progress">
+            <div class="progress-text">
+                <span id="progressText">סקציה 0 מתוך 4</span>
+                <span id="progressPercentage">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="progress-sections">
+                <div class="progress-section-item" data-section="1">
+                    <span class="section-status-icon">○</span>
+                    <span class="section-name">פרטים אישיים</span>
+                </div>
+                <div class="progress-section-item" data-section="2">
+                    <span class="section-status-icon">○</span>
+                    <span class="section-name">סוגי אימונים</span>
+                </div>
+                <div class="progress-section-item" data-section="3">
+                    <span class="section-status-icon">○</span>
+                    <span class="section-name">תמחור</span>
+                </div>
+                <div class="progress-section-item" data-section="4">
+                    <span class="section-status-icon">○</span>
+                    <span class="section-name">פרטים נוספים</span>
+                </div>
+            </div>
+        </div>
+
+        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container" id="trainerRegistrationForm">
             @csrf
             
             <!-- Section 1: Personal Details -->
-            <div class="form-card">
-                <h2 class="form-section-title">📋 פרטים אישיים</h2>
+            <div class="accordion-section" data-section="1">
+                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-1">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">○</span>
+                        <h2 class="accordion-title">📋 פרטים אישיים</h2>
+                    </div>
+                    <span class="accordion-chevron">▾</span>
+                </div>
+                <div class="accordion-content" id="accordion-content-1">
                 
                 <div class="form-group">
                     <label for="full_name">שם מלא *</label>
@@ -65,11 +101,19 @@
                     <label for="main_specialization">התמחות עיקרית</label>
                     <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
                 </div>
+                </div>
             </div>
 
             <!-- Section 2: Training Types -->
-            <div class="form-card training-types-card">
-                <div class="form-section-title">💪 סוגי אימונים</div>
+            <div class="accordion-section training-types-card" data-section="2">
+                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-2">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">○</span>
+                        <h2 class="accordion-title">💪 סוגי אימונים</h2>
+                    </div>
+                    <span class="accordion-chevron">▾</span>
+                </div>
+                <div class="accordion-content" id="accordion-content-2">
                 <p class="form-section-subtitle">סוגי אימונים שאתה מציע (אפשר לבחור כמה)</p>
 
                 <div class="training-types-select">
@@ -126,21 +170,36 @@
                         </ul>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- Section 3: Pricing -->
-            <div class="form-card pricing-card">
-                <h2 class="form-section-title">💰 תמחור</h2>
-
+            <div class="accordion-section pricing-card" data-section="3">
+                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-3">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">○</span>
+                        <h2 class="accordion-title">💰 תמחור</h2>
+                    </div>
+                    <span class="accordion-chevron">▾</span>
+                </div>
+                <div class="accordion-content" id="accordion-content-3">
                 <div class="form-group">
                     <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
                     <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
                 </div>
+                </div>
             </div>
 
             <!-- Section 4: Additional Details -->
-            <div class="form-card">
-                <h2 class="form-section-title">📸 פרטים נוספים</h2>
+            <div class="accordion-section" data-section="4">
+                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-4">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">○</span>
+                        <h2 class="accordion-title">📸 פרטים נוספים</h2>
+                    </div>
+                    <span class="accordion-chevron">▾</span>
+                </div>
+                <div class="accordion-content" id="accordion-content-4">
 
                 <div class="form-group">
                     <label for="instagram">אינסטגרם (אופציונלי)</label>
@@ -156,9 +215,10 @@
                     <label for="bio">תיאור קצר (אופציונלי)</label>
                     <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
                 </div>
+                </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">שלח בקשה לאישור</button>
+            <button type="submit" class="btn btn-primary sticky-submit">שלח בקשה לאישור</button>
         </form>
     </main>
 
@@ -193,7 +253,30 @@
                 }, 100);
             }
             
-            // REMOVED: initRegistrationSlider() - הסליידר הוסר
+            // Initialize Accordion
+            if (typeof initRegistrationAccordion === 'function') {
+                initRegistrationAccordion();
+            } else {
+                console.warn('initRegistrationAccordion function not found');
+            }
+            
+            // Initialize Progress Tracking
+            if (typeof initRegistrationProgressTracking === 'function') {
+                initRegistrationProgressTracking();
+            } else {
+                console.warn('initRegistrationProgressTracking function not found');
+            }
+            
+            // Add form validation before submit
+            const form = document.getElementById('trainerRegistrationForm');
+            if (form && typeof validateRegistrationForm === 'function') {
+                form.addEventListener('submit', function(e) {
+                    if (!validateRegistrationForm()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
         }
         
         // Ensure DOM is ready before initializing

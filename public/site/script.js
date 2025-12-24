@@ -1684,6 +1684,268 @@ function initFadeInAnimations() {
 // Smooth scroll behavior
 document.documentElement.style.scrollBehavior = 'smooth';
 
+// ============================================
+// REGISTRATION ACCORDION FUNCTIONALITY
+// ============================================
+
+function initRegistrationAccordion() {
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    
+    if (accordionHeaders.length === 0) {
+        return; // Not on registration page
+    }
+    
+    accordionHeaders.forEach(header => {
+        // Click event
+        header.addEventListener('click', function() {
+            toggleAccordionSection(this);
+        });
+        
+        // Keyboard navigation
+        header.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleAccordionSection(this);
+            }
+        });
+    });
+}
+
+function toggleAccordionSection(header) {
+    const section = header.closest('.accordion-section');
+    const isActive = section.classList.contains('active');
+    
+    // Close all other sections (optional - can be changed to allow multiple open)
+    if (!isActive) {
+        document.querySelectorAll('.accordion-section.active').forEach(activeSection => {
+            activeSection.classList.remove('active');
+            const activeHeader = activeSection.querySelector('.accordion-header');
+            if (activeHeader) {
+                activeHeader.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    
+    // Toggle current section
+    section.classList.toggle('active');
+    header.setAttribute('aria-expanded', section.classList.contains('active'));
+    
+    // Smooth scroll to section if opening
+    if (section.classList.contains('active')) {
+        setTimeout(() => {
+            section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+    
+    // Update progress after toggle
+    updateRegistrationProgress();
+}
+
+// ============================================
+// REGISTRATION PROGRESS TRACKING
+// ============================================
+
+function updateRegistrationProgress() {
+    const form = document.getElementById('trainerRegistrationForm');
+    if (!form) return;
+    
+    const sections = [
+        {
+            num: 1,
+            required: ['full_name', 'city'],
+            optional: ['age', 'phone', 'experience_years', 'main_specialization']
+        },
+        {
+            num: 2,
+            required: [], // At least one training type
+            optional: []
+        },
+        {
+            num: 3,
+            required: [],
+            optional: ['price_per_session']
+        },
+        {
+            num: 4,
+            required: [],
+            optional: ['instagram', 'tiktok', 'bio']
+        }
+    ];
+    
+    let completedSections = 0;
+    let totalRequired = 0;
+    let completedRequired = 0;
+    
+    sections.forEach((section, index) => {
+        const sectionElement = document.querySelector(`.accordion-section[data-section="${section.num}"]`);
+        const progressItem = document.querySelector(`.progress-section-item[data-section="${section.num}"]`);
+        
+        if (!sectionElement || !progressItem) return;
+        
+        let sectionStatus = 'not-started';
+        let hasRequired = true;
+        let hasAnyField = false;
+        
+        // Check required fields
+        if (section.num === 1) {
+            // Personal details
+            const fullName = form.querySelector('#full_name')?.value.trim();
+            const city = form.querySelector('#city')?.value.trim();
+            hasRequired = fullName && city;
+            hasAnyField = hasRequired || form.querySelector('#age')?.value || form.querySelector('#phone')?.value || form.querySelector('#experience_years')?.value || form.querySelector('#main_specialization')?.value;
+        } else if (section.num === 2) {
+            // Training types - at least one checkbox checked
+            const checkedTypes = form.querySelectorAll('input[name="training_types[]"]:checked');
+            hasRequired = checkedTypes.length > 0;
+            hasAnyField = hasRequired;
+        } else if (section.num === 3) {
+            // Pricing - optional
+            hasRequired = true;
+            hasAnyField = form.querySelector('#price_per_session')?.value;
+        } else if (section.num === 4) {
+            // Additional details - optional
+            hasRequired = true;
+            hasAnyField = form.querySelector('#instagram')?.value || form.querySelector('#tiktok')?.value || form.querySelector('#bio')?.value;
+        }
+        
+        // Determine status
+        if (hasRequired && hasAnyField) {
+            sectionStatus = 'completed';
+            completedSections++;
+        } else if (hasAnyField) {
+            sectionStatus = 'in-progress';
+        } else {
+            sectionStatus = 'not-started';
+        }
+        
+        // Update section element
+        sectionElement.classList.remove('not-started', 'in-progress', 'completed');
+        sectionElement.classList.add(sectionStatus);
+        
+        // Update progress item
+        progressItem.classList.remove('not-started', 'in-progress', 'completed');
+        progressItem.classList.add(sectionStatus);
+        
+        // Update status icon
+        const statusIcon = progressItem.querySelector('.section-status-icon');
+        const accordionStatusIcon = sectionElement.querySelector('.accordion-header .section-status-icon');
+        
+        if (sectionStatus === 'completed') {
+            if (statusIcon) statusIcon.textContent = '✓';
+            if (accordionStatusIcon) accordionStatusIcon.textContent = '✓';
+        } else if (sectionStatus === 'in-progress') {
+            if (statusIcon) statusIcon.textContent = '◐';
+            if (accordionStatusIcon) accordionStatusIcon.textContent = '◐';
+        } else {
+            if (statusIcon) statusIcon.textContent = '○';
+            if (accordionStatusIcon) accordionStatusIcon.textContent = '○';
+        }
+        
+        // Count required fields
+        if (section.required.length > 0 || section.num === 2) {
+            totalRequired++;
+            if (hasRequired) completedRequired++;
+        }
+    });
+    
+    // Update progress bar
+    const progressPercentage = (completedSections / sections.length) * 100;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercentageText = document.getElementById('progressPercentage');
+    
+    if (progressBar) {
+        progressBar.style.width = progressPercentage + '%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = `סקציה ${completedSections} מתוך ${sections.length}`;
+    }
+    
+    if (progressPercentageText) {
+        progressPercentageText.textContent = Math.round(progressPercentage) + '%';
+    }
+}
+
+// ============================================
+// REGISTRATION FORM VALIDATION
+// ============================================
+
+function validateRegistrationForm() {
+    const form = document.getElementById('trainerRegistrationForm');
+    if (!form) return true;
+    
+    let isValid = true;
+    const errors = [];
+    
+    // Section 1: Personal Details
+    const fullName = form.querySelector('#full_name')?.value.trim();
+    const city = form.querySelector('#city')?.value.trim();
+    
+    if (!fullName) {
+        errors.push({ section: 1, field: 'full_name', message: 'שם מלא הוא שדה חובה' });
+        isValid = false;
+    }
+    
+    if (!city) {
+        errors.push({ section: 1, field: 'city', message: 'עיר היא שדה חובה' });
+        isValid = false;
+    }
+    
+    // Section 2: Training Types
+    const checkedTypes = form.querySelectorAll('input[name="training_types[]"]:checked');
+    if (checkedTypes.length === 0) {
+        errors.push({ section: 2, field: 'training_types', message: 'יש לבחור לפחות סוג אימון אחד' });
+        isValid = false;
+    }
+    
+    // Show errors and open relevant sections
+    if (!isValid) {
+        errors.forEach(error => {
+            const section = document.querySelector(`.accordion-section[data-section="${error.section}"]`);
+            if (section) {
+                section.classList.add('active');
+                const header = section.querySelector('.accordion-header');
+                if (header) {
+                    header.setAttribute('aria-expanded', 'true');
+                }
+            }
+        });
+        
+        // Scroll to first error
+        if (errors.length > 0) {
+            const firstErrorSection = document.querySelector(`.accordion-section[data-section="${errors[0].section}"]`);
+            if (firstErrorSection) {
+                firstErrorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    }
+    
+    return isValid;
+}
+
+// Initialize progress tracking on form inputs
+function initRegistrationProgressTracking() {
+    const form = document.getElementById('trainerRegistrationForm');
+    if (!form) return;
+    
+    // Track all input changes
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', updateRegistrationProgress);
+        input.addEventListener('change', updateRegistrationProgress);
+    });
+    
+    // Track checkbox changes for training types
+    const checkboxes = form.querySelectorAll('input[name="training_types[]"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateRegistrationProgress);
+    });
+    
+    // Initial progress update (with delay to ensure DOM is ready)
+    setTimeout(updateRegistrationProgress, 100);
+}
+
 // Initialize animations on page load
 document.addEventListener('DOMContentLoaded', function() {
     initStatsCounter();
