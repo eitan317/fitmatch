@@ -80,8 +80,7 @@ body {
     overflow-y: auto; /* Only body should scroll vertically */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    /* הוספתי: מונע scroll chaining */
-    overscroll-behavior-y: contain;
+    /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" במקום גלילה */
     font-size: 16px;
 }
 
@@ -1297,8 +1296,7 @@ button[type="submit"]:hover,
     scroll-behavior: smooth;
     /* Smooth vertical scroll only */
     touch-action: pan-y;
-    /* הוספתי: מונע scroll chaining */
-    overscroll-behavior-y: contain;
+    /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" */
     /* הוספתי: שיפור ביצועים */
     will-change: scroll-position;
 }
