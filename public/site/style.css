@@ -93,7 +93,7 @@ input, select, textarea, button {
 section,
 main,
 article,
-div:not(.training-types-dropdown):not(.accessibility-menu),
+div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-container):not(.training-types-list),
 .container,
 .page-container,
 .main-container,
@@ -5576,11 +5576,11 @@ fieldset legend {
     z-index: 0;
 }
 
-/* Training Types */
+/* Training Types Container - Exception from global overflow rule */
 .training-types-container {
     width: 100%;
     overflow-x: hidden !important;
-    overflow-y: visible;
+    overflow-y: visible !important;
     box-sizing: border-box;
     transform: none !important;
 }
@@ -5596,11 +5596,13 @@ fieldset legend {
     margin-bottom: 1.5rem;
 }
 
+/* Training Types List - Exception from global overflow rule */
 .training-types-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 0.75rem;
     overflow-x: hidden !important;
+    overflow-y: visible !important;
     padding: 0.5rem;
     width: 100%;
     box-sizing: border-box;
