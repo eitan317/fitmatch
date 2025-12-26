@@ -54,6 +54,56 @@ body.theme-dark {
     -ms-overflow-style: none; /* IE/Edge */
 }
 
+/* Global: Prevent horizontal scrolling and elastic behavior */
+html, body {
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
+    position: relative;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+/* Prevent any element from causing horizontal scroll */
+*, *::before, *::after {
+    max-width: 100%;
+}
+
+/* Ensure form elements don't cause horizontal overflow */
+input, select, textarea, button {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* COMPLETE DISABLE of horizontal interaction for wizard form */
+.wizard-form,
+.wizard-form *,
+.wizard-step,
+.wizard-step *,
+.wizard-navigation,
+.wizard-navigation * {
+    transform: none !important;
+    transition: none !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto !important;
+}
+
+/* Force vertical-only scrolling */
+.wizard-form,
+.wizard-step,
+.wizard-step-content,
+.wizard-navigation {
+    position: static !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
 *::-webkit-scrollbar {
     display: none; /* Chrome/Safari/Opera */
     width: 0;
@@ -65,7 +115,6 @@ body {
     background-image: 
         radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.05) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(107, 182, 255, 0.04) 0%, transparent 50%);
-    /* שינוי: scroll במקום fixed - משפר ביצועי גלילה במובייל */
     background-attachment: scroll;
     color: var(--text-main);
     font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -76,21 +125,26 @@ body {
     line-height: 1.7;
     transition: background-color 0.3s, color 0.3s;
     position: relative;
-    overflow-x: hidden;
-    overflow-y: auto; /* Only body should scroll vertically */
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" במקום גלילה */
+    overflow-x: hidden !important;
+    overflow-y: auto;
+    scroll-behavior: auto;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto;
     font-size: 16px;
+    width: 100%;
 }
 
 /* Global responsive fixes - prevent horizontal scroll */
 html {
-    overflow-x: hidden;
-    overflow-y: auto; /* Only html should scroll vertically */
+    overflow-x: hidden !important;
+    overflow-y: auto;
     width: 100%;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    -webkit-overflow-scrolling: auto;
+    position: relative;
 }
 
 /* Images and videos - responsive */
@@ -225,10 +279,12 @@ a:not(.btn):not(.nav-links a):hover {
     padding: 1rem 1.25rem 2rem;
     width: 100%;
     box-sizing: border-box;
-    overflow: visible !important; /* Force visible - no scroll containers */
-    /* הוספתי: וידוא גלילה חלקה */
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
     position: relative;
-    /* הסרתי: transform: translateZ(0) - גורם לבעיות scroll */
+    transform: none !important;
 }
 
 .container {
@@ -790,13 +846,13 @@ button[type="submit"]:hover,
 }
 
 @keyframes heroCircleMainFloat {
-    0%   { transform: translate3d(0, 0, 0) scale(1); }
-    100% { transform: translate3d(-10px, 8px, 0) scale(1.03); }
+    0%   { transform: scale(1); }
+    100% { transform: scale(1.03); }
 }
 
 @keyframes heroCircleSecondaryFloat {
-    0%   { transform: translate3d(0, 0, 0) scale(1); }
-    100% { transform: translate3d(8px, -8px, 0) scale(1.04); }
+    0%   { transform: scale(1); }
+    100% { transform: scale(1.04); }
 }
 
 .hero-dumbbell {
@@ -1297,16 +1353,16 @@ button[type="submit"]:hover,
     max-width: 600px;
     margin: 0 auto;
     padding: 2.5rem;
-    padding-bottom: 0; /* Remove padding, we'll add margin */
-    overflow: visible;
+    padding-bottom: 0;
+    overflow-x: hidden !important;
+    overflow-y: visible;
     position: relative;
-    scroll-behavior: smooth;
-    margin-bottom: 2rem; /* Space before submit button */
-    /* Smooth vertical scroll only */
-    touch-action: pan-y;
-    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-    /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" */
-    /* הסרתי: will-change: scroll-position - גורם לבעיות */
+    scroll-behavior: auto;
+    margin-bottom: 2rem;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -1971,16 +2027,6 @@ select:focus {
     }
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
 
 /* Auth Divider */
 .auth-divider {
@@ -3804,9 +3850,9 @@ fieldset legend {
 }
 
 @keyframes orbFloat {
-    0%   { transform: translate3d(0, 0, 0); }
-    50%  { transform: translate3d(-16px, 10px, 0); }
-    100% { transform: translate3d(10px, 18px, 0); }
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(10px); }
+    100% { transform: translateY(18px); }
 }
 
 /* Floating Particles */
@@ -3862,7 +3908,6 @@ fieldset legend {
 
 .wave-top {
     top: 0;
-    animation: waveMotion 8s ease-in-out infinite;
     background: linear-gradient(90deg, 
         transparent 0%, 
         rgba(74, 158, 255, 0.15) 25%, 
@@ -4730,17 +4775,6 @@ fieldset legend {
     }
 }
 
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes pulse {
     0%, 100% {
         transform: scale(1);
@@ -4791,16 +4825,6 @@ fieldset legend {
     }
 }
 
-@keyframes slideInRight {
-    0% {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
 
 @keyframes shimmer {
     0% {
@@ -4832,25 +4856,11 @@ fieldset legend {
         opacity: 1;
     }
     100% {
-        transform: translateY(-100vh) translateX(50px) rotate(360deg);
+        transform: translateY(-100vh) rotate(360deg);
         opacity: 0;
     }
 }
 
-@keyframes waveMotion {
-    0%, 100% {
-        transform: translateX(0) translateY(0);
-    }
-    25% {
-        transform: translateX(25%) translateY(-10px);
-    }
-    50% {
-        transform: translateX(50%) translateY(0);
-    }
-    75% {
-        transform: translateX(75%) translateY(10px);
-    }
-}
 
 @keyframes textReveal {
     0% {
@@ -4880,10 +4890,6 @@ fieldset legend {
     animation: fadeIn 0.6s ease-out;
 }
 
-.slide-in-up {
-    animation: slideInUp 0.6s ease-out;
-}
-
 .pulse {
     animation: pulse 2s ease-in-out infinite;
 }
@@ -4902,10 +4908,6 @@ fieldset legend {
 
 .float-up {
     animation: floatUp 0.8s ease-out forwards;
-}
-
-.slide-in-right {
-    animation: slideInRight 0.6s ease-out forwards;
 }
 
 .text-reveal {
@@ -5103,12 +5105,22 @@ fieldset legend {
     margin: 0 auto;
     padding: 0;
     position: relative;
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
 }
 
 .wizard-progress {
     max-width: 600px;
     margin: 0 auto 2rem;
     padding: 0 1rem;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .wizard-progress-bar {
@@ -5142,10 +5154,20 @@ fieldset legend {
     border: 1px solid var(--border-soft);
     padding: 2rem;
     margin-bottom: 2rem;
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    touch-action: pan-y !important;
+    width: 100%;
+    box-sizing: border-box;
+    position: static;
+    transform: none !important;
+    transition: none !important;
 }
 
 .wizard-step.active {
     display: block;
+    transform: none !important;
+    transition: none !important;
 }
 
 .wizard-step-header {
@@ -5169,6 +5191,11 @@ fieldset legend {
 
 .wizard-step-content {
     padding: 0;
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    touch-action: pan-y !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .wizard-navigation {
@@ -5178,6 +5205,11 @@ fieldset legend {
     padding: 1.5rem 0;
     max-width: 600px;
     margin: 0 auto;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .wizard-btn-next,
@@ -5222,6 +5254,12 @@ fieldset legend {
 /* Training Types in Wizard */
 .training-types-container {
     width: 100%;
+    overflow-x: hidden !important;
+    overflow-y: visible;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    box-sizing: border-box;
+    transform: none !important;
 }
 
 .training-types-search-input {
@@ -5240,9 +5278,14 @@ fieldset legend {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 0.75rem;
     max-height: 400px;
+    overflow-x: hidden !important;
     overflow-y: auto;
     padding: 0.5rem;
-    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y !important;
+    overscroll-behavior: none !important;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: auto;
 }
 
 .training-type-checkbox {
@@ -5344,27 +5387,58 @@ fieldset legend {
 }
 
 @media (max-width: 480px) {
+    html, body, main, .page-container, .wizard-form, .wizard-step {
+        overflow-x: hidden !important;
+        touch-action: pan-y !important;
+        overscroll-behavior: none !important;
+    }
+
     .wizard-progress {
         padding: 0 0.5rem;
         margin-bottom: 1.5rem;
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .wizard-step {
         padding: 1.25rem;
         margin-bottom: 1.25rem;
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    .wizard-step.active {
+        transform: none !important;
+        transition: none !important;
     }
 
     .wizard-step-header {
         margin-bottom: 1.5rem;
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .wizard-step-header h2 {
         font-size: 1.1rem;
     }
 
+    .wizard-step-content {
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .wizard-navigation {
         padding: 1rem 0;
         gap: 0.75rem;
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .wizard-btn-next,
@@ -5373,15 +5447,28 @@ fieldset legend {
         min-height: 48px;
         padding: 0.875rem 1.5rem;
         font-size: 0.95rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .training-types-list {
         max-height: 300px;
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .training-types-container {
+        overflow-x: hidden !important;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .training-type-checkbox {
         min-height: 44px;
         padding: 0.625rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .form-group input,
@@ -5390,10 +5477,14 @@ fieldset legend {
         font-size: 16px !important;
         padding: 0.75rem;
         min-height: 44px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .form-group {
         margin-bottom: 1.25rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 

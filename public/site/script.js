@@ -1105,12 +1105,8 @@ function initTrainingTypesSelectorOnRegisterPage() {
     }, true); // Use capture phase to ensure this fires first
 
     // Prevent clicks inside dropdown from closing it
-    // BUT: Don't block touch events that might be for scrolling
     dropdown.addEventListener("click", function (e) {
-        // Only stop propagation for actual clicks, not touch moves
-        if (e.type === 'click') {
-            e.stopPropagation();
-        }
+        e.stopPropagation();
     }, true); // Use capture phase
 
     // Close dropdown when clicking outside - must be attached after toggle listener
@@ -1695,36 +1691,7 @@ function initStatsCounter() {
     });
 }
 
-// Initialize fade-in animations with Intersection Observer
-function initFadeInAnimations() {
-    const fadeElements = document.querySelectorAll('.fade-in, .card, .feature-card, .stat-card');
-    
-    if (fadeElements.length === 0) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    entry.target.classList.add('visible');
-                }, index * 100); // Staggered animation
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-    
-    fadeElements.forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(30px)';
-        element.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
-        observer.observe(element);
-    });
-}
 
-// Smooth scroll behavior
-document.documentElement.style.scrollBehavior = 'smooth';
 
 // ============================================
 // REGISTRATION ACCORDION FUNCTIONALITY
@@ -1995,6 +1962,5 @@ function initRegistrationProgressTracking() {
 // Initialize animations on page load
 document.addEventListener('DOMContentLoaded', function() {
     initStatsCounter();
-    initFadeInAnimations();
 });
 
