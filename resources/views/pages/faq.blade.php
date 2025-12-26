@@ -57,6 +57,8 @@
         
         <div class="form-container">
             <div style="padding: 2rem;">
+                <div class="faq-slider-container" id="faqSlider">
+                    <div class="faq-slider-track">
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         <span>איך אני מוצא מאמן כושר?</span>
@@ -144,6 +146,8 @@
                         אנו ממליצים לתאם עם המאמן מראש על מדיניות הביטולים והשינויים.</p>
                     </div>
                 </div>
+                    </div>
+                </div>
 
                 <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-soft);">
                     <p style="color: var(--text-muted); margin-bottom: 1rem;">לא מצאת את התשובה שחיפשת?</p>
@@ -176,6 +180,13 @@
                 faqItem.classList.add('active');
             }
         }
+
+        // Initialize FAQ slider
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initMobileSlider === 'function') {
+                initMobileSlider('#faqSlider', { cardsPerView: 1 });
+            }
+        });
     </script>
 </body>
 </html>

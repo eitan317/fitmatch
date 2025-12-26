@@ -53,130 +53,132 @@ use Illuminate\Support\Facades\Storage;
                     <p class="admin-section-subtitle">נתונים כלליים על הפלטפורמה</p>
                 </div>
 
-                <div class="admin-stats-grid">
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-users" style="color: var(--primary);"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['total_users']) }}</div>
-                            <div class="admin-stat-label">משתמשים רשומים</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>כל המשתמשים במערכת</span>
+                <div class="admin-stats-slider-container" id="adminStatsSlider">
+                    <div class="admin-stats-slider-track">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-users" style="color: var(--primary);"></i>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-dumbbell" style="color: var(--primary);"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['total_trainers']) }}</div>
-                            <div class="admin-stat-label">סה"כ מאמנים</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-info-circle"></i>
-                                <span>
-                                    @if($stats['active_trainers'] > 0 || $stats['trial_trainers'] > 0)
-                                        {{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון
-                                    @else
-                                        אין מאמנים פעילים
-                                    @endif
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card admin-stat-card-warning">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(255, 193, 7, 0.15);">
-                            <i class="fas fa-clock" style="color: #ffc107;"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['pending_payment_trainers']) }}</div>
-                            <div class="admin-stat-label">ממתינים לתשלום</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>דורש טיפול</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card admin-stat-card-success">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(40, 167, 69, 0.15);">
-                            <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['active_trainers']) }}</div>
-                            <div class="admin-stat-label">מאמנים פעילים</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-check"></i>
-                                <span>פעילים בפלטפורמה</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-hourglass-half" style="color: var(--primary);"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['trial_trainers']) }}</div>
-                            <div class="admin-stat-label">בחודש ניסיון</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-info-circle"></i>
-                                <span>30 יום חינם</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-star" style="color: var(--primary);"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            @if($stats['total_reviews'] > 0)
-                                <div class="admin-stat-value">{{ number_format($stats['average_rating'], 1) }}</div>
-                                <div class="admin-stat-label">דירוג ממוצע</div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['total_users']) }}</div>
+                                <div class="admin-stat-label">משתמשים רשומים</div>
                                 <div class="admin-stat-trend">
-                                    <i class="fas fa-chart-line"></i>
-                                    <span>מתוך {{ number_format($stats['total_reviews']) }} ביקורות</span>
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>כל המשתמשים במערכת</span>
                                 </div>
-                            @else
-                                <div class="admin-stat-value">-</div>
-                                <div class="admin-stat-label">דירוג ממוצע</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-dumbbell" style="color: var(--primary);"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['total_trainers']) }}</div>
+                                <div class="admin-stat-label">סה"כ מאמנים</div>
                                 <div class="admin-stat-trend">
                                     <i class="fas fa-info-circle"></i>
-                                    <span>אין ביקורות עדיין</span>
+                                    <span>
+                                        @if($stats['active_trainers'] > 0 || $stats['trial_trainers'] > 0)
+                                            {{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון
+                                        @else
+                                            אין מאמנים פעילים
+                                        @endif
+                                    </span>
                                 </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-calendar-week" style="color: var(--primary);"></i>
-                        </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['trainers_this_month']) }}</div>
-                            <div class="admin-stat-label">הרשמות החודש</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>{{ $stats['trainers_last_7_days'] }} ב-7 ימים האחרונים</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="admin-stat-card">
-                        <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
-                            <i class="fas fa-eye" style="color: var(--primary);"></i>
+                        <div class="admin-stat-card admin-stat-card-warning">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(255, 193, 7, 0.15);">
+                                <i class="fas fa-clock" style="color: #ffc107;"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['pending_payment_trainers']) }}</div>
+                                <div class="admin-stat-label">ממתינים לתשלום</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span>דורש טיפול</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="admin-stat-content">
-                            <div class="admin-stat-value">{{ number_format($stats['total_page_views']) }}</div>
-                            <div class="admin-stat-label">צפיות באתר</div>
-                            <div class="admin-stat-trend">
-                                <i class="fas fa-chart-line"></i>
-                                <span>{{ $stats['page_views_today'] }} היום, {{ $stats['page_views_this_month'] }} החודש</span>
+
+                        <div class="admin-stat-card admin-stat-card-success">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(40, 167, 69, 0.15);">
+                                <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['active_trainers']) }}</div>
+                                <div class="admin-stat-label">מאמנים פעילים</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-check"></i>
+                                    <span>פעילים בפלטפורמה</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-hourglass-half" style="color: var(--primary);"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['trial_trainers']) }}</div>
+                                <div class="admin-stat-label">בחודש ניסיון</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>30 יום חינם</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-star" style="color: var(--primary);"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                @if($stats['total_reviews'] > 0)
+                                    <div class="admin-stat-value">{{ number_format($stats['average_rating'], 1) }}</div>
+                                    <div class="admin-stat-label">דירוג ממוצע</div>
+                                    <div class="admin-stat-trend">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>מתוך {{ number_format($stats['total_reviews']) }} ביקורות</span>
+                                    </div>
+                                @else
+                                    <div class="admin-stat-value">-</div>
+                                    <div class="admin-stat-label">דירוג ממוצע</div>
+                                    <div class="admin-stat-trend">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>אין ביקורות עדיין</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-calendar-week" style="color: var(--primary);"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['trainers_this_month']) }}</div>
+                                <div class="admin-stat-label">הרשמות החודש</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>{{ $stats['trainers_last_7_days'] }} ב-7 ימים האחרונים</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-icon-wrapper" style="background: rgba(0, 217, 255, 0.1);">
+                                <i class="fas fa-eye" style="color: var(--primary);"></i>
+                            </div>
+                            <div class="admin-stat-content">
+                                <div class="admin-stat-value">{{ number_format($stats['total_page_views']) }}</div>
+                                <div class="admin-stat-label">צפיות באתר</div>
+                                <div class="admin-stat-trend">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>{{ $stats['page_views_today'] }} היום, {{ $stats['page_views_this_month'] }} החודש</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -195,6 +197,8 @@ use Illuminate\Support\Facades\Storage;
                     </div>
                 </div>
 
+                <div class="admin-pending-slider-container" id="adminPendingSlider">
+                    <div class="admin-pending-slider-track">
                 @forelse($pendingTrainers as $trainer)
                     <div class="admin-trainer-card admin-trainer-card-pending">
                         <div class="admin-trainer-card-header">
@@ -373,6 +377,8 @@ use Illuminate\Support\Facades\Storage;
                         <p class="admin-empty-description">כל הבקשות טופלו או שאין בקשות חדשות</p>
                     </div>
                 @endforelse
+                    </div>
+                </div>
             </section>
 
             <!-- Active Trainers Section -->
@@ -396,7 +402,8 @@ use Illuminate\Support\Facades\Storage;
                     </div>
                 </div>
 
-                <div class="admin-approved-trainers-grid">
+                <div class="admin-active-slider-container" id="adminActiveSlider">
+                    <div class="admin-active-slider-track">
                     @forelse($activeTrainers as $trainer)
                         <div class="admin-trainer-card admin-trainer-card-approved">
                             <div class="admin-trainer-card-header">
@@ -469,6 +476,7 @@ use Illuminate\Support\Facades\Storage;
                             <p class="admin-empty-description">עדיין לא יש מאמנים פעילים בפלטפורמה</p>
                         </div>
                     @endforelse
+                    </div>
                 </div>
             </section>
         </main>
@@ -544,6 +552,15 @@ use Illuminate\Support\Facades\Storage;
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeDeleteModal();
+            }
+        });
+
+        // Initialize admin sliders
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initMobileSlider === 'function') {
+                initMobileSlider('#adminStatsSlider', { cardsPerView: 1 });
+                initMobileSlider('#adminPendingSlider', { cardsPerView: 1 });
+                initMobileSlider('#adminActiveSlider', { cardsPerView: 1 });
             }
         });
     </script>

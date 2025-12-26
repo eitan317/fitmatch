@@ -229,10 +229,11 @@
             const stepText = document.getElementById('wizardStepText');
             const stepPercentage = document.getElementById('wizardStepPercentage');
 
-            // Swipe detection state
+            // Swipe detection state - VERTICAL
             let isDragging = false;
-            let startX = 0;
-            let currentX = 0;
+            let startY = 0; // Changed from startX for vertical swipe
+            let currentY = 0; // Changed from currentX
+            let startX = 0; // Track X for horizontal scroll detection
             let startTime = 0;
             let currentPointerId = null;
             const SWIPE_THRESHOLD = 60; // pixels
@@ -332,7 +333,7 @@
                 if (stepPercentage) stepPercentage.textContent = Math.round(percentage) + '%';
             }
 
-            // Update slider position
+            // Update slider position - VERTICAL
             function updateSliderPosition(step, animate = true) {
                 if (!animate) {
                     sliderTrack.style.transition = 'none';
@@ -341,7 +342,7 @@
                 }
                 
                 const offset = -step * 100;
-                sliderTrack.style.transform = `translateX(${offset}%)`;
+                sliderTrack.style.transform = `translateY(${offset}%)`; // Changed from translateX
                 
                 // Update active step
                 steps.forEach((s, index) => {
@@ -426,14 +427,15 @@
                 });
             }
 
-            // Pointer Events for swipe detection
+            // Pointer Events for VERTICAL swipe detection
             function handlePointerDown(e) {
                 // Only handle primary pointer (mouse or first touch)
                 if (e.isPrimary === false) return;
                 
                 isDragging = true;
-                startX = e.clientX;
-                currentX = startX;
+                startY = e.clientY; // Changed from clientX
+                startX = e.clientX; // Track X for horizontal detection
+                currentY = startY; // Changed from currentX
                 startTime = Date.now();
                 currentPointerId = e.pointerId;
                 
@@ -449,22 +451,30 @@
             function handlePointerMove(e) {
                 if (!isDragging || e.pointerId !== currentPointerId) return;
                 
-                currentX = e.clientX;
-                const deltaX = currentX - startX;
+                currentY = e.clientY; // Changed from clientX
+                const currentX = e.clientX; // Track X
+                const deltaY = currentY - startY; // Changed from deltaX
+                const deltaX = Math.abs(currentX - startX); // Track horizontal movement
                 
-                // Calculate position with resistance at boundaries
-                const containerWidth = sliderContainer.offsetWidth;
-                const baseOffset = -currentStep * containerWidth;
-                let offset = baseOffset + deltaX;
-                
-                // Add resistance at boundaries
-                if (currentStep === 0 && deltaX > 0) {
-                    offset = baseOffset + deltaX * 0.3; // Resist right swipe on first step
-                } else if (currentStep === totalSteps - 1 && deltaX < 0) {
-                    offset = baseOffset + deltaX * 0.3; // Resist left swipe on last step
+                // If horizontal movement is greater than vertical, allow scrolling instead
+                if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+                    // This is a horizontal scroll, don't prevent it
+                    return;
                 }
                 
-                sliderTrack.style.transform = `translateX(${offset}px)`;
+                // Calculate position with resistance at boundaries - VERTICAL
+                const containerHeight = sliderContainer.offsetHeight; // Changed from containerWidth
+                const baseOffset = -currentStep * containerHeight; // Changed calculation
+                let offset = baseOffset + deltaY; // Changed from deltaX
+                
+                // Add resistance at boundaries
+                if (currentStep === 0 && deltaY > 0) {
+                    offset = baseOffset + deltaY * 0.3; // Resist down swipe on first step
+                } else if (currentStep === totalSteps - 1 && deltaY < 0) {
+                    offset = baseOffset + deltaY * 0.3; // Resist up swipe on last step
+                }
+                
+                sliderTrack.style.transform = `translateY(${offset}px)`; // Changed from translateX
                 
                 e.preventDefault();
             }
@@ -472,26 +482,36 @@
             function handlePointerUp(e) {
                 if (!isDragging || e.pointerId !== currentPointerId) return;
                 
-                const deltaX = currentX - startX;
+                const deltaY = currentY - startY; // Changed from deltaX
+                const deltaX = Math.abs(e.clientX - startX); // Track horizontal
                 const deltaTime = Date.now() - startTime;
-                const velocity = Math.abs(deltaX) / deltaTime;
+                const velocity = deltaTime > 0 ? Math.abs(deltaY) / deltaTime : 0;
                 
-                // Determine if we should change steps
+                // If it was more of a horizontal scroll, don't swipe
+                if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+                    isDragging = false;
+                    sliderTrack.classList.remove('dragging');
+                    sliderTrack.releasePointerCapture(currentPointerId);
+                    currentPointerId = null;
+                    updateSliderPosition(currentStep, true);
+                    return;
+                }
+                
+                // Determine if we should change steps - VERTICAL
                 let shouldChange = false;
                 let newStep = currentStep;
                 
-                // Check threshold or velocity
-                if (Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-                    // RTL: swipe left (negative deltaX) = next, swipe right (positive deltaX) = prev
-                    // This matches Instagram behavior regardless of RTL
-                    if (deltaX < -SWIPE_THRESHOLD || (deltaX < 0 && velocity > VELOCITY_THRESHOLD)) {
-                        // Swipe left = next step
+                // Check threshold or velocity - VERTICAL
+                if (Math.abs(deltaY) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+                    // Vertical swipe: swipe down (positive deltaY) = next, swipe up (negative deltaY) = prev
+                    if (deltaY > 0) {
+                        // Swipe down = next step
                         if (currentStep < totalSteps - 1) {
                             newStep = currentStep + 1;
                             shouldChange = true;
                         }
-                    } else if (deltaX > SWIPE_THRESHOLD || (deltaX > 0 && velocity > VELOCITY_THRESHOLD)) {
-                        // Swipe right = previous step
+                    } else {
+                        // Swipe up = previous step
                         if (currentStep > 0) {
                             newStep = currentStep - 1;
                             shouldChange = true;

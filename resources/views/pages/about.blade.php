@@ -35,34 +35,36 @@
 
                 <div style="margin-bottom: 2rem;">
                     <h2 style="color: var(--primary); margin-bottom: 1rem; font-size: 2rem;">למה לבחור בנו?</h2>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
-                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
-                            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
-                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">מאמנים מאומתים</h3>
-                            <p style="color: var(--text-muted); line-height: 1.6;">
-                                כל המאמנים בפלטפורמה שלנו עוברים תהליך אימות מקצועי כדי להבטיח איכות ושירות מעולה.
-                            </p>
-                        </div>
-                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
-                            <div style="font-size: 2.5rem; margin-bottom: 1rem;">💪</div>
-                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">מגוון רחב</h3>
-                            <p style="color: var(--text-muted); line-height: 1.6;">
-                                מאות מאמנים מקצועיים במגוון תחומים: כוח, אירובי, יוגה, פילאטיס ועוד.
-                            </p>
-                        </div>
-                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
-                            <div style="font-size: 2.5rem; margin-bottom: 1rem;">⭐</div>
-                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">ביקורות אמיתיות</h3>
-                            <p style="color: var(--text-muted); line-height: 1.6;">
-                                קראו ביקורות אמיתיות ממתאמנים אחרים כדי לבחור את המאמן המתאים לכם.
-                            </p>
-                        </div>
-                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
-                            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔒</div>
-                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">אבטחה ואמינות</h3>
-                            <p style="color: var(--text-muted); line-height: 1.6;">
-                                הפלטפורמה שלנו מאובטחת ומאומתת, כך שתוכלו להתאמן בביטחון מלא.
-                            </p>
+                    <div class="features-slider-container" id="aboutFeaturesSlider">
+                        <div class="features-slider-track">
+                            <div class="feature-card" style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
+                                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">מאמנים מאומתים</h3>
+                                <p style="color: var(--text-muted); line-height: 1.6;">
+                                    כל המאמנים בפלטפורמה שלנו עוברים תהליך אימות מקצועי כדי להבטיח איכות ושירות מעולה.
+                                </p>
+                            </div>
+                            <div class="feature-card" style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
+                                <div style="font-size: 2.5rem; margin-bottom: 1rem;">💪</div>
+                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">מגוון רחב</h3>
+                                <p style="color: var(--text-muted); line-height: 1.6;">
+                                    מאות מאמנים מקצועיים במגוון תחומים: כוח, אירובי, יוגה, פילאטיס ועוד.
+                                </p>
+                            </div>
+                            <div class="feature-card" style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
+                                <div style="font-size: 2.5rem; margin-bottom: 1rem;">⭐</div>
+                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">ביקורות אמיתיות</h3>
+                                <p style="color: var(--text-muted); line-height: 1.6;">
+                                    קראו ביקורות אמיתיות ממתאמנים אחרים כדי לבחור את המאמן המתאים לכם.
+                                </p>
+                            </div>
+                            <div class="feature-card" style="background: rgba(220, 38, 38, 0.1); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-soft);">
+                                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔒</div>
+                                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">אבטחה ואמינות</h3>
+                                <p style="color: var(--text-muted); line-height: 1.6;">
+                                    הפלטפורמה שלנו מאובטחת ומאומתת, כך שתוכלו להתאמן בביטחון מלא.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -92,6 +94,13 @@
     <script>
         if (typeof initTheme === 'function') initTheme();
         if (typeof initNavbarToggle === 'function') initNavbarToggle();
+        
+        // Initialize about page slider
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initMobileSlider === 'function') {
+                initMobileSlider('#aboutFeaturesSlider', { cardsPerView: 1 });
+            }
+        });
     </script>
 </body>
 </html>

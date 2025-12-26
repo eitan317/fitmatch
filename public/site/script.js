@@ -2001,7 +2001,10 @@ function initMobileSlider(containerSelector, options = {}) {
         child.classList.contains('feature-card') ||
         child.classList.contains('stat-card') ||
         child.classList.contains('trainer-card') ||
-        !child.classList.contains('slider-indicators')
+        child.classList.contains('admin-stat-card') ||
+        child.classList.contains('admin-trainer-card') ||
+        child.classList.contains('faq-item') ||
+        (!child.classList.contains('slider-indicators') && child.nodeType === 1)
     );
     
     if (cards.length === 0) {
@@ -2014,12 +2017,13 @@ function initMobileSlider(containerSelector, options = {}) {
     // Slider state
     let currentIndex = 0;
     let isDragging = false;
-    let startX = 0;
-    let currentX = 0;
+    let startY = 0; // Changed from startX for vertical swipe
+    let currentY = 0; // Changed from currentX
     let startTime = 0;
     let currentPointerId = null;
+    let startX = 0; // Track X for horizontal scroll detection
 
-    // Update position
+    // Update position - VERTICAL
     function updatePosition(index, animate = true) {
         if (!isMobile()) {
             track.style.transform = 'none';
@@ -2035,11 +2039,11 @@ function initMobileSlider(containerSelector, options = {}) {
             track.style.transition = 'none';
         }
 
-        const containerWidth = container.offsetWidth;
-        const cardWidth = containerWidth;
-        const offset = -currentIndex * cardWidth;
+        const containerHeight = container.offsetHeight; // Changed from containerWidth
+        const cardHeight = containerHeight; // Changed from cardWidth
+        const offset = -currentIndex * cardHeight; // Changed calculation
         
-        track.style.transform = `translateX(${offset}px)`;
+        track.style.transform = `translateY(${offset}px)`; // Changed from translateX
         
         if (showIndicators) updateIndicators();
     }
@@ -2076,35 +2080,70 @@ function initMobileSlider(containerSelector, options = {}) {
         });
     }
 
-    // Pointer events
+    // Check if element is interactive (should not trigger swipe)
+    function isInteractiveElement(element) {
+        if (!element) return false;
+        const tagName = element.tagName.toLowerCase();
+        const interactiveTags = ['a', 'button', 'input', 'select', 'textarea', 'label'];
+        if (interactiveTags.includes(tagName)) return true;
+        
+        // Check if element has click handlers or is inside a link/button
+        while (element && element !== container) {
+            if (element.onclick || element.getAttribute('onclick')) return true;
+            if (element.tagName && interactiveTags.includes(element.tagName.toLowerCase())) return true;
+            element = element.parentElement;
+        }
+        return false;
+    }
+
+    // Pointer events - VERTICAL swipe - attach to CONTAINER so it works everywhere
     function handleDown(e) {
         if (!isMobile() || e.isPrimary === false) return;
+        
+        // Don't start swipe if clicking on interactive elements (unless it's a card itself)
+        const target = e.target;
+        if (isInteractiveElement(target) && 
+            !target.closest('.feature-card, .stat-card, .trainer-card, .admin-stat-card, .admin-trainer-card, .faq-item')) {
+            return;
+        }
+        
         isDragging = true;
-        startX = e.clientX;
-        currentX = startX;
+        startY = e.clientY; // Changed from clientX
+        startX = e.clientX; // Track X for horizontal detection
+        currentY = startY; // Changed from currentX
         startTime = Date.now();
         currentPointerId = e.pointerId;
-        track.setPointerCapture(e.pointerId);
+        container.setPointerCapture(e.pointerId);
         track.classList.add('dragging');
         e.preventDefault();
     }
 
     function handleMove(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
-        currentX = e.clientX;
-        const deltaX = currentX - startX;
-        const containerWidth = container.offsetWidth;
-        const baseOffset = -currentIndex * containerWidth;
-        let offset = baseOffset + deltaX;
         
-        const maxIndex = cards.length - cardsPerView;
-        if (currentIndex === 0 && deltaX > 0) {
-            offset = baseOffset + deltaX * 0.3;
-        } else if (currentIndex >= maxIndex && deltaX < 0) {
-            offset = baseOffset + deltaX * 0.3;
+        currentY = e.clientY; // Changed from clientX
+        const currentX = e.clientX; // Track X
+        const deltaY = currentY - startY; // Changed from deltaX
+        const deltaX = Math.abs(currentX - startX); // Track horizontal movement
+        
+        // If horizontal movement is greater than vertical, allow scrolling instead
+        if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+            // This is a horizontal scroll, don't prevent it
+            return;
         }
         
-        track.style.transform = `translateX(${offset}px)`;
+        const containerHeight = container.offsetHeight; // Changed from containerWidth
+        const baseOffset = -currentIndex * containerHeight; // Changed calculation
+        let offset = baseOffset + deltaY; // Changed from deltaX
+        
+        const maxIndex = cards.length - cardsPerView;
+        if (currentIndex === 0 && deltaY > 0) { // Swiping down at start
+            offset = baseOffset + deltaY * 0.3;
+        } else if (currentIndex >= maxIndex && deltaY < 0) { // Swiping up at end
+            offset = baseOffset + deltaY * 0.3;
+        }
+        
+        track.style.transform = `translateY(${offset}px)`; // Changed from translateX
         track.style.transition = 'none';
         e.preventDefault();
     }
@@ -2112,25 +2151,35 @@ function initMobileSlider(containerSelector, options = {}) {
     function handleUp(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
         
-        const deltaX = currentX - startX;
+        const deltaY = currentY - startY; // Changed from deltaX
+        const deltaX = Math.abs(e.clientX - startX); // Track horizontal
         const deltaTime = Date.now() - startTime;
-        const velocity = deltaTime > 0 ? Math.abs(deltaX) / deltaTime : 0;
+        const velocity = deltaTime > 0 ? Math.abs(deltaY) / deltaTime : 0;
+        
+        // If it was more of a horizontal scroll, don't swipe
+        if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+            isDragging = false;
+            track.classList.remove('dragging');
+            container.releasePointerCapture(currentPointerId);
+            currentPointerId = null;
+            updatePosition(currentIndex, true);
+            return;
+        }
         
         let newIndex = currentIndex;
-        const isRTL = document.documentElement.dir === 'rtl';
 
-        // Instagram-style swipe: swipe left = next, swipe right = previous
-        if (Math.abs(deltaX) > swipeThreshold || velocity > velocityThreshold) {
-            if (deltaX < 0) { // Swiping left
-                newIndex = isRTL ? Math.max(0, currentIndex - 1) : Math.min(cards.length - cardsPerView, currentIndex + 1);
-            } else { // Swiping right
-                newIndex = isRTL ? Math.min(cards.length - cardsPerView, currentIndex + 1) : Math.max(0, currentIndex - 1);
+        // Vertical swipe: swipe down = next, swipe up = previous
+        if (Math.abs(deltaY) > swipeThreshold || velocity > velocityThreshold) {
+            if (deltaY > 0) { // Swiping down (positive) = next
+                newIndex = Math.min(cards.length - cardsPerView, currentIndex + 1);
+            } else { // Swiping up (negative) = previous
+                newIndex = Math.max(0, currentIndex - 1);
             }
         }
         
         isDragging = false;
         track.classList.remove('dragging');
-        track.releasePointerCapture(currentPointerId);
+        container.releasePointerCapture(currentPointerId);
         currentPointerId = null;
         
         updatePosition(newIndex, true);
@@ -2141,17 +2190,17 @@ function initMobileSlider(containerSelector, options = {}) {
         isDragging = false;
         track.classList.remove('dragging');
         if (currentPointerId !== null) {
-            track.releasePointerCapture(currentPointerId);
+            container.releasePointerCapture(currentPointerId);
             currentPointerId = null;
         }
         updatePosition(currentIndex, true);
     }
 
-    // Attach events
-    track.addEventListener('pointerdown', handleDown);
-    track.addEventListener('pointermove', handleMove);
-    track.addEventListener('pointerup', handleUp);
-    track.addEventListener('pointercancel', handleCancel);
+    // Attach events to CONTAINER (not track) so it works everywhere
+    container.addEventListener('pointerdown', handleDown);
+    container.addEventListener('pointermove', handleMove);
+    container.addEventListener('pointerup', handleUp);
+    container.addEventListener('pointercancel', handleCancel);
 
     // Initialize
     updatePosition(0, false);
