@@ -3372,6 +3372,9 @@ fieldset legend {
     z-index: 10000; /* very high, above other cards including pricing section */
     display: none;
     backdrop-filter: blur(18px);
+    max-height: 400px; /* הגבלת גובה מקסימלי */
+    overflow-y: auto; /* scroll פנימי אנכי */
+    overflow-x: hidden; /* מונע scroll אופקי */
 }
 
 .training-types-dropdown.open {
@@ -3399,8 +3402,6 @@ fieldset legend {
     list-style: none;
     margin: 0;
     padding: 0.15rem 0 0;
-    /* הסרתי: max-height ו-overflow-y: auto - יוצרים scroll container נפרד */
-    /* הגלילה תהיה של ה-body - רציפה וחלקה */
 }
 
 .training-type-item {
