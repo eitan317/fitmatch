@@ -1,9 +1,6 @@
 @php
 use Illuminate\Support\Facades\Storage;
 @endphp
-@php
-use Illuminate\Support\Facades\Storage;
-@endphp
 <!DOCTYPE html>
 <html lang="{{ session('locale', 'he') }}" dir="{{ in_array(session('locale', 'he'), ['he', 'ar']) ? 'rtl' : 'ltr' }}">
 <head>
