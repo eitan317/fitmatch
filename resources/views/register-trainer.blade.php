@@ -104,8 +104,15 @@
 
                 <div class="form-group">
                     <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                    <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" class="form-control">
-                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; display: block;">גודל מקסימלי: 5MB. פורמטים מותרים: JPG, PNG, GIF</small>
+                    <label for="profile_image" class="file-upload-btn" style="display: block; padding: 1.5rem; border: 2px dashed var(--border-soft); border-radius: 12px; text-align: center; cursor: pointer; background: var(--bg-card); transition: all 0.2s ease;">
+                        <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--primary);"></i>
+                        <span style="color: var(--text-main); font-weight: 500;">לחץ להעלאת תמונה</span>
+                        <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                    </label>
+                    <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
+                        <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    </div>
+                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">גודל מקסימלי: 5MB. פורמטים: JPG, PNG, GIF</small>
                     @if($errors->has('profile_image'))
                         <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
                     @endif
@@ -285,6 +292,50 @@
                         return false;
                     }
                 });
+            }
+            
+            // תצוגה מקדימה לתמונת פרופיל
+            const profileImageInput = document.getElementById('profile_image');
+            if (profileImageInput) {
+                profileImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const preview = document.getElementById('imagePreview');
+                            const img = document.getElementById('previewImg');
+                            if (preview && img) {
+                                img.src = e.target.result;
+                                preview.style.display = 'block';
+                            }
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        const preview = document.getElementById('imagePreview');
+                        if (preview) {
+                            preview.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // פתיחת הסקציה הראשונה אוטומטית בטלפון
+            if (window.innerWidth <= 480) {
+                setTimeout(function() {
+                    const firstSection = document.querySelector('.accordion-section[data-section="1"]');
+                    if (firstSection) {
+                        firstSection.classList.add('active');
+                        const content = firstSection.querySelector('.accordion-content');
+                        if (content) {
+                            content.style.maxHeight = '3000px';
+                            content.style.padding = '0 1.75rem 1.5rem 1.75rem';
+                        }
+                        // עדכון הפרוגרס אם הפונקציה קיימת
+                        if (typeof initRegistrationProgressTracking === 'function') {
+                            initRegistrationProgressTracking();
+                        }
+                    }
+                }, 200);
             }
         }
         

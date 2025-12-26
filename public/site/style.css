@@ -1629,10 +1629,71 @@ button[type="submit"]:hover,
     }
     
     .sticky-submit {
-        bottom: 0.25rem;
-        margin-top: 1.25rem;
-        padding: 0.875rem 1.5rem;
-        font-size: 0.95rem;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        padding: 1.25rem !important;
+        font-size: 1.1rem !important;
+        z-index: 9999 !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+        margin: 0 !important;
+    }
+    
+    /* הוספת padding לתחתית העמוד כדי שהתוכן לא יוסתר */
+    .form-container {
+        padding-bottom: 100px !important;
+    }
+    
+    /* הגדלת שדות טקסט ומרווחים */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px !important; /* מונע zoom אוטומטי ב-iOS */
+        padding: 1rem !important; /* יותר נוח למגע */
+        min-height: 48px !important; /* גודל מינימלי למגע */
+    }
+    
+    .form-group {
+        margin-bottom: 1.75rem !important; /* יותר רווח בין שדות */
+    }
+    
+    /* הגדלת accordion header */
+    .accordion-header {
+        padding: 1.25rem 1rem !important; /* יותר מקום למגע */
+        min-height: 60px !important; /* גובה מינימלי */
+    }
+    
+    /* שיפור Progress Indicator */
+    .progress-sections {
+        grid-template-columns: repeat(2, 1fr) !important; /* 2 עמודות במקום 4 */
+        gap: 0.5rem;
+    }
+    
+    .section-name {
+        font-size: 0.75rem !important; /* קטן יותר */
+    }
+    
+    /* הגדלת checkboxes בטלפון */
+    .training-type-option input[type="checkbox"] {
+        width: 24px !important; /* במקום 16px */
+        height: 24px !important;
+    }
+    
+    /* שיפור כפתור העלאת תמונה בטלפון */
+    .file-upload-btn {
+        padding: 2rem 1rem !important;
+        min-height: 120px;
+    }
+    
+    .file-upload-btn i {
+        font-size: 2.5rem !important;
+    }
+    
+    .file-upload-btn span {
+        font-size: 1rem !important;
     }
 }
 
@@ -1690,6 +1751,15 @@ select:focus {
 .form-group input[type="file"] {
     padding: 0.5rem;
     cursor: pointer;
+}
+
+.file-upload-btn {
+    transition: all 0.2s ease;
+}
+
+.file-upload-btn:hover {
+    border-color: var(--primary) !important;
+    background: rgba(220, 38, 38, 0.05) !important;
 }
 
 #imagePreview {
