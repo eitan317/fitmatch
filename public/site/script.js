@@ -1775,8 +1775,12 @@ function toggleAccordionSection(header) {
     // Smooth scroll to section if opening
     if (section.classList.contains('active')) {
         setTimeout(() => {
-            section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
+            section.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'nearest'
+            });
+        }, 50); // Reduced from 100ms for faster response
     }
     
     // Update progress after toggle

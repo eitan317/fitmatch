@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class TrainerController extends Controller
@@ -112,15 +113,42 @@ class TrainerController extends Controller
         // Get owner email from authenticated user
         $ownerEmail = Auth::user()->email;
 
-        // Handle profile image upload
+        // Handle profile image upload with error handling
         $profileImagePath = null;
         if ($request->hasFile('profile_image')) {
-            $file = $request->file('profile_image');
-            // Generate unique filename
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            
-            // Store in public storage under trainers directory
-            $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+            try {
+                $file = $request->file('profile_image');
+                
+                // Check if file is valid
+                if (!$file->isValid()) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['profile_image' => 'הקובץ לא תקין. אנא נסה שוב.']);
+                }
+                
+                // Generate unique filename
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                
+                // Ensure trainers directory exists
+                $trainersPath = storage_path('app/public/trainers');
+                if (!File::exists($trainersPath)) {
+                    File::makeDirectory($trainersPath, 0755, true);
+                }
+                
+                // Store in public storage under trainers directory
+                $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+                
+                if (!$profileImagePath) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Profile image upload failed: ' . $e->getMessage());
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['profile_image' => 'שגיאה בהעלאת התמונה. אנא נסה שוב.']);
+            }
         }
 
         $trainerData = [
