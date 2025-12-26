@@ -81,26 +81,6 @@ input, select, textarea, button {
     box-sizing: border-box;
 }
 
-/* Prevent horizontal interaction for wizard form only */
-.wizard-form,
-.wizard-form *,
-.wizard-step,
-.wizard-step *,
-.wizard-navigation,
-.wizard-navigation * {
-    overflow-x: hidden !important;
-    overscroll-behavior-x: none !important;
-}
-
-/* Force vertical-only scrolling */
-.wizard-form,
-.wizard-step,
-.wizard-step-content,
-.wizard-navigation {
-    position: static !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
 
 *::-webkit-scrollbar {
     display: none; /* Chrome/Safari/Opera */
@@ -4567,62 +4547,6 @@ fieldset legend {
     padding: 0 1.5rem;
 }
 
-/* Feature Cards Slider - HORIZONTAL */
-.features-slider-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    position: relative;
-}
-
-.features-slider-track {
-    display: flex;
-    gap: 2rem;
-    transition: transform 200ms ease-out;
-}
-
-.features-slider-track.dragging {
-    transition: none;
-    cursor: grabbing;
-}
-
-.features-slider-track.dragging * {
-    -webkit-user-select: none;
-    user-select: none;
-    pointer-events: none;
-}
-
-.features-slider-container .feature-card {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .features-slider-container {
-        overflow-x: visible;
-    }
-    .features-slider-track {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        transform: none !important;
-        gap: 2rem;
-    }
-    .features-slider-container .feature-card {
-        flex: none;
-        min-width: auto;
-        width: auto;
-    }
-}
-
-@media (max-width: 767px) {
-    .features-slider-container {
-        overflow-x: hidden;
-        touch-action: pan-y;
-        overscroll-behavior-x: none;
-    }
-}
 
 .feature-card {
     background: var(--bg-card);
@@ -4679,62 +4603,6 @@ fieldset legend {
     padding: 0 1.5rem;
 }
 
-/* Stats Cards Slider */
-.stats-slider-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    position: relative;
-}
-
-.stats-slider-track {
-    display: flex;
-    gap: 2rem;
-    transition: transform 200ms ease-out;
-}
-
-.stats-slider-track.dragging {
-    transition: none;
-    cursor: grabbing;
-}
-
-.stats-slider-track.dragging * {
-    -webkit-user-select: none;
-    user-select: none;
-    pointer-events: none;
-}
-
-.stats-slider-container .stat-card {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .stats-slider-container {
-        overflow-x: visible;
-    }
-    .stats-slider-track {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        transform: none !important;
-        gap: 2rem;
-    }
-    .stats-slider-container .stat-card {
-        flex: none;
-        min-width: auto;
-        width: auto;
-    }
-}
-
-@media (max-width: 767px) {
-    .stats-slider-container {
-        overflow-x: hidden;
-        touch-action: pan-y;
-        overscroll-behavior-x: none;
-    }
-}
 
 .stat-card {
     text-align: center;
@@ -5522,196 +5390,7 @@ fieldset legend {
     z-index: 0;
 }
 
-/* ============================================
-   WIZARD / STEP-BASED FORM STYLES
-   ============================================ */
-
-.wizard-form {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0;
-    position: relative;
-    width: 100%;
-}
-
-/* Slider Container - Mobile-first swipe - VERTICAL */
-.wizard-slider-container {
-    width: 100%;
-    overflow-y: hidden;
-    overflow-x: visible;
-    touch-action: pan-x;
-    overscroll-behavior-y: none;
-    position: relative;
-    -webkit-overflow-scrolling: touch;
-}
-
-.wizard-slider-track {
-    display: flex;
-    flex-direction: column;
-    will-change: transform;
-    transition: transform 200ms ease-out;
-    width: 100%;
-}
-
-.wizard-slider-track.dragging {
-    transition: none;
-    cursor: grabbing;
-}
-
-.wizard-slider-track.dragging * {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.wizard-slider-track.dragging input,
-.wizard-slider-track.dragging textarea,
-.wizard-slider-track.dragging select,
-.wizard-slider-track.dragging button {
-    pointer-events: none;
-}
-
-.wizard-progress {
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    padding: 0 1rem;
-    overflow-x: hidden !important;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.wizard-progress-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--border-soft);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-
-.wizard-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    border-radius: 4px;
-}
-
-.wizard-progress-text {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.wizard-step {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-soft);
-    padding: 2rem;
-    margin-bottom: 2rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-    touch-action: pan-y;
-    box-sizing: border-box;
-    position: relative;
-    outline: none;
-}
-
-.wizard-step:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-.wizard-step-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-soft);
-}
-
-.wizard-step-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0 0 0.5rem 0;
-}
-
-.wizard-step-subtitle {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    margin: 0.5rem 0 0 0;
-}
-
-.wizard-step-content {
-    padding: 0;
-    overflow-x: hidden !important;
-    overflow-y: visible;
-    touch-action: pan-y !important;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.wizard-navigation {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.5rem 0;
-    max-width: 600px;
-    margin: 0 auto;
-    overflow-x: hidden !important;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.wizard-btn-next,
-.wizard-btn-back,
-.wizard-btn-submit {
-    min-height: 48px;
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    flex: 1;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-}
-
-.wizard-btn-next,
-.wizard-btn-submit {
-    background: var(--primary);
-    color: var(--button-text);
-    margin-right: auto;
-}
-
-.wizard-btn-next:active,
-.wizard-btn-submit:active {
-    background: var(--primary-dark);
-}
-
-.wizard-btn-next:disabled,
-.wizard-btn-submit:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.wizard-btn-back {
-    background: var(--bg-card);
-    color: var(--text-main);
-    border: 2px solid var(--border-soft);
-    margin-left: auto;
-}
-
-.wizard-btn-back:active {
-    background: var(--bg-secondary);
-    border-color: var(--primary);
-}
-
-/* Training Types in Wizard */
+/* Training Types */
 .training-types-container {
     width: 100%;
     overflow-x: hidden !important;
@@ -5735,13 +5414,10 @@ fieldset legend {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 0.75rem;
-    max-height: 400px;
     overflow-x: hidden !important;
-    overflow-y: auto;
     padding: 0.5rem;
     width: 100%;
     box-sizing: border-box;
-    -webkit-overflow-scrolling: touch;
 }
 
 .training-type-checkbox {
@@ -5815,93 +5491,13 @@ fieldset legend {
 
 /* Mobile Optimizations */
 @media (max-width: 768px) {
-    .wizard-step {
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .wizard-step-header h2 {
-        font-size: 1.25rem;
-    }
-
-    .wizard-navigation {
-        padding: 1rem 0;
-        flex-direction: column;
-    }
-
-    .wizard-btn-next,
-    .wizard-btn-back,
-    .wizard-btn-submit {
-        width: 100%;
-        margin: 0;
-    }
-
     .training-types-list {
         grid-template-columns: 1fr;
-        max-height: 350px;
     }
 }
 
 @media (max-width: 480px) {
-    .wizard-slider-container {
-        overflow-x: hidden;
-        touch-action: pan-y;
-        overscroll-behavior-x: none;
-    }
-
-    .wizard-progress {
-        padding: 0 0.5rem;
-        margin-bottom: 1.5rem;
-        overflow-x: hidden !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .wizard-step {
-        padding: 1.25rem;
-        margin-bottom: 1.25rem;
-        overflow-x: hidden !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .wizard-step-header {
-        margin-bottom: 1.5rem;
-        overflow-x: hidden !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .wizard-step-header h2 {
-        font-size: 1.1rem;
-    }
-
-    .wizard-step-content {
-        overflow-x: hidden !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .wizard-navigation {
-        padding: 1rem 0;
-        gap: 0.75rem;
-        overflow-x: hidden !important;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .wizard-btn-next,
-    .wizard-btn-back,
-    .wizard-btn-submit {
-        min-height: 48px;
-        padding: 0.875rem 1.5rem;
-        font-size: 0.95rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
     .training-types-list {
-        max-height: 300px;
         overflow-x: hidden !important;
         width: 100%;
         box-sizing: border-box;

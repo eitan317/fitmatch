@@ -29,29 +29,19 @@
             </div>
         @endif
 
-        <!-- Progress Indicator -->
-        <div class="wizard-progress">
-            <div class="wizard-progress-bar">
-                <div class="wizard-progress-fill" id="wizardProgressFill" style="width: 25%"></div>
-            </div>
-            <div class="wizard-progress-text">
-                <span id="wizardStepText">שלב 1 מתוך 4</span>
-                <span id="wizardStepPercentage">25%</span>
-            </div>
-        </div>
-
-        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="wizard-form" id="trainerRegistrationForm">
+        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container" id="trainerRegistrationForm">
             @csrf
             
-            <!-- Slider Container -->
-            <div class="wizard-slider-container" id="wizardSliderContainer">
-                <div class="wizard-slider-track" id="wizardSliderTrack">
-                    <!-- Step 1: Personal Details -->
-                    <div class="wizard-step active" data-step="1" role="tabpanel" aria-labelledby="step-1-title" tabindex="0">
-                <div class="wizard-step-header">
-                    <h2 id="step-1-title">📋 פרטים אישיים</h2>
+            <!-- Section 1: Personal Details -->
+            <div class="accordion-section" data-section="1">
+                <div class="accordion-header" tabindex="0" role="button" aria-expanded="false">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">📋</span>
+                        <h2 class="accordion-title">פרטים אישיים</h2>
+                    </div>
+                    <i class="fas fa-chevron-down accordion-chevron"></i>
                 </div>
-                <div class="wizard-step-content">
+                <div class="accordion-content">
                     <div class="form-group">
                         <label for="full_name">שם מלא *</label>
                         <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" required>
@@ -84,13 +74,17 @@
                 </div>
             </div>
 
-                    <!-- Step 2: Training Types -->
-                    <div class="wizard-step" data-step="2" role="tabpanel" aria-labelledby="step-2-title" tabindex="0">
-                        <div class="wizard-step-header">
-                            <h2 id="step-2-title">💪 סוגי אימונים</h2>
-                    <p class="wizard-step-subtitle">בחר את סוגי האימונים שאתה מציע (אפשר לבחור כמה)</p>
+            <!-- Section 2: Training Types -->
+            <div class="accordion-section training-types-card" data-section="2">
+                <div class="accordion-header" tabindex="0" role="button" aria-expanded="false">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">💪</span>
+                        <h2 class="accordion-title">סוגי אימונים</h2>
+                    </div>
+                    <i class="fas fa-chevron-down accordion-chevron"></i>
                 </div>
-                <div class="wizard-step-content">
+                <div class="accordion-content">
+                    <p class="form-section-subtitle">בחר את סוגי האימונים שאתה מציע (אפשר לבחור כמה)</p>
                     <div class="training-types-container">
                         <input
                             type="text"
@@ -137,27 +131,37 @@
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="kids"><span>ילדים</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="seniors"><span>גיל שלישי</span></label>
                         </div>
-                        </div>
                     </div>
-
-                    <!-- Step 3: Pricing -->
-                    <div class="wizard-step" data-step="3" role="tabpanel" aria-labelledby="step-3-title" tabindex="0">
-                        <div class="wizard-step-header">
-                            <h2 id="step-3-title">💰 תמחור</h2>
                 </div>
-                <div class="wizard-step-content">
+            </div>
+
+            <!-- Section 3: Pricing -->
+            <div class="accordion-section pricing-card" data-section="3">
+                <div class="accordion-header" tabindex="0" role="button" aria-expanded="false">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">💰</span>
+                        <h2 class="accordion-title">תמחור</h2>
+                    </div>
+                    <i class="fas fa-chevron-down accordion-chevron"></i>
+                </div>
+                <div class="accordion-content">
                     <div class="form-group">
                         <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
                         <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
-                        </div>
                     </div>
-
-                    <!-- Step 4: Additional Details -->
-                    <div class="wizard-step" data-step="4" role="tabpanel" aria-labelledby="step-4-title" tabindex="0">
-                        <div class="wizard-step-header">
-                            <h2 id="step-4-title">📸 פרטים נוספים</h2>
                 </div>
-                <div class="wizard-step-content">
+            </div>
+
+            <!-- Section 4: Additional Details -->
+            <div class="accordion-section" data-section="4">
+                <div class="accordion-header" tabindex="0" role="button" aria-expanded="false">
+                    <div class="accordion-header-left">
+                        <span class="section-status-icon">📸</span>
+                        <h2 class="accordion-title">פרטים נוספים</h2>
+                    </div>
+                    <i class="fas fa-chevron-down accordion-chevron"></i>
+                </div>
+                <div class="accordion-content">
                     <div class="form-group">
                         <label for="instagram">אינסטגרם (אופציונלי)</label>
                         <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
@@ -188,408 +192,33 @@
                         @if($errors->has('profile_image'))
                             <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
                         @endif
-                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Navigation Buttons -->
-            <div class="wizard-navigation">
-                <button type="button" class="btn btn-secondary wizard-btn-back" id="wizardBtnBack" style="display: none;" aria-label="חזרה לשלב הקודם">
-                    ← חזרה
-                </button>
-                <button type="button" class="btn btn-primary wizard-btn-next" id="wizardBtnNext" aria-label="המשך לשלב הבא">
-                    הבא →
-                </button>
-                <button type="submit" class="btn btn-primary wizard-btn-submit" id="wizardBtnSubmit" style="display: none;" aria-label="שלח את הבקשה לאישור">
-                    שלח בקשה לאישור
-                </button>
-            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary sticky-submit">
+                שלח בקשה לאישור
+            </button>
         </form>
     </main>
 
     <script src="/site/script.js"></script>
     <script>
-        // Mobile-first Slider Wizard with Pointer Events
-        (function() {
-            const form = document.getElementById('trainerRegistrationForm');
-            if (!form) return;
-
-            const sliderContainer = document.getElementById('wizardSliderContainer');
-            const sliderTrack = document.getElementById('wizardSliderTrack');
-            if (!sliderContainer || !sliderTrack) return;
-
-            let currentStep = 0; // 0-indexed for easier calculations
-            const totalSteps = 4;
-            const steps = Array.from(sliderTrack.querySelectorAll('.wizard-step'));
-            const btnNext = document.getElementById('wizardBtnNext');
-            const btnBack = document.getElementById('wizardBtnBack');
-            const btnSubmit = document.getElementById('wizardBtnSubmit');
-            const progressFill = document.getElementById('wizardProgressFill');
-            const stepText = document.getElementById('wizardStepText');
-            const stepPercentage = document.getElementById('wizardStepPercentage');
-
-            // Swipe detection state - HORIZONTAL
-            let isDragging = false;
-            let startX = 0;
-            let currentX = 0;
-            let startTime = 0;
-            let currentPointerId = null;
-            let startY = 0; // Track Y for vertical scroll detection
-            const SWIPE_THRESHOLD = 60; // pixels
-            const VELOCITY_THRESHOLD = 0.3; // pixels per ms
-
-            // Form state persistence
-            const formState = {
-                step1: {},
-                step2: {},
-                step3: {},
-                step4: {}
-            };
-
-            // Save form state
-            function saveFormState() {
-                // Step 1
-                formState.step1 = {
-                    full_name: document.getElementById('full_name').value,
-                    city: document.getElementById('city').value,
-                    phone: document.getElementById('phone').value,
-                    age: document.getElementById('age').value,
-                    experience_years: document.getElementById('experience_years').value,
-                    main_specialization: document.getElementById('main_specialization').value
-                };
-
-                // Step 2 - training types
-                const trainingTypes = [];
-                form.querySelectorAll('input[name="training_types[]"]:checked').forEach(cb => {
-                    trainingTypes.push(cb.value);
-                });
-                formState.step2 = { training_types: trainingTypes };
-
-                // Step 3
-                formState.step3 = {
-                    price_per_session: document.getElementById('price_per_session').value
-                };
-
-                // Step 4
-                formState.step4 = {
-                    instagram: document.getElementById('instagram').value,
-                    tiktok: document.getElementById('tiktok').value,
-                    bio: document.getElementById('bio').value
-                };
+        // Initialize accordion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initRegistrationAccordion === 'function') {
+                initRegistrationAccordion();
             }
-
-            // Restore form state
-            function restoreFormState() {
-                // Step 1
-                if (formState.step1.full_name) document.getElementById('full_name').value = formState.step1.full_name;
-                if (formState.step1.city) document.getElementById('city').value = formState.step1.city;
-                if (formState.step1.phone) document.getElementById('phone').value = formState.step1.phone;
-                if (formState.step1.age) document.getElementById('age').value = formState.step1.age;
-                if (formState.step1.experience_years) document.getElementById('experience_years').value = formState.step1.experience_years;
-                if (formState.step1.main_specialization) document.getElementById('main_specialization').value = formState.step1.main_specialization;
-
-                // Step 2
-                if (formState.step2.training_types) {
-                    formState.step2.training_types.forEach(value => {
-                        const checkbox = form.querySelector(`input[name="training_types[]"][value="${value}"]`);
-                        if (checkbox) checkbox.checked = true;
-                    });
-                }
-
-                // Step 3
-                if (formState.step3.price_per_session) document.getElementById('price_per_session').value = formState.step3.price_per_session;
-
-                // Step 4
-                if (formState.step4.instagram) document.getElementById('instagram').value = formState.step4.instagram;
-                if (formState.step4.tiktok) document.getElementById('tiktok').value = formState.step4.tiktok;
-                if (formState.step4.bio) document.getElementById('bio').value = formState.step4.bio;
-            }
-
-            // Validate current step
-            function validateStep(step) {
-                if (step === 1) {
-                    const fullName = document.getElementById('full_name').value.trim();
-                    const city = document.getElementById('city').value.trim();
-                    if (!fullName || !city) {
-                        alert('אנא מלא את שדות החובה: שם מלא ועיר');
-                        return false;
-                    }
-                } else if (step === 2) {
-                    const checkedTypes = form.querySelectorAll('input[name="training_types[]"]:checked');
-                    if (checkedTypes.length === 0) {
-                        alert('אנא בחר לפחות סוג אימון אחד');
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            // Update progress
-            function updateProgress(step) {
-                const percentage = (step / totalSteps) * 100;
-                if (progressFill) progressFill.style.width = percentage + '%';
-                if (stepText) stepText.textContent = `שלב ${step} מתוך ${totalSteps}`;
-                if (stepPercentage) stepPercentage.textContent = Math.round(percentage) + '%';
-            }
-
-            // Update slider position - HORIZONTAL
-            function updateSliderPosition(step, animate = true) {
-                if (!animate) {
-                    sliderTrack.style.transition = 'none';
-                } else {
-                    sliderTrack.style.transition = 'transform 200ms ease-out';
-                }
-                
-                const offset = -step * 100;
-                sliderTrack.style.transform = `translateX(${offset}%)`;
-                
-                // Update active step
-                steps.forEach((s, index) => {
-                    if (index === step) {
-                        s.classList.add('active');
-                        s.setAttribute('aria-hidden', 'false');
-                    } else {
-                        s.classList.remove('active');
-                        s.setAttribute('aria-hidden', 'true');
-                    }
-                });
-
-                // Update buttons (step is 1-indexed for display)
-                const displayStep = step + 1;
-                if (btnBack) {
-                    btnBack.style.display = step > 0 ? 'inline-block' : 'none';
-                }
-                if (btnNext) {
-                    btnNext.style.display = step < totalSteps - 1 ? 'inline-block' : 'none';
-                }
-                if (btnSubmit) {
-                    btnSubmit.style.display = step === totalSteps - 1 ? 'inline-block' : 'none';
-                }
-
-                updateProgress(displayStep);
-                
-                // Announce step change for accessibility
-                announceStep(displayStep);
-            }
-
-            // Announce step change
-            function announceStep(step) {
-                const announcement = `שלב ${step} מתוך ${totalSteps}`;
-                const announcer = document.getElementById('wizardAnnouncer') || createAnnouncer();
-                announcer.textContent = announcement;
-            }
-
-            function createAnnouncer() {
-                const announcer = document.createElement('div');
-                announcer.id = 'wizardAnnouncer';
-                announcer.setAttribute('role', 'status');
-                announcer.setAttribute('aria-live', 'polite');
-                announcer.setAttribute('aria-atomic', 'true');
-                announcer.style.position = 'absolute';
-                announcer.style.left = '-10000px';
-                announcer.style.width = '1px';
-                announcer.style.height = '1px';
-                announcer.style.overflow = 'hidden';
-                document.body.appendChild(announcer);
-                return announcer;
-            }
-
-            // Navigate to step
-            function goToStep(step, validate = true) {
-                const displayStep = currentStep + 1;
-                if (validate && !validateStep(displayStep)) {
-                    return false;
-                }
-                
-                saveFormState();
-                currentStep = Math.max(0, Math.min(totalSteps - 1, step));
-                restoreFormState();
-                updateSliderPosition(currentStep, true);
-                return true;
-            }
-
-            // Next button
-            if (btnNext) {
-                btnNext.addEventListener('click', function() {
-                    if (currentStep < totalSteps - 1) {
-                        goToStep(currentStep + 1, true);
-                    }
-                });
-            }
-
-            // Back button
-            if (btnBack) {
-                btnBack.addEventListener('click', function() {
-                    if (currentStep > 0) {
-                        goToStep(currentStep - 1, false);
-                    }
-                });
-            }
-
-            // Pointer Events for HORIZONTAL swipe detection
-            function handlePointerDown(e) {
-                // Only handle primary pointer (mouse or first touch)
-                if (e.isPrimary === false) return;
-                
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY; // Track Y for vertical scroll detection
-                currentX = startX;
-                startTime = Date.now();
-                currentPointerId = e.pointerId;
-                
-                // Capture pointer to track it even if it leaves the element
-                sliderTrack.setPointerCapture(e.pointerId);
-                
-                // Prevent text selection while dragging
-                sliderTrack.classList.add('dragging');
-                
-                // Don't prevent default on pointerdown - let the browser handle initial touch
-            }
-
-            function handlePointerMove(e) {
-                if (!isDragging || e.pointerId !== currentPointerId) return;
-                
-                currentX = e.clientX;
-                const currentY = e.clientY;
-                const deltaX = currentX - startX;
-                const deltaY = Math.abs(currentY - startY);
-                
-                // If vertical movement is greater than horizontal, allow scrolling instead
-                if (deltaY > Math.abs(deltaX) && deltaY > 10) {
-                    // This is a vertical scroll, don't prevent it
-                    isDragging = false;
-                    sliderTrack.classList.remove('dragging');
-                    sliderTrack.releasePointerCapture(currentPointerId);
-                    currentPointerId = null;
-                    return;
-                }
-                
-                // Only prevent default if we have significant horizontal movement (slider swipe)
-                // Small movements should allow page scrolling
-                if (Math.abs(deltaX) > 10) {
-                    // Calculate position with resistance at boundaries - HORIZONTAL
-                    const containerWidth = sliderContainer.offsetWidth;
-                    const baseOffset = -currentStep * containerWidth;
-                    let offset = baseOffset + deltaX;
-                    
-                    // Add resistance at boundaries
-                    if (currentStep === 0 && deltaX > 0) {
-                        offset = baseOffset + deltaX * 0.3; // Resist right swipe on first step
-                    } else if (currentStep === totalSteps - 1 && deltaX < 0) {
-                        offset = baseOffset + deltaX * 0.3; // Resist left swipe on last step
-                    }
-                    
-                    sliderTrack.style.transform = `translateX(${offset}px)`;
-                    e.preventDefault(); // Only prevent default for significant slider swipes
-                }
-            }
-
-            function handlePointerUp(e) {
-                if (!isDragging || e.pointerId !== currentPointerId) return;
-                
-                const deltaX = currentX - startX;
-                const deltaY = Math.abs(e.clientY - startY);
-                const deltaTime = Date.now() - startTime;
-                const velocity = deltaTime > 0 ? Math.abs(deltaX) / deltaTime : 0;
-                
-                // If it was more of a vertical scroll, don't swipe
-                if (deltaY > Math.abs(deltaX) && deltaY > 10) {
-                    isDragging = false;
-                    sliderTrack.classList.remove('dragging');
-                    sliderTrack.releasePointerCapture(currentPointerId);
-                    currentPointerId = null;
-                    updateSliderPosition(currentStep, true);
-                    return;
-                }
-                
-                // Determine if we should change steps - HORIZONTAL
-                let shouldChange = false;
-                let newStep = currentStep;
-                
-                // Check threshold or velocity - HORIZONTAL
-                if (Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-                    // Horizontal swipe: swipe left (negative deltaX) = next, swipe right (positive deltaX) = prev
-                    const isRTL = document.documentElement.dir === 'rtl';
-                    if (deltaX < 0) { // Swiping left
-                        if (currentStep < totalSteps - 1) {
-                            newStep = isRTL ? Math.max(0, currentStep - 1) : currentStep + 1;
-                            shouldChange = true;
-                        }
-                    } else { // Swiping right
-                        if (currentStep > 0) {
-                            newStep = isRTL ? currentStep + 1 : currentStep - 1;
-                            shouldChange = true;
-                        }
-                    }
-                }
-                
-                // Cleanup
-                isDragging = false;
-                sliderTrack.classList.remove('dragging');
-                if (currentPointerId !== null) {
-                    sliderTrack.releasePointerCapture(currentPointerId);
-                    currentPointerId = null;
-                }
-                
-                // Navigate or snap back
-                if (shouldChange) {
-                    goToStep(newStep, newStep > currentStep);
-                } else {
-                    updateSliderPosition(currentStep, true);
-                }
-                
-                e.preventDefault();
-            }
-
-            function handlePointerCancel(e) {
-                isDragging = false;
-                sliderTrack.classList.remove('dragging');
-                if (currentPointerId !== null) {
-                    sliderTrack.releasePointerCapture(currentPointerId);
-                    currentPointerId = null;
-                }
-                updateSliderPosition(currentStep, true);
-            }
-
-            // Attach pointer events to slider track
-            sliderTrack.addEventListener('pointerdown', handlePointerDown);
-            sliderTrack.addEventListener('pointermove', handlePointerMove);
-            sliderTrack.addEventListener('pointerup', handlePointerUp);
-            sliderTrack.addEventListener('pointercancel', handlePointerCancel);
             
-            // Keyboard navigation
-            sliderTrack.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    const isRTL = document.documentElement.dir === 'rtl';
-                    const isNext = (e.key === 'ArrowLeft' && !isRTL) || (e.key === 'ArrowRight' && isRTL);
-                    
-                    if (isNext && currentStep < totalSteps - 1) {
-                        goToStep(currentStep + 1, true);
-                    } else if (!isNext && currentStep > 0) {
-                        goToStep(currentStep - 1, false);
-                    }
-                }
-            });
-
-            // Form submission with loading state
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (btnSubmit) {
-                        btnSubmit.disabled = true;
-                        btnSubmit.textContent = 'שולח...';
-                        btnSubmit.style.opacity = '0.6';
-                        btnSubmit.style.cursor = 'not-allowed';
-                    }
-                    // Allow form to submit normally
-                });
+            if (typeof initRegistrationProgressTracking === 'function') {
+                initRegistrationProgressTracking();
             }
 
             // Training types search
             const searchInput = document.getElementById('trainingTypesSearch');
             if (searchInput) {
+                const form = document.getElementById('trainerRegistrationForm');
                 searchInput.addEventListener('input', function(e) {
                     const query = e.target.value.toLowerCase();
                     const checkboxes = form.querySelectorAll('.training-type-checkbox');
@@ -646,17 +275,27 @@
                 });
             }
 
-            // Initialize
-            updateSliderPosition(0, false);
+            // Form submission validation
+            const form = document.getElementById('trainerRegistrationForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (typeof validateRegistrationForm === 'function') {
+                        if (!validateRegistrationForm()) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                });
+            }
 
-            // Initialize theme if available
+            // Initialize theme and navbar if available
             if (typeof initTheme === 'function') {
                 initTheme();
             }
             if (typeof initNavbarToggle === 'function') {
                 initNavbarToggle();
             }
-        })();
+        });
     </script>
     @include('partials.accessibility-panel')
 </body>
