@@ -13,6 +13,27 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
+// Temporary route to download hero image (remove after use)
+Route::get('/download-hero-image', function () {
+    $url = "https://media.istockphoto.com/id/972833328/photo/male-personal-trainer-helping-sportswoman-to-do-exercises-with-barbell-at-gym.jpg?s=612x612&w=0&k=20&c=5kIxaobVDjjDrYvv8qNB2lGJoBImzHvj-csu30o_lZY=";
+    $dir = public_path('images');
+    $output = $dir . '/hero-trainers.jpg';
+    
+    // Create directory if it doesn't exist
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+    
+    // Download image
+    $imageData = @file_get_contents($url);
+    if ($imageData !== false) {
+        file_put_contents($output, $imageData);
+        return response()->json(['success' => true, 'message' => 'Image downloaded successfully', 'path' => $output]);
+    } else {
+        return response()->json(['success' => false, 'message' => 'Failed to download image'], 500);
+    }
+})->name('download.hero.image');
+
 Route::get('/', [PageController::class, 'welcome'])->name('welcome');
 
 // Public pages routes

@@ -35,14 +35,8 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="hero-graphic">
-                    <div class="hero-circle hero-circle-main"></div>
-                    <div class="hero-circle hero-circle-secondary"></div>
-                    <div class="hero-dumbbell">💪</div>
-                    <div class="hero-stat-card">
-                        <div class="hero-stat-label">{{ __('messages.active_trainers') }}</div>
-                        <div class="hero-stat-number">+{{ $stats['active_trainers'] }}</div>
-                    </div>
+                <div class="hero-image-container">
+                    <img src="https://media.istockphoto.com/id/972833328/photo/male-personal-trainer-helping-sportswoman-to-do-exercises-with-barbell-at-gym.jpg?s=612x612&w=0&k=20&c=5kIxaobVDjjDrYvv8qNB2lGJoBImzHvj-csu30o_lZY=" alt="מאמני כושר מקצועיים" class="hero-image" onerror="this.onerror=null; this.src='{{ asset('images/hero-trainers.jpg') }}';">
                 </div>
             </div>
         </div>
