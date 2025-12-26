@@ -340,8 +340,8 @@
 
                 updateProgress();
 
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Scroll to top (no animation for reliability)
+                window.scrollTo(0, 0);
             }
 
             // Next button

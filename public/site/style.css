@@ -5124,7 +5124,6 @@ fieldset legend {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--primary-light));
     border-radius: 4px;
-    transition: width 0.3s ease;
 }
 
 .wizard-progress-text {
@@ -5143,15 +5142,10 @@ fieldset legend {
     border: 1px solid var(--border-soft);
     padding: 2rem;
     margin-bottom: 2rem;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .wizard-step.active {
     display: block;
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .wizard-step-header {
@@ -5195,9 +5189,10 @@ fieldset legend {
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
     border: none;
     flex: 1;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .wizard-btn-next,
@@ -5207,11 +5202,9 @@ fieldset legend {
     margin-right: auto;
 }
 
-.wizard-btn-next:hover,
-.wizard-btn-submit:hover {
+.wizard-btn-next:active,
+.wizard-btn-submit:active {
     background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
 }
 
 .wizard-btn-back {
@@ -5221,7 +5214,7 @@ fieldset legend {
     margin-left: auto;
 }
 
-.wizard-btn-back:hover {
+.wizard-btn-back:active {
     background: var(--bg-secondary);
     border-color: var(--primary);
 }
@@ -5261,11 +5254,12 @@ fieldset legend {
     border-radius: 8px;
     background: var(--bg-card);
     cursor: pointer;
-    transition: all 0.2s ease;
     min-height: 48px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
-.training-type-checkbox:hover {
+.training-type-checkbox:active {
     border-color: var(--primary);
     background: rgba(74, 158, 255, 0.05);
 }
@@ -5297,11 +5291,12 @@ fieldset legend {
     text-align: center;
     cursor: pointer;
     background: var(--bg-card);
-    transition: all 0.2s ease;
     min-height: 120px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
-.file-upload-btn:hover {
+.file-upload-btn:active {
     border-color: var(--primary);
     background: rgba(74, 158, 255, 0.05);
 }
