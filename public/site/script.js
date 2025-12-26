@@ -1180,6 +1180,7 @@ function initNavbarToggle() {
     if (!toggle || !links) return;
 
     toggle.addEventListener("click", function () {
+        toggle.classList.toggle("active"); // Toggle hamburger animation
         links.classList.toggle("nav-open");
         // Close language menu when opening nav
         const languageMenu = document.getElementById('languageMenu');
@@ -1192,6 +1193,7 @@ function initNavbarToggle() {
     document.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
             if (!toggle.contains(e.target) && !links.contains(e.target)) {
+                toggle.classList.remove('active');
                 links.classList.remove('nav-open');
             }
         }

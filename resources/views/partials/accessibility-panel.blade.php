@@ -189,7 +189,8 @@
     backdrop-filter: blur(10px);
     display: none;
     animation: slideUp 0.3s ease;
-    overflow-y: auto;
+    overflow-y: auto; /* Exception: panel menu needs internal scroll */
+    overflow-x: hidden; /* Prevent horizontal scroll */
     z-index: 10000;
     -webkit-overflow-scrolling: touch;
 }
@@ -444,12 +445,8 @@ body.font-xxlarge {
     border-width: 0;
 }
 
-/* Prevent body scroll when menu is open on mobile */
-body.accessibility-menu-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-}
+/* Allow page to scroll normally even when panel is open */
+/* body.accessibility-menu-open - removed to allow unified scroll */
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -604,14 +601,8 @@ body.accessibility-menu-open {
             if (overlay) overlay.classList.add('active');
             toggle.setAttribute('aria-expanded', 'true');
             
-            // Prevent body scroll on mobile
-            if (isMobile()) {
-                const scrollY = window.scrollY;
-                document.body.style.position = 'fixed';
-                document.body.style.top = `-${scrollY}px`;
-                document.body.style.width = '100%';
-                document.body.classList.add('accessibility-menu-open');
-            }
+            // Allow page to scroll normally - don't block scroll
+            // Panel is a non-blocking overlay
             
             announceToScreenReader('פאנל נגישות נפתח');
         } else {
@@ -626,17 +617,7 @@ body.accessibility-menu-open {
         if (overlay) overlay.classList.remove('active');
         toggle.setAttribute('aria-expanded', 'false');
         
-        // Restore body scroll on mobile
-        if (isMobile() && document.body.classList.contains('accessibility-menu-open')) {
-            const scrollY = document.body.style.top;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.width = '';
-            document.body.classList.remove('accessibility-menu-open');
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
-            }
-        }
+        // Page scroll is always enabled - no need to restore
         
         announceToScreenReader('פאנל נגישות נסגר');
     }
@@ -767,12 +748,8 @@ body.accessibility-menu-open {
 
     // Handle window resize
     window.addEventListener('resize', function() {
-        if (!isMobile() && document.body.classList.contains('accessibility-menu-open')) {
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.width = '';
-            document.body.classList.remove('accessibility-menu-open');
-        }
+        // Panel will handle its own positioning
+        // No need to interfere with body scroll
     });
 
     // Load preferences on page load
