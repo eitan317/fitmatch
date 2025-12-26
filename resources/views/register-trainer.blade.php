@@ -228,7 +228,7 @@
                         <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                     </div>
                     <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
-                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">גודל מקסימלי: 5MB. פורמטים: JPG, PNG, GIF</small>
+                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF</small>
                     @if($errors->has('profile_image'))
                         <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
                     @endif
@@ -312,18 +312,6 @@
                     }
                     
                     if (file) {
-                        // בדיקת גודל (5MB)
-                        const maxSize = 5 * 1024 * 1024; // 5MB
-                        if (file.size > maxSize) {
-                            if (errorDiv) {
-                                errorDiv.textContent = 'הקובץ גדול מדי. גודל מקסימלי: 5MB';
-                                errorDiv.style.display = 'block';
-                            }
-                            this.value = ''; // איפוס השדה
-                            if (preview) preview.style.display = 'none';
-                            return;
-                        }
-                        
                         // בדיקת סוג קובץ
                         const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
                         if (!allowedTypes.includes(file.type)) {
@@ -355,25 +343,6 @@
                         if (preview) preview.style.display = 'none';
                     }
                 });
-            }
-            
-            // פתיחת הסקציה הראשונה אוטומטית בטלפון
-            if (window.innerWidth <= 480) {
-                setTimeout(function() {
-                    const firstSection = document.querySelector('.accordion-section[data-section="1"]');
-                    if (firstSection && !firstSection.classList.contains('active')) {
-                        firstSection.classList.add('active');
-                        const content = firstSection.querySelector('.accordion-content');
-                        if (content) {
-                            content.style.maxHeight = '3000px';
-                            content.style.padding = '0 1.75rem 1.5rem 1.75rem';
-                        }
-                        // עדכון הפרוגרס אם הפונקציה קיימת
-                        if (typeof initRegistrationProgressTracking === 'function') {
-                            initRegistrationProgressTracking();
-                        }
-                    }
-                }, 200);
             }
         }
         

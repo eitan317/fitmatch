@@ -97,13 +97,13 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB מקסימום
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480', // 20MB מקסימום
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
             'profile_image.image' => 'הקובץ חייב להיות תמונה',
             'profile_image.mimes' => 'פורמטי תמונה מותרים: JPEG, PNG, JPG, GIF',
-            'profile_image.max' => 'גודל התמונה לא יכול להיות יותר מ-5MB',
+            'profile_image.max' => 'גודל התמונה לא יכול להיות יותר מ-20MB',
         ]);
 
         // Note: Training types validation will be done after subscription is selected

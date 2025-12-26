@@ -1302,6 +1302,7 @@ button[type="submit"]:hover,
     scroll-behavior: smooth;
     /* Smooth vertical scroll only */
     touch-action: pan-y;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
     /* הסרתי: overscroll-behavior-y: contain - גורם ל-"נמתח" */
     /* הסרתי: will-change: scroll-position - גורם לבעיות */
 }
@@ -1492,6 +1493,7 @@ button[type="submit"]:hover,
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
                 padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0 1.75rem;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 }
 
 .accordion-section.active .accordion-content {
@@ -1632,28 +1634,38 @@ button[type="submit"]:hover,
         position: sticky;
         bottom: 1rem;
         margin-top: 2rem;
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
         width: 100%;
         z-index: 100;
     }
     
-    /* תיקון שדות טקסט - יותר מתון */
+    /* תיקון שדות טקסט - מותאם לממוצע */
     .form-group input,
     .form-group select,
     .form-group textarea {
         font-size: 16px; /* מונע zoom ב-iOS */
-        padding: 0.75rem;
-        min-height: 44px;
+        padding: 0.7rem 0.85rem;
+        min-height: 44px; /* מינימום למגע */
     }
     
     .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.15rem;
     }
     
-    /* הגדלת accordion header */
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    /* הגדלת accordion header - touch target טוב */
     .accordion-header {
-        min-height: 56px;
+        min-height: 48px;
+        padding: 0.9rem 1rem;
+    }
+    
+    .accordion-title {
+        font-size: 1.05rem;
     }
     
     /* שיפור Progress Indicator */
@@ -1674,21 +1686,27 @@ button[type="submit"]:hover,
     
     /* כפתור העלאת תמונה */
     .file-upload-btn {
-        padding: 1.5rem 1rem;
-        min-height: 100px;
+        padding: 1.25rem 0.85rem;
+        min-height: 90px;
     }
     
     .file-upload-btn i {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
     
     .file-upload-btn span {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
     
     /* הוספת padding לתחתית */
     .form-container {
-        padding-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    /* שיפור scroll במובייל */
+    .form-container,
+    .accordion-section {
+        -webkit-overflow-scrolling: touch;
     }
 }
 
