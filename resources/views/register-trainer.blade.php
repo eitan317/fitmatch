@@ -445,7 +445,7 @@
                 // Prevent text selection while dragging
                 sliderTrack.classList.add('dragging');
                 
-                e.preventDefault();
+                // Don't prevent default on pointerdown - let the browser handle initial touch
             }
 
             function handlePointerMove(e) {
@@ -459,24 +459,31 @@
                 // If horizontal movement is greater than vertical, allow scrolling instead
                 if (deltaX > Math.abs(deltaY) && deltaX > 10) {
                     // This is a horizontal scroll, don't prevent it
+                    isDragging = false;
+                    sliderTrack.classList.remove('dragging');
+                    sliderTrack.releasePointerCapture(currentPointerId);
+                    currentPointerId = null;
                     return;
                 }
                 
-                // Calculate position with resistance at boundaries - VERTICAL
-                const containerHeight = sliderContainer.offsetHeight; // Changed from containerWidth
-                const baseOffset = -currentStep * containerHeight; // Changed calculation
-                let offset = baseOffset + deltaY; // Changed from deltaX
-                
-                // Add resistance at boundaries
-                if (currentStep === 0 && deltaY > 0) {
-                    offset = baseOffset + deltaY * 0.3; // Resist down swipe on first step
-                } else if (currentStep === totalSteps - 1 && deltaY < 0) {
-                    offset = baseOffset + deltaY * 0.3; // Resist up swipe on last step
+                // Only prevent default if we have significant vertical movement (slider swipe)
+                // Small movements should allow page scrolling
+                if (Math.abs(deltaY) > 10) {
+                    // Calculate position with resistance at boundaries - VERTICAL
+                    const containerHeight = sliderContainer.offsetHeight; // Changed from containerWidth
+                    const baseOffset = -currentStep * containerHeight; // Changed calculation
+                    let offset = baseOffset + deltaY; // Changed from deltaX
+                    
+                    // Add resistance at boundaries
+                    if (currentStep === 0 && deltaY > 0) {
+                        offset = baseOffset + deltaY * 0.3; // Resist down swipe on first step
+                    } else if (currentStep === totalSteps - 1 && deltaY < 0) {
+                        offset = baseOffset + deltaY * 0.3; // Resist up swipe on last step
+                    }
+                    
+                    sliderTrack.style.transform = `translateY(${offset}px)`; // Changed from translateX
+                    e.preventDefault(); // Only prevent default for significant slider swipes
                 }
-                
-                sliderTrack.style.transform = `translateY(${offset}px)`; // Changed from translateX
-                
-                e.preventDefault();
             }
 
             function handlePointerUp(e) {

@@ -2115,7 +2115,7 @@ function initMobileSlider(containerSelector, options = {}) {
         currentPointerId = e.pointerId;
         container.setPointerCapture(e.pointerId);
         track.classList.add('dragging');
-        e.preventDefault();
+        // Don't prevent default on pointerdown - let the browser handle initial touch
     }
 
     function handleMove(e) {
@@ -2129,23 +2129,31 @@ function initMobileSlider(containerSelector, options = {}) {
         // If horizontal movement is greater than vertical, allow scrolling instead
         if (deltaX > Math.abs(deltaY) && deltaX > 10) {
             // This is a horizontal scroll, don't prevent it
+            isDragging = false;
+            track.classList.remove('dragging');
+            container.releasePointerCapture(currentPointerId);
+            currentPointerId = null;
             return;
         }
         
-        const containerHeight = container.offsetHeight; // Changed from containerWidth
-        const baseOffset = -currentIndex * containerHeight; // Changed calculation
-        let offset = baseOffset + deltaY; // Changed from deltaX
-        
-        const maxIndex = cards.length - cardsPerView;
-        if (currentIndex === 0 && deltaY > 0) { // Swiping down at start
-            offset = baseOffset + deltaY * 0.3;
-        } else if (currentIndex >= maxIndex && deltaY < 0) { // Swiping up at end
-            offset = baseOffset + deltaY * 0.3;
+        // Only prevent default if we have significant vertical movement (slider swipe)
+        // Small movements should allow page scrolling
+        if (Math.abs(deltaY) > 10) {
+            const containerHeight = container.offsetHeight; // Changed from containerWidth
+            const baseOffset = -currentIndex * containerHeight; // Changed calculation
+            let offset = baseOffset + deltaY; // Changed from deltaX
+            
+            const maxIndex = cards.length - cardsPerView;
+            if (currentIndex === 0 && deltaY > 0) { // Swiping down at start
+                offset = baseOffset + deltaY * 0.3;
+            } else if (currentIndex >= maxIndex && deltaY < 0) { // Swiping up at end
+                offset = baseOffset + deltaY * 0.3;
+            }
+            
+            track.style.transform = `translateY(${offset}px)`; // Changed from translateX
+            track.style.transition = 'none';
+            e.preventDefault(); // Only prevent default for significant slider swipes
         }
-        
-        track.style.transform = `translateY(${offset}px)`; // Changed from translateX
-        track.style.transition = 'none';
-        e.preventDefault();
     }
 
     function handleUp(e) {

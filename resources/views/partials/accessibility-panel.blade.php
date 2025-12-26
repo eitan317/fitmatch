@@ -163,11 +163,13 @@
     z-index: 9998;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none; /* Allow clicks to pass through when inactive */
 }
 
 .accessibility-overlay.active {
     display: block;
     opacity: 1;
+    pointer-events: auto; /* Enable clicks when active (to close menu) */
 }
 
 /* Panel Menu */

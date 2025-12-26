@@ -54,11 +54,13 @@ body.theme-dark {
     -ms-overflow-style: none; /* IE/Edge */
 }
 
-/* Global: Prevent horizontal scrolling and elastic behavior */
+/* Global: Prevent horizontal scrolling, allow vertical scrolling */
 html, body {
     overflow-x: hidden !important;
+    overflow-y: auto !important;
     touch-action: pan-y !important;
-    overscroll-behavior: none !important;
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: auto !important;
     width: 100%;
     position: relative;
 }
@@ -79,19 +81,15 @@ input, select, textarea, button {
     box-sizing: border-box;
 }
 
-/* COMPLETE DISABLE of horizontal interaction for wizard form */
+/* Prevent horizontal interaction for wizard form only */
 .wizard-form,
 .wizard-form *,
 .wizard-step,
 .wizard-step *,
 .wizard-navigation,
 .wizard-navigation * {
-    transform: none !important;
-    transition: none !important;
     overflow-x: hidden !important;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
-    -webkit-overflow-scrolling: auto !important;
+    overscroll-behavior-x: none !important;
 }
 
 /* Force vertical-only scrolling */
@@ -126,11 +124,12 @@ body {
     transition: background-color 0.3s, color 0.3s;
     position: relative;
     overflow-x: hidden !important;
-    overflow-y: auto;
+    overflow-y: auto !important;
     scroll-behavior: auto;
     touch-action: pan-y !important;
-    overscroll-behavior: none !important;
-    -webkit-overflow-scrolling: auto;
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     font-size: 16px;
     width: 100%;
 }
@@ -138,12 +137,13 @@ body {
 /* Global responsive fixes - prevent horizontal scroll */
 html {
     overflow-x: hidden !important;
-    overflow-y: auto;
+    overflow-y: auto !important;
     width: 100%;
     scroll-behavior: auto;
     touch-action: pan-y !important;
-    overscroll-behavior: none !important;
-    -webkit-overflow-scrolling: auto;
+    overscroll-behavior-x: none !important;
+    overscroll-behavior-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     position: relative;
 }
 
@@ -281,10 +281,7 @@ a:not(.btn):not(.nav-links a):hover {
     box-sizing: border-box;
     overflow-x: hidden !important;
     overflow-y: visible;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     position: relative;
-    transform: none !important;
 }
 
 .container {
@@ -1423,8 +1420,6 @@ button[type="submit"]:hover,
     position: relative;
     scroll-behavior: auto;
     margin-bottom: 2rem;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     width: 100%;
     box-sizing: border-box;
 }
@@ -5611,8 +5606,6 @@ fieldset legend {
     margin: 0 auto 2rem;
     padding: 0 1rem;
     overflow-x: hidden !important;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     width: 100%;
     box-sizing: border-box;
 }
@@ -5699,8 +5692,6 @@ fieldset legend {
     max-width: 600px;
     margin: 0 auto;
     overflow-x: hidden !important;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     width: 100%;
     box-sizing: border-box;
 }
@@ -5756,8 +5747,6 @@ fieldset legend {
     width: 100%;
     overflow-x: hidden !important;
     overflow-y: visible;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     box-sizing: border-box;
     transform: none !important;
 }
@@ -5781,11 +5770,9 @@ fieldset legend {
     overflow-x: hidden !important;
     overflow-y: auto;
     padding: 0.5rem;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     width: 100%;
     box-sizing: border-box;
-    -webkit-overflow-scrolling: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .training-type-checkbox {
