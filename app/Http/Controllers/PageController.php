@@ -20,7 +20,10 @@ class PageController extends Controller
         // Check if status column exists (for migration compatibility)
         $activeTrainers = 0;
         if (Schema::hasColumn('trainers', 'status')) {
-            $activeTrainers = Trainer::where('status', 'approved')->count();
+            // Only count active/trial trainers that are approved by admin
+            $activeTrainers = Trainer::whereIn('status', ['active', 'trial'])
+                ->where('approved_by_admin', true)
+                ->count();
         } else {
             // Fallback: count all trainers if status column doesn't exist yet
             $activeTrainers = Trainer::count();

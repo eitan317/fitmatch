@@ -93,7 +93,7 @@ input, select, textarea, button {
 section,
 main,
 article,
-div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-container):not(.training-types-list),
+div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-container):not(.training-types-list):not(.accordion-content),
 .container,
 .page-container,
 .main-container,
@@ -1780,7 +1780,7 @@ button[type="submit"]:hover,
 /* Make sure accordion content is hidden by default */
 .accordion-content {
     max-height: 0 !important;
-    overflow: hidden;
+    overflow: hidden !important;
     transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
                 padding 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0 1.75rem !important;
@@ -1797,6 +1797,7 @@ button[type="submit"]:hover,
 .training-types-card .accordion-content {
     max-height: 0 !important;
     padding: 0 1.75rem !important;
+    overflow: hidden !important;
 }
 
 .training-types-card.active .accordion-content {
@@ -2603,8 +2604,18 @@ select:focus {
     width: 64px;
     height: 64px;
     border-radius: 12px;
-    object-fit: cover;
     border: 2px solid rgba(74, 158, 255, 0.2);
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.admin-trainer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
 }
 
 .admin-trainer-avatar-small {
@@ -2613,6 +2624,8 @@ select:focus {
 }
 
 .admin-trainer-avatar-placeholder {
+    width: 100%;
+    height: 100%;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: var(--button-text);
     display: flex;
@@ -2620,6 +2633,11 @@ select:focus {
     justify-content: center;
     font-weight: 700;
     font-size: 1.5rem;
+    border-radius: 12px;
+}
+
+.admin-trainer-avatar-small .admin-trainer-avatar-placeholder {
+    font-size: 1.2rem;
 }
 
 .admin-trainer-identity-info {

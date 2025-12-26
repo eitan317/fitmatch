@@ -1,6 +1,9 @@
 @php
 use Illuminate\Support\Facades\Storage;
 @endphp
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ session('locale', 'he') }}" dir="{{ in_array(session('locale', 'he'), ['he', 'ar']) ? 'rtl' : 'ltr' }}">
 <head>
@@ -203,8 +206,17 @@ use Illuminate\Support\Facades\Storage;
                     <div class="admin-trainer-card admin-trainer-card-pending">
                         <div class="admin-trainer-card-header">
                             <div class="admin-trainer-identity">
-                                <div class="admin-trainer-avatar admin-trainer-avatar-placeholder">
-                                    {{ substr($trainer->full_name, 0, 1) }}
+                                <div class="admin-trainer-avatar">
+                                    @if($trainer->profile_image_path)
+                                        <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                            {{ substr($trainer->full_name, 0, 1) }}
+                                        </div>
+                                    @else
+                                        <div class="admin-trainer-avatar-placeholder">
+                                            {{ substr($trainer->full_name, 0, 1) }}
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="admin-trainer-identity-info">
                                     <h3 class="admin-trainer-name">
@@ -408,8 +420,17 @@ use Illuminate\Support\Facades\Storage;
                         <div class="admin-trainer-card admin-trainer-card-approved">
                             <div class="admin-trainer-card-header">
                                 <div class="admin-trainer-identity">
-                                    <div class="admin-trainer-avatar admin-trainer-avatar-small admin-trainer-avatar-placeholder">
-                                        {{ substr($trainer->full_name, 0, 1) }}
+                                    <div class="admin-trainer-avatar admin-trainer-avatar-small">
+                                        @if($trainer->profile_image_path)
+                                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                                {{ substr($trainer->full_name, 0, 1) }}
+                                            </div>
+                                        @else
+                                            <div class="admin-trainer-avatar-placeholder">
+                                                {{ substr($trainer->full_name, 0, 1) }}
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="admin-trainer-identity-info">
                                         <h3 class="admin-trainer-name">{{ $trainer->full_name }}</h3>

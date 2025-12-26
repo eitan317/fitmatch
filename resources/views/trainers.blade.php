@@ -123,7 +123,7 @@ use Illuminate\Support\Facades\Storage;
                     <div class="trainer-card">
                     <div class="trainer-card-image">
                         @if($trainer->profile_image_path)
-                            <img src="{{ asset('storage/' . $trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="trainer-avatar" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @else
                             <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
