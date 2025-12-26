@@ -97,9 +97,13 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB מקסימום
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
+            'profile_image.image' => 'הקובץ חייב להיות תמונה',
+            'profile_image.mimes' => 'פורמטי תמונה מותרים: JPEG, PNG, JPG, GIF',
+            'profile_image.max' => 'גודל התמונה לא יכול להיות יותר מ-5MB',
         ]);
 
         // Note: Training types validation will be done after subscription is selected
@@ -107,6 +111,17 @@ class TrainerController extends Controller
 
         // Get owner email from authenticated user
         $ownerEmail = Auth::user()->email;
+
+        // Handle profile image upload
+        $profileImagePath = null;
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            // Generate unique filename
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Store in public storage under trainers directory
+            $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+        }
 
         $trainerData = [
             'owner_email' => $ownerEmail,
@@ -121,6 +136,7 @@ class TrainerController extends Controller
             'instagram' => $validated['instagram'] ?? null,
             'tiktok' => $validated['tiktok'] ?? null,
             'bio' => $validated['bio'] ?? null,
+            'profile_image_path' => $profileImagePath, // הוספת נתיב התמונה
             'status' => 'pending',
             'approved_by_admin' => false,
         ];

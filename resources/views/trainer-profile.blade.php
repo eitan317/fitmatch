@@ -23,7 +23,12 @@ use Illuminate\Support\Facades\Storage;
             <div class="trainer-profile">
                 <div class="trainer-profile-header">
                     <div class="trainer-profile-image-container">
-                        <div class="trainer-avatar-large">{{ substr($trainer->full_name, 0, 1) }}</div>
+                        @if($trainer->profile_image_path)
+                            <img src="{{ asset('storage/' . $trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-profile-image-large" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="trainer-avatar-large" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
+                        @else
+                            <div class="trainer-avatar-large">{{ substr($trainer->full_name, 0, 1) }}</div>
+                        @endif
                     </div>
                     <div class="trainer-profile-info">
                         <h1>{{ $trainer->full_name }}</h1>

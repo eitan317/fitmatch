@@ -101,6 +101,15 @@
                     <label for="main_specialization">התמחות עיקרית</label>
                     <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
                 </div>
+
+                <div class="form-group">
+                    <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
+                    <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" class="form-control">
+                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; display: block;">גודל מקסימלי: 5MB. פורמטים מותרים: JPG, PNG, GIF</small>
+                    @if($errors->has('profile_image'))
+                        <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
+                    @endif
+                </div>
                 </div>
             </div>
 
