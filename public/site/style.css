@@ -1325,7 +1325,12 @@ button[type="submit"]:hover,
     position: relative;
     z-index: 100; /* Increased to ensure dropdown appears above pricing section */
     overflow: visible;
-    margin-bottom: 2rem; /* Extra space before submit button to prevent overlap */
+    margin-bottom: 3.5rem; /* Extra space before submit button to prevent overlap */
+}
+
+/* Also add padding-bottom to accordion content in training types */
+.training-types-card .accordion-content {
+    padding-bottom: 1.5rem !important;
 }
 
 /* Pricing card should sit below it */
@@ -1523,7 +1528,7 @@ button[type="submit"]:hover,
     position: sticky;
     bottom: 1rem;
     z-index: 100;
-    margin-top: 2rem;
+    margin-top: 3rem;
     width: 100%;
 }
 
@@ -1631,21 +1636,38 @@ button[type="submit"]:hover,
         padding: 0 1.25rem 1rem 1.25rem;
     }
     
+    /* Extra spacing for training types section */
+    .training-types-card {
+        margin-bottom: 4rem !important;
+    }
+    
     .sticky-submit {
         position: sticky;
         bottom: 1rem;
-        margin-top: 2rem;
+        margin-top: 3.5rem !important;
         padding: 0.875rem 1.25rem;
         font-size: 0.95rem;
         width: 100%;
         z-index: 100;
     }
     
+    /* Add padding to form container bottom */
+    .form-container {
+        padding-bottom: 3rem !important;
+    }
+    
     /* תיקון שדות טקסט - מותאם לממוצע */
     .form-group input,
     .form-group select,
-    .form-group textarea {
-        font-size: 16px; /* מונע zoom ב-iOS */
+    .form-group textarea,
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 16px !important; /* Critical: prevents iOS zoom */
         padding: 0.7rem 0.85rem;
         min-height: 44px; /* מינימום למגע */
     }
