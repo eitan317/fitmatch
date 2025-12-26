@@ -1968,35 +1968,47 @@ function initRegistrationProgressTracking() {
  * @param {string} containerSelector - CSS selector for the slider container
  * @param {Object} options - Configuration options
  */
+// Simple, reliable mobile slider with Pointer Events
 function initMobileSlider(containerSelector, options = {}) {
     const container = document.querySelector(containerSelector);
-    if (!container) return;
-
-    const {
-        cardsPerView = 1, // Number of cards visible at once on mobile
-        gap = 16, // Gap between cards in pixels
-        showIndicators = true, // Show dot indicators
-        swipeThreshold = 60, // Minimum swipe distance in pixels
-        velocityThreshold = 0.3, // Minimum velocity for fast swipe
-        cardSelector = null // Custom card selector (defaults to direct children)
-    } = options;
-
-    // Find track - it should already exist in the HTML with class like features-slider-track, stats-slider-track, etc.
-    const track = container.querySelector('[class*="slider-track"]') || container.firstElementChild;
-    
-    if (!track) {
-        console.warn('Slider track not found for', containerSelector);
+    if (!container) {
+        console.warn('Slider container not found:', containerSelector);
         return;
     }
 
-    // Get cards
-    const cards = cardSelector 
-        ? track.querySelectorAll(cardSelector)
-        : Array.from(track.children).filter(child => !child.classList.contains('slider-indicators'));
-    
-    if (cards.length === 0) return;
+    const {
+        cardsPerView = 1,
+        gap = 16,
+        showIndicators = true,
+        swipeThreshold = 60,
+        velocityThreshold = 0.3
+    } = options;
 
-    // Only enable slider on mobile
+    // Find track - try multiple methods
+    let track = container.querySelector('.features-slider-track') ||
+                container.querySelector('.stats-slider-track') ||
+                container.querySelector('.trainers-slider-track') ||
+                container.querySelector('[class*="slider-track"]') ||
+                container.firstElementChild;
+    
+    if (!track) {
+        console.warn('Slider track not found in:', containerSelector);
+        return;
+    }
+
+    // Get all cards
+    const cards = Array.from(track.children).filter(child => 
+        child.classList.contains('feature-card') ||
+        child.classList.contains('stat-card') ||
+        child.classList.contains('trainer-card') ||
+        !child.classList.contains('slider-indicators')
+    );
+    
+    if (cards.length === 0) {
+        console.warn('No cards found in slider');
+        return;
+    }
+
     const isMobile = () => window.innerWidth < 768;
     
     // Slider state
@@ -2007,31 +2019,29 @@ function initMobileSlider(containerSelector, options = {}) {
     let startTime = 0;
     let currentPointerId = null;
 
-    // Update slider position
-    function updateSliderPosition(index, animate = true) {
+    // Update position
+    function updatePosition(index, animate = true) {
         if (!isMobile()) {
             track.style.transform = 'none';
+            track.style.transition = '';
             return;
         }
 
         currentIndex = Math.max(0, Math.min(cards.length - cardsPerView, index));
         
-        if (!animate) {
-            track.style.transition = 'none';
-        } else {
+        if (animate) {
             track.style.transition = 'transform 200ms ease-out';
+        } else {
+            track.style.transition = 'none';
         }
 
         const containerWidth = container.offsetWidth;
-        const cardWidth = (containerWidth - (gap * (cardsPerView - 1))) / cardsPerView;
-        const offset = -currentIndex * (cardWidth + gap);
+        const cardWidth = containerWidth;
+        const offset = -currentIndex * cardWidth;
         
         track.style.transform = `translateX(${offset}px)`;
         
-        // Update indicators
-        if (showIndicators) {
-            updateIndicators();
-        }
+        if (showIndicators) updateIndicators();
     }
 
     // Create indicators
@@ -2039,25 +2049,22 @@ function initMobileSlider(containerSelector, options = {}) {
     function createIndicators() {
         if (!showIndicators || !isMobile()) return;
         
-        indicatorsContainer = container.querySelector('.slider-indicators');
-        if (!indicatorsContainer) {
-            indicatorsContainer = document.createElement('div');
-            indicatorsContainer.className = 'slider-indicators';
-            container.appendChild(indicatorsContainer);
-        }
+        let existing = container.querySelector('.slider-indicators');
+        if (existing) existing.remove();
+        
+        indicatorsContainer = document.createElement('div');
+        indicatorsContainer.className = 'slider-indicators';
+        container.appendChild(indicatorsContainer);
 
         const totalPages = Math.ceil(cards.length / cardsPerView);
-        indicatorsContainer.innerHTML = '';
-        
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'slider-dot';
-            dot.setAttribute('aria-label', `עבור לדף ${i + 1}`);
-            dot.addEventListener('click', () => {
-                updateSliderPosition(i * cardsPerView, true);
-            });
+            dot.setAttribute('aria-label', `עמוד ${i + 1}`);
+            dot.addEventListener('click', () => updatePosition(i * cardsPerView, true));
             indicatorsContainer.appendChild(dot);
         }
+        updateIndicators();
     }
 
     function updateIndicators() {
@@ -2069,34 +2076,27 @@ function initMobileSlider(containerSelector, options = {}) {
         });
     }
 
-    // Pointer Events handlers
-    function handlePointerDown(e) {
+    // Pointer events
+    function handleDown(e) {
         if (!isMobile() || e.isPrimary === false) return;
-        
         isDragging = true;
         startX = e.clientX;
         currentX = startX;
         startTime = Date.now();
         currentPointerId = e.pointerId;
-        
         track.setPointerCapture(e.pointerId);
         track.classList.add('dragging');
-        
         e.preventDefault();
     }
 
-    function handlePointerMove(e) {
+    function handleMove(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
-        
         currentX = e.clientX;
         const deltaX = currentX - startX;
-        
         const containerWidth = container.offsetWidth;
-        const cardWidth = (containerWidth - (gap * (cardsPerView - 1))) / cardsPerView;
-        const baseOffset = -currentIndex * (cardWidth + gap);
+        const baseOffset = -currentIndex * containerWidth;
         let offset = baseOffset + deltaX;
         
-        // Resistance at boundaries
         const maxIndex = cards.length - cardsPerView;
         if (currentIndex === 0 && deltaX > 0) {
             offset = baseOffset + deltaX * 0.3;
@@ -2106,101 +2106,67 @@ function initMobileSlider(containerSelector, options = {}) {
         
         track.style.transform = `translateX(${offset}px)`;
         track.style.transition = 'none';
-        
         e.preventDefault();
     }
 
-    function handlePointerUp(e) {
+    function handleUp(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
         
         const deltaX = currentX - startX;
         const deltaTime = Date.now() - startTime;
-        const velocity = Math.abs(deltaX) / deltaTime;
+        const velocity = deltaTime > 0 ? Math.abs(deltaX) / deltaTime : 0;
         
-        let shouldChange = false;
         let newIndex = currentIndex;
-        
+        const isRTL = document.documentElement.dir === 'rtl';
+
+        // Instagram-style swipe: swipe left = next, swipe right = previous
         if (Math.abs(deltaX) > swipeThreshold || velocity > velocityThreshold) {
-            const containerWidth = container.offsetWidth;
-            const cardWidth = (containerWidth - (gap * (cardsPerView - 1))) / cardsPerView;
-            
-            if (deltaX < -swipeThreshold || (deltaX < 0 && velocity > velocityThreshold)) {
-                // Swipe left = next
-                newIndex = Math.min(cards.length - cardsPerView, currentIndex + cardsPerView);
-                shouldChange = true;
-            } else if (deltaX > swipeThreshold || (deltaX > 0 && velocity > velocityThreshold)) {
-                // Swipe right = previous
-                newIndex = Math.max(0, currentIndex - cardsPerView);
-                shouldChange = true;
+            if (deltaX < 0) { // Swiping left
+                newIndex = isRTL ? Math.max(0, currentIndex - 1) : Math.min(cards.length - cardsPerView, currentIndex + 1);
+            } else { // Swiping right
+                newIndex = isRTL ? Math.min(cards.length - cardsPerView, currentIndex + 1) : Math.max(0, currentIndex - 1);
             }
         }
         
         isDragging = false;
         track.classList.remove('dragging');
-        if (currentPointerId !== null) {
-            track.releasePointerCapture(currentPointerId);
-            currentPointerId = null;
-        }
+        track.releasePointerCapture(currentPointerId);
+        currentPointerId = null;
         
-        if (shouldChange) {
-            updateSliderPosition(newIndex, true);
-        } else {
-            updateSliderPosition(currentIndex, true);
-        }
-        
+        updatePosition(newIndex, true);
         e.preventDefault();
     }
 
-    function handlePointerCancel(e) {
+    function handleCancel(e) {
         isDragging = false;
         track.classList.remove('dragging');
         if (currentPointerId !== null) {
             track.releasePointerCapture(currentPointerId);
             currentPointerId = null;
         }
-        updateSliderPosition(currentIndex, true);
+        updatePosition(currentIndex, true);
     }
 
-    // Attach pointer events
-    track.addEventListener('pointerdown', handlePointerDown);
-    track.addEventListener('pointermove', handlePointerMove);
-    track.addEventListener('pointerup', handlePointerUp);
-    track.addEventListener('pointercancel', handlePointerCancel);
-
-    // Keyboard navigation
-    container.addEventListener('keydown', function(e) {
-        if (!isMobile()) return;
-        
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            e.preventDefault();
-            const isRTL = document.documentElement.dir === 'rtl';
-            const isNext = (e.key === 'ArrowLeft' && !isRTL) || (e.key === 'ArrowRight' && isRTL);
-            
-            if (isNext) {
-                updateSliderPosition(currentIndex + cardsPerView, true);
-            } else {
-                updateSliderPosition(currentIndex - cardsPerView, true);
-            }
-        }
-    });
+    // Attach events
+    track.addEventListener('pointerdown', handleDown);
+    track.addEventListener('pointermove', handleMove);
+    track.addEventListener('pointerup', handleUp);
+    track.addEventListener('pointercancel', handleCancel);
 
     // Initialize
-    createIndicators();
-    updateSliderPosition(0, false);
+    updatePosition(0, false);
+    if (isMobile()) createIndicators();
 
-    // Handle resize
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
+    // Resize handler
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            updatePosition(0, false);
             if (isMobile()) {
-                updateSliderPosition(0, false);
                 createIndicators();
             } else {
-                track.style.transform = 'none';
-                if (indicatorsContainer) {
-                    indicatorsContainer.style.display = 'none';
-                }
+                if (indicatorsContainer) indicatorsContainer.remove();
             }
         }, 150);
     });

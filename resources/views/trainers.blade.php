@@ -193,13 +193,13 @@ use Illuminate\Support\Facades\Storage;
         }
         
         // Initialize trainer cards slider
-        if (typeof initMobileSlider === 'function') {
-            initMobileSlider('#trainersSlider', { 
-                cardsPerView: 1, 
-                gap: 24,
-                cardSelector: '.trainer-card'
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initMobileSlider === 'function') {
+                initMobileSlider('#trainersSlider', { 
+                    cardsPerView: 1
+                });
+            }
+        });
     </script>
 </body>
 </html>

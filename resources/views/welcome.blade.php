@@ -239,11 +239,13 @@
         initTheme && initTheme();
         initNavbarToggle && initNavbarToggle();
         
-        // Initialize mobile sliders
-        if (typeof initMobileSlider === 'function') {
-            initMobileSlider('#featuresSlider', { cardsPerView: 1, gap: 32 });
-            initMobileSlider('#statsSlider', { cardsPerView: 1, gap: 32 });
-        }
+        // Initialize sliders - wait for DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initMobileSlider === 'function') {
+                initMobileSlider('#featuresSlider', { cardsPerView: 1 });
+                initMobileSlider('#statsSlider', { cardsPerView: 1 });
+            }
+        });
     </script>
 </body>
 </html>
