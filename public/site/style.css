@@ -1777,22 +1777,31 @@ button[type="submit"]:hover,
     color: var(--primary);
 }
 
+/* Make sure accordion content is hidden by default */
 .accordion-content {
-    max-height: 0;
+    max-height: 0 !important;
     overflow: hidden;
     transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
                 padding 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0 1.75rem;
+    padding: 0 1.75rem !important;
 }
 
+/* Only show content when section has active class */
 .accordion-section.active .accordion-content {
-    max-height: 3000px;
-    padding: 0 1.75rem 1.5rem 1.75rem;
+    max-height: 3000px !important;
+    padding: 0 1.75rem 1.5rem 1.75rem !important;
     overflow: visible;
 }
 
-/* Allow dropdown to overflow in training types card */
+/* Ensure training types card also starts closed */
+.training-types-card .accordion-content {
+    max-height: 0 !important;
+    padding: 0 1.75rem !important;
+}
+
 .training-types-card.active .accordion-content {
+    max-height: 3000px !important;
+    padding: 0 1.75rem 1.5rem 1.75rem !important;
     overflow: visible !important;
 }
 

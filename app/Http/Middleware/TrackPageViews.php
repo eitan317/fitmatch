@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\PageView;
+use Illuminate\Support\Facades\Schema;
 
 class TrackPageViews
 {
@@ -24,13 +25,16 @@ class TrackPageViews
                 // Skip tracking for admin routes and API routes
                 $path = $request->path();
                 if (!str_starts_with($path, 'admin') && !str_starts_with($path, 'api')) {
-                    PageView::create([
-                        'page_path' => $path,
-                        'ip_address' => $request->ip(),
-                        'user_agent' => $request->userAgent(),
-                        'user_id' => auth()->id(),
-                        'viewed_at' => now(),
-                    ]);
+                    // Check if table exists before trying to insert
+                    if (Schema::hasTable('page_views')) {
+                        PageView::create([
+                            'page_path' => $path,
+                            'ip_address' => $request->ip(),
+                            'user_agent' => $request->userAgent(),
+                            'user_id' => auth()->id(),
+                            'viewed_at' => now(),
+                        ]);
+                    }
                 }
             } catch (\Exception $e) {
                 // Silently fail if tracking fails (e.g., database not migrated yet)

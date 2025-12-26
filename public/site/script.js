@@ -1706,6 +1706,20 @@ function initRegistrationAccordion() {
         return; // Not on registration page
     }
     
+    // Ensure all sections start closed
+    document.querySelectorAll('.accordion-section').forEach(section => {
+        section.classList.remove('active');
+        const header = section.querySelector('.accordion-header');
+        if (header) {
+            header.setAttribute('aria-expanded', 'false');
+        }
+        const content = section.querySelector('.accordion-content');
+        if (content) {
+            content.style.maxHeight = '0';
+            content.style.padding = '0 1.75rem';
+        }
+    });
+    
     accordionHeaders.forEach(header => {
         // Click event
         header.addEventListener('click', function() {
