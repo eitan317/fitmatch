@@ -30,273 +30,356 @@
         @endif
 
         <!-- Progress Indicator -->
-        <div class="registration-progress">
-            <div class="progress-text">
-                <span id="progressText">סקציה 0 מתוך 4</span>
-                <span id="progressPercentage">0%</span>
+        <div class="wizard-progress">
+            <div class="wizard-progress-bar">
+                <div class="wizard-progress-fill" id="wizardProgressFill" style="width: 25%"></div>
             </div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-            </div>
-            <div class="progress-sections">
-                <div class="progress-section-item" data-section="1">
-                    <span class="section-status-icon">○</span>
-                    <span class="section-name">פרטים אישיים</span>
-                </div>
-                <div class="progress-section-item" data-section="2">
-                    <span class="section-status-icon">○</span>
-                    <span class="section-name">סוגי אימונים</span>
-                </div>
-                <div class="progress-section-item" data-section="3">
-                    <span class="section-status-icon">○</span>
-                    <span class="section-name">תמחור</span>
-                </div>
-                <div class="progress-section-item" data-section="4">
-                    <span class="section-status-icon">○</span>
-                    <span class="section-name">פרטים נוספים</span>
-                </div>
+            <div class="wizard-progress-text">
+                <span id="wizardStepText">שלב 1 מתוך 4</span>
+                <span id="wizardStepPercentage">25%</span>
             </div>
         </div>
 
-        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="form-container" id="trainerRegistrationForm">
+        <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="wizard-form" id="trainerRegistrationForm">
             @csrf
             
-            <!-- Section 1: Personal Details -->
-            <div class="accordion-section" data-section="1">
-                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-1">
-                    <div class="accordion-header-left">
-                        <span class="section-status-icon">○</span>
-                        <h2 class="accordion-title">📋 פרטים אישיים</h2>
+            <!-- Step 1: Personal Details -->
+            <div class="wizard-step active" data-step="1">
+                <div class="wizard-step-header">
+                    <h2>📋 פרטים אישיים</h2>
+                </div>
+                <div class="wizard-step-content">
+                    <div class="form-group">
+                        <label for="full_name">שם מלא *</label>
+                        <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" required>
                     </div>
-                    <span class="accordion-chevron">▾</span>
-                </div>
-                <div class="accordion-content" id="accordion-content-1">
-                
-                <div class="form-group">
-                    <label for="full_name">שם מלא *</label>
-                    <input type="text" id="full_name" name="full_name" value="{{ old('full_name') }}" required>
-                </div>
 
-                <div class="form-group">
-                    <label for="age">גיל</label>
-                    <input type="number" id="age" name="age" min="18" max="120" value="{{ old('age') }}">
-                </div>
+                    <div class="form-group">
+                        <label for="city">עיר *</label>
+                        <input type="text" id="city" name="city" value="{{ old('city') }}" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="city">עיר *</label>
-                    <input type="text" id="city" name="city" value="{{ old('city') }}" required>
-                </div>
+                    <div class="form-group">
+                        <label for="phone">טלפון</label>
+                        <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="050-1234567">
+                    </div>
 
-                <div class="form-group">
-                    <label for="phone">טלפון</label>
-                    <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" placeholder="050-1234567">
-                </div>
+                    <div class="form-group">
+                        <label for="age">גיל</label>
+                        <input type="number" id="age" name="age" min="18" max="120" value="{{ old('age') }}">
+                    </div>
 
-                <div class="form-group">
-                    <label for="experience_years">שנות ניסיון</label>
-                    <input type="number" id="experience_years" name="experience_years" min="0" max="60" value="{{ old('experience_years') }}">
-                </div>
+                    <div class="form-group">
+                        <label for="experience_years">שנות ניסיון</label>
+                        <input type="number" id="experience_years" name="experience_years" min="0" max="60" value="{{ old('experience_years') }}">
+                    </div>
 
-                <div class="form-group">
-                    <label for="main_specialization">התמחות עיקרית</label>
-                    <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
-                </div>
-
+                    <div class="form-group">
+                        <label for="main_specialization">התמחות עיקרית</label>
+                        <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
+                    </div>
                 </div>
             </div>
 
-            <!-- Section 2: Training Types -->
-            <div class="accordion-section training-types-card" data-section="2">
-                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-2">
-                    <div class="accordion-header-left">
-                        <span class="section-status-icon">○</span>
-                        <h2 class="accordion-title">💪 סוגי אימונים</h2>
-                    </div>
-                    <span class="accordion-chevron">▾</span>
+            <!-- Step 2: Training Types -->
+            <div class="wizard-step" data-step="2">
+                <div class="wizard-step-header">
+                    <h2>💪 סוגי אימונים</h2>
+                    <p class="wizard-step-subtitle">בחר את סוגי האימונים שאתה מציע (אפשר לבחור כמה)</p>
                 </div>
-                <div class="accordion-content" id="accordion-content-2">
-                <p class="form-section-subtitle">סוגי אימונים שאתה מציע (אפשר לבחור כמה)</p>
-
-                <div class="training-types-select">
-                    <div class="training-types-toggle" id="trainingTypesToggle">
-                        <span id="trainingTypesSummary">בחר סוגי אימונים...</span>
-                        <span class="training-types-chevron">▾</span>
-                    </div>
-
-                    <div class="training-types-dropdown" id="trainingTypesDropdown">
+                <div class="wizard-step-content">
+                    <div class="training-types-container">
                         <input
                             type="text"
                             id="trainingTypesSearch"
-                            class="training-types-search"
-                            placeholder="חפש סוג אימון (למשל: חיטוב, ריצה, יוגה...)"
+                            class="training-types-search-input"
+                            placeholder="חפש סוג אימון..."
                         />
-
-                        <ul class="training-types-options" id="trainingTypesList">
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">חדר כושר בסיסי</span><input type="checkbox" name="training_types[]" value="gym_basic"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">מסת שריר</span><input type="checkbox" name="training_types[]" value="hypertrophy"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">פאוורליפטינג</span><input type="checkbox" name="training_types[]" value="powerlifting"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרוספיט</span><input type="checkbox" name="training_types[]" value="crossfit"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">סטריט וורקאאוט / מתח מקבילים</span><input type="checkbox" name="training_types[]" value="street_workout"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">חיטוב / ירידה במשקל</span><input type="checkbox" name="training_types[]" value="weightloss"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני HIIT</span><input type="checkbox" name="training_types[]" value="hiit"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אינטרוולים עצימים</span><input type="checkbox" name="training_types[]" value="intervals"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">מוביליטי וגמישות</span><input type="checkbox" name="training_types[]" value="mobility"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">יוגה</span><input type="checkbox" name="training_types[]" value="yoga"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">פילאטיס</span><input type="checkbox" name="training_types[]" value="pilates"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">שיקום / פיזיותרפיה</span><input type="checkbox" name="training_types[]" value="physio_rehab"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים לכאבי גב</span><input type="checkbox" name="training_types[]" value="back_pain"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים אחרי לידה</span><input type="checkbox" name="training_types[]" value="postnatal"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני בית (משקל גוף)</span><input type="checkbox" name="training_types[]" value="home_bodyweight"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימוני TRX</span><input type="checkbox" name="training_types[]" value="trx"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קצרים (20 דק׳)</span><input type="checkbox" name="training_types[]" value="short20"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ריצה</span><input type="checkbox" name="training_types[]" value="running"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ספרינטים</span><input type="checkbox" name="training_types[]" value="sprints"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">הכנה למרתון</span><input type="checkbox" name="training_types[]" value="marathon"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">רכיבה על אופניים</span><input type="checkbox" name="training_types[]" value="cycling"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">שחייה</span><input type="checkbox" name="training_types[]" value="swimming"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אגרוף</span><input type="checkbox" name="training_types[]" value="boxing"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קיקבוקס</span><input type="checkbox" name="training_types[]" value="kickboxing"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">MMA</span><input type="checkbox" name="training_types[]" value="mma"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">קרב מגע</span><input type="checkbox" name="training_types[]" value="kravmaga"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים זוגיים</span><input type="checkbox" name="training_types[]" value="couple"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים קבוצתיים</span><input type="checkbox" name="training_types[]" value="group"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים אונליין (זום)</span><input type="checkbox" name="training_types[]" value="online"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">אימונים בחוץ / בפארק</span><input type="checkbox" name="training_types[]" value="outdoor"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">בוטקמפ</span><input type="checkbox" name="training_types[]" value="bootcamp"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נשים בלבד</span><input type="checkbox" name="training_types[]" value="women_only"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">גברים בלבד</span><input type="checkbox" name="training_types[]" value="men_only"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">נוער</span><input type="checkbox" name="training_types[]" value="teens"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">ילדים</span><input type="checkbox" name="training_types[]" value="kids"></label></li>
-                            <li class="training-type-item"><label class="training-type-option"><span class="option-label">גיל שלישי</span><input type="checkbox" name="training_types[]" value="seniors"></label></li>
-                        </ul>
+                        
+                        <div class="training-types-list">
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="gym_basic"><span>חדר כושר בסיסי</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="hypertrophy"><span>מסת שריר</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="powerlifting"><span>פאוורליפטינג</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="crossfit"><span>קרוספיט</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="street_workout"><span>סטריט וורקאאוט / מתח מקבילים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="weightloss"><span>חיטוב / ירידה במשקל</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="hiit"><span>אימוני HIIT</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="intervals"><span>אינטרוולים עצימים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="mobility"><span>מוביליטי וגמישות</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="yoga"><span>יוגה</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="pilates"><span>פילאטיס</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="physio_rehab"><span>שיקום / פיזיותרפיה</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="back_pain"><span>אימונים לכאבי גב</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="postnatal"><span>נשים אחרי לידה</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="home_bodyweight"><span>אימוני בית (משקל גוף)</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="trx"><span>אימוני TRX</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="short20"><span>אימונים קצרים (20 דק׳)</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="running"><span>ריצה</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="sprints"><span>ספרינטים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="marathon"><span>הכנה למרתון</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="cycling"><span>רכיבה על אופניים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="swimming"><span>שחייה</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="boxing"><span>אגרוף</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="kickboxing"><span>קיקבוקס</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="mma"><span>MMA</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="kravmaga"><span>קרב מגע</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="couple"><span>אימונים זוגיים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="group"><span>אימונים קבוצתיים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="online"><span>אימונים אונליין (זום)</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="outdoor"><span>אימונים בחוץ / בפארק</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="bootcamp"><span>בוטקמפ</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="women_only"><span>נשים בלבד</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="men_only"><span>גברים בלבד</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="teens"><span>נוער</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="kids"><span>ילדים</span></label>
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="seniors"><span>גיל שלישי</span></label>
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
 
-            <!-- Section 3: Pricing -->
-            <div class="accordion-section pricing-card" data-section="3">
-                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-3">
-                    <div class="accordion-header-left">
-                        <span class="section-status-icon">○</span>
-                        <h2 class="accordion-title">💰 תמחור</h2>
+            <!-- Step 3: Pricing -->
+            <div class="wizard-step" data-step="3">
+                <div class="wizard-step-header">
+                    <h2>💰 תמחור</h2>
+                </div>
+                <div class="wizard-step-content">
+                    <div class="form-group">
+                        <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
+                        <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
                     </div>
-                    <span class="accordion-chevron">▾</span>
-                </div>
-                <div class="accordion-content" id="accordion-content-3">
-                <div class="form-group">
-                    <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
-                    <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
-                </div>
                 </div>
             </div>
 
-            <!-- Section 4: Additional Details -->
-            <div class="accordion-section" data-section="4">
-                <div class="accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="accordion-content-4">
-                    <div class="accordion-header-left">
-                        <span class="section-status-icon">○</span>
-                        <h2 class="accordion-title">📸 פרטים נוספים</h2>
+            <!-- Step 4: Additional Details -->
+            <div class="wizard-step" data-step="4">
+                <div class="wizard-step-header">
+                    <h2>📸 פרטים נוספים</h2>
+                </div>
+                <div class="wizard-step-content">
+                    <div class="form-group">
+                        <label for="instagram">אינסטגרם (אופציונלי)</label>
+                        <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
                     </div>
-                    <span class="accordion-chevron">▾</span>
-                </div>
-                <div class="accordion-content" id="accordion-content-4">
 
-                <div class="form-group">
-                    <label for="instagram">אינסטגרם (אופציונלי)</label>
-                    <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
-                </div>
-
-                <div class="form-group">
-                    <label for="tiktok">טיקטוק (אופציונלי)</label>
-                    <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok') }}">
-                </div>
-
-                <div class="form-group">
-                    <label for="bio">תיאור קצר (אופציונלי)</label>
-                    <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                    <label for="profile_image" class="file-upload-btn" style="display: block; padding: 1.5rem; border: 2px dashed var(--border-soft); border-radius: 12px; text-align: center; cursor: pointer; background: var(--bg-card); transition: all 0.2s ease;">
-                        <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--primary);"></i>
-                        <span style="color: var(--text-main); font-weight: 500;">לחץ להעלאת תמונה</span>
-                        <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
-                    </label>
-                    <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
-                        <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <div class="form-group">
+                        <label for="tiktok">טיקטוק (אופציונלי)</label>
+                        <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok') }}">
                     </div>
-                    <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
-                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF</small>
-                    @if($errors->has('profile_image'))
-                        <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
-                    @endif
-                </div>
+
+                    <div class="form-group">
+                        <label for="bio">תיאור קצר (אופציונלי)</label>
+                        <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
+                        <label for="profile_image" class="file-upload-btn">
+                            <i class="fas fa-camera"></i>
+                            <span>לחץ להעלאת תמונה</span>
+                            <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                        </label>
+                        <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
+                            <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        </div>
+                        <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
+                        <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF</small>
+                        @if($errors->has('profile_image'))
+                            <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary sticky-submit">שלח בקשה לאישור</button>
+            <!-- Navigation Buttons -->
+            <div class="wizard-navigation">
+                <button type="button" class="btn btn-secondary wizard-btn-back" id="wizardBtnBack" style="display: none;">
+                    ← חזרה
+                </button>
+                <button type="button" class="btn btn-primary wizard-btn-next" id="wizardBtnNext">
+                    הבא →
+                </button>
+                <button type="submit" class="btn btn-primary wizard-btn-submit" id="wizardBtnSubmit" style="display: none;">
+                    שלח בקשה לאישור
+                </button>
+            </div>
         </form>
     </main>
 
     <script src="/site/script.js"></script>
     <script>
-        // Wait for both DOM and script.js to be fully loaded
-        function initializePage() {
-            if (typeof initTheme === 'function') {
-                initTheme();
-            } else {
-                console.warn('initTheme function not found');
-            }
-            
-            if (typeof initNavbarToggle === 'function') {
-                initNavbarToggle();
-            } else {
-                console.warn('initNavbarToggle function not found');
-            }
-            
-            if (typeof initTrainingTypesSelectorOnRegisterPage === 'function') {
-                initTrainingTypesSelectorOnRegisterPage();
-            } else {
-                console.error('initTrainingTypesSelectorOnRegisterPage function not found - script.js may not be loaded yet');
-                // Retry after a short delay
-                setTimeout(function() {
-                    if (typeof initTrainingTypesSelectorOnRegisterPage === 'function') {
-                        console.log('Retrying initTrainingTypesSelectorOnRegisterPage...');
-                        initTrainingTypesSelectorOnRegisterPage();
-                    } else {
-                        console.error('initTrainingTypesSelectorOnRegisterPage still not found after retry');
-                    }
-                }, 100);
-            }
-            
-            // Initialize Accordion
-            if (typeof initRegistrationAccordion === 'function') {
-                initRegistrationAccordion();
-            } else {
-                console.warn('initRegistrationAccordion function not found');
-            }
-            
-            // Initialize Progress Tracking
-            if (typeof initRegistrationProgressTracking === 'function') {
-                initRegistrationProgressTracking();
-            } else {
-                console.warn('initRegistrationProgressTracking function not found');
-            }
-            
-            // Add form validation before submit
+        // Step-based Wizard Implementation
+        (function() {
             const form = document.getElementById('trainerRegistrationForm');
-            if (form && typeof validateRegistrationForm === 'function') {
-                form.addEventListener('submit', function(e) {
-                    if (!validateRegistrationForm()) {
-                        e.preventDefault();
+            if (!form) return;
+
+            let currentStep = 1;
+            const totalSteps = 4;
+            const steps = form.querySelectorAll('.wizard-step');
+            const btnNext = document.getElementById('wizardBtnNext');
+            const btnBack = document.getElementById('wizardBtnBack');
+            const btnSubmit = document.getElementById('wizardBtnSubmit');
+            const progressFill = document.getElementById('wizardProgressFill');
+            const stepText = document.getElementById('wizardStepText');
+            const stepPercentage = document.getElementById('wizardStepPercentage');
+
+            // Form state persistence
+            const formState = {
+                step1: {},
+                step2: {},
+                step3: {},
+                step4: {}
+            };
+
+            // Save form state
+            function saveFormState() {
+                // Step 1
+                formState.step1 = {
+                    full_name: document.getElementById('full_name').value,
+                    city: document.getElementById('city').value,
+                    phone: document.getElementById('phone').value,
+                    age: document.getElementById('age').value,
+                    experience_years: document.getElementById('experience_years').value,
+                    main_specialization: document.getElementById('main_specialization').value
+                };
+
+                // Step 2 - training types
+                const trainingTypes = [];
+                form.querySelectorAll('input[name="training_types[]"]:checked').forEach(cb => {
+                    trainingTypes.push(cb.value);
+                });
+                formState.step2 = { training_types: trainingTypes };
+
+                // Step 3
+                formState.step3 = {
+                    price_per_session: document.getElementById('price_per_session').value
+                };
+
+                // Step 4
+                formState.step4 = {
+                    instagram: document.getElementById('instagram').value,
+                    tiktok: document.getElementById('tiktok').value,
+                    bio: document.getElementById('bio').value
+                };
+            }
+
+            // Restore form state
+            function restoreFormState() {
+                // Step 1
+                if (formState.step1.full_name) document.getElementById('full_name').value = formState.step1.full_name;
+                if (formState.step1.city) document.getElementById('city').value = formState.step1.city;
+                if (formState.step1.phone) document.getElementById('phone').value = formState.step1.phone;
+                if (formState.step1.age) document.getElementById('age').value = formState.step1.age;
+                if (formState.step1.experience_years) document.getElementById('experience_years').value = formState.step1.experience_years;
+                if (formState.step1.main_specialization) document.getElementById('main_specialization').value = formState.step1.main_specialization;
+
+                // Step 2
+                if (formState.step2.training_types) {
+                    formState.step2.training_types.forEach(value => {
+                        const checkbox = form.querySelector(`input[name="training_types[]"][value="${value}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+
+                // Step 3
+                if (formState.step3.price_per_session) document.getElementById('price_per_session').value = formState.step3.price_per_session;
+
+                // Step 4
+                if (formState.step4.instagram) document.getElementById('instagram').value = formState.step4.instagram;
+                if (formState.step4.tiktok) document.getElementById('tiktok').value = formState.step4.tiktok;
+                if (formState.step4.bio) document.getElementById('bio').value = formState.step4.bio;
+            }
+
+            // Validate current step
+            function validateStep(step) {
+                if (step === 1) {
+                    const fullName = document.getElementById('full_name').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    if (!fullName || !city) {
+                        alert('אנא מלא את שדות החובה: שם מלא ועיר');
                         return false;
+                    }
+                } else if (step === 2) {
+                    const checkedTypes = form.querySelectorAll('input[name="training_types[]"]:checked');
+                    if (checkedTypes.length === 0) {
+                        alert('אנא בחר לפחות סוג אימון אחד');
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            // Update progress
+            function updateProgress() {
+                const percentage = (currentStep / totalSteps) * 100;
+                if (progressFill) progressFill.style.width = percentage + '%';
+                if (stepText) stepText.textContent = `שלב ${currentStep} מתוך ${totalSteps}`;
+                if (stepPercentage) stepPercentage.textContent = Math.round(percentage) + '%';
+            }
+
+            // Show step
+            function showStep(step) {
+                steps.forEach((s, index) => {
+                    if (index + 1 === step) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+
+                // Update buttons
+                if (btnBack) {
+                    btnBack.style.display = step > 1 ? 'inline-block' : 'none';
+                }
+                if (btnNext) {
+                    btnNext.style.display = step < totalSteps ? 'inline-block' : 'none';
+                }
+                if (btnSubmit) {
+                    btnSubmit.style.display = step === totalSteps ? 'inline-block' : 'none';
+                }
+
+                updateProgress();
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Next button
+            if (btnNext) {
+                btnNext.addEventListener('click', function() {
+                    saveFormState();
+                    if (validateStep(currentStep)) {
+                        currentStep++;
+                        restoreFormState();
+                        showStep(currentStep);
                     }
                 });
             }
-            
-            // תצוגה מקדימה ותיקון שגיאות העלאת תמונה
+
+            // Back button
+            if (btnBack) {
+                btnBack.addEventListener('click', function() {
+                    saveFormState();
+                    currentStep--;
+                    restoreFormState();
+                    showStep(currentStep);
+                });
+            }
+
+            // Training types search
+            const searchInput = document.getElementById('trainingTypesSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const query = e.target.value.toLowerCase();
+                    const checkboxes = form.querySelectorAll('.training-type-checkbox');
+                    checkboxes.forEach(cb => {
+                        const text = cb.querySelector('span').textContent.toLowerCase();
+                        cb.style.display = text.includes(query) ? 'block' : 'none';
+                    });
+                });
+            }
+
+            // Image preview
             const profileImageInput = document.getElementById('profile_image');
             if (profileImageInput) {
                 profileImageInput.addEventListener('change', function(e) {
@@ -305,14 +388,12 @@
                     const preview = document.getElementById('imagePreview');
                     const img = document.getElementById('previewImg');
                     
-                    // הסתרת שגיאה קודמת
                     if (errorDiv) {
                         errorDiv.style.display = 'none';
                         errorDiv.textContent = '';
                     }
                     
                     if (file) {
-                        // בדיקת סוג קובץ
                         const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
                         if (!allowedTypes.includes(file.type)) {
                             if (errorDiv) {
@@ -324,7 +405,6 @@
                             return;
                         }
                         
-                        // הצגת תצוגה מקדימה
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             if (preview && img) {
@@ -344,20 +424,19 @@
                     }
                 });
             }
-        }
-        
-        // Ensure DOM is ready before initializing
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                // Wait a bit to ensure script.js is loaded
-                setTimeout(initializePage, 50);
-            });
-        } else {
-            // DOM is already ready, but wait for script.js
-            setTimeout(initializePage, 50);
-        }
+
+            // Initialize
+            showStep(1);
+
+            // Initialize theme if available
+            if (typeof initTheme === 'function') {
+                initTheme();
+            }
+            if (typeof initNavbarToggle === 'function') {
+                initNavbarToggle();
+            }
+        })();
     </script>
     @include('partials.accessibility-panel')
 </body>
 </html>
-
