@@ -27,6 +27,11 @@
     --admin-text-primary: #f1f5f9; /* light gray */
     --admin-text-secondary: #94a3b8; /* medium gray */
     --admin-border: rgba(74, 158, 255, 0.1); /* subtle blue border */
+    
+    /* Background Images URLs */
+    --bg-image-1: url('https://totalfusion.com.au/wp-content/uploads/elementor/thumbs/2023_02_08_SF_GymFloor-860-1024x683-1-qep3pa1r6s1f1ajydt3vni5ytgt0pju0tyjufoufzk.jpg');
+    --bg-image-2: url('https://plus.unsplash.com/premium_photo-1661580282598-6883482b4c8e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29uYWwlMjB0cmFpbmVyfGVufDB8fDB8fHww');
+    --bg-image-3: url('https://t3.ftcdn.net/jpg/03/17/91/76/360_F_317917629_HjBCyRlH1Hpwwg2HfEbExTdkbyWiGFuN.jpg');
 }
 
 /* CSS Variables - Dark Theme (same as default for cyan theme) */
@@ -121,10 +126,56 @@ div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-c
 
 body {
     background: var(--bg-body);
+    /* Beautiful multi-layer background with trainer images */
     background-image: 
-        radial-gradient(circle at 20% 50%, rgba(74, 158, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(107, 182, 255, 0.04) 0%, transparent 50%);
-    background-attachment: scroll;
+        /* Dark overlay gradient - ensures text readability */
+        linear-gradient(
+            to bottom,
+            rgba(10, 26, 31, 0.85) 0%,
+            rgba(10, 26, 31, 0.75) 30%,
+            rgba(10, 26, 31, 0.80) 70%,
+            rgba(10, 26, 31, 0.85) 100%
+        ),
+        /* Gradient overlay with cyan tint */
+        linear-gradient(
+            135deg,
+            rgba(10, 26, 31, 0.9) 0%,
+            rgba(0, 26, 26, 0.8) 50%,
+            rgba(10, 26, 31, 0.9) 100%
+        ),
+        /* Trainer image 3 - positioned at top right */
+        var(--bg-image-3),
+        /* Trainer image 2 - positioned at center */
+        var(--bg-image-2),
+        /* Gym floor image 1 - base layer */
+        var(--bg-image-1);
+    
+    /* Background sizing and positioning for layered effect */
+    background-size: 
+        cover,           /* overlay gradient */
+        cover,           /* gradient overlay */
+        800px 600px,     /* trainer image 3 - smaller, top right */
+        1200px 900px,    /* trainer image 2 - medium, center */
+        cover;           /* gym floor - full cover */
+    
+    background-position: 
+        center center,
+        center center,
+        top 10% right 5%,   /* trainer image 3 */
+        center 40%,         /* trainer image 2 */
+        center center;      /* gym floor */
+    
+    /* Blend modes for beautiful overlay effect */
+    background-blend-mode: 
+        normal,    /* overlay gradient */
+        multiply,  /* gradient overlay */
+        soft-light, /* trainer image 3 - subtle blend */
+        overlay,   /* trainer image 2 - medium blend */
+        normal;    /* gym floor - base */
+    
+    background-repeat: no-repeat;
+    background-attachment: scroll; /* Changed from fixed for better mobile performance */
+    
     color: var(--text-main);
     font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     direction: rtl;
@@ -136,6 +187,18 @@ body {
     position: relative;
     font-size: 16px;
     width: 100%;
+}
+
+/* Enhanced background for larger screens */
+@media (min-width: 1200px) {
+    body {
+        background-size: 
+            cover,
+            cover,
+            1000px 750px,    /* larger trainer image 3 */
+            1400px 1050px,   /* larger trainer image 2 */
+            cover;
+    }
 }
 
 /* Images and videos - responsive */
@@ -226,6 +289,46 @@ strong, b {
     
     body {
         font-size: 15px;
+        /* Simplified background for mobile - better performance */
+        background-image: 
+            /* Dark overlay - stronger on mobile for text readability */
+            linear-gradient(
+                to bottom,
+                rgba(10, 26, 31, 0.92) 0%,
+                rgba(10, 26, 31, 0.88) 50%,
+                rgba(10, 26, 31, 0.92) 100%
+            ),
+            /* Single trainer image on mobile for performance */
+            var(--bg-image-2);
+        
+        background-size: 
+            cover,
+            cover;
+        
+        background-position: 
+            center center,
+            center center;
+        
+        background-blend-mode: 
+            normal,
+            multiply;
+    }
+}
+
+/* Even more simplified for small mobile devices */
+@media (max-width: 480px) {
+    body {
+        background-image: 
+            /* Strong overlay for maximum readability on small screens */
+            linear-gradient(
+                to bottom,
+                rgba(10, 26, 31, 0.95) 0%,
+                rgba(10, 26, 31, 0.90) 100%
+            ),
+            var(--bg-image-2);
+        
+        background-size: cover;
+        background-blend-mode: multiply;
     }
 }
 
@@ -6177,5 +6280,25 @@ fieldset legend {
     [dir="ltr"] .language-selector {
         margin-left: auto;
         margin-right: 0.5rem;
+    }
+}
+
+/* Glass Morphism Effect for Cards - Desktop Only */
+@media (min-width: 769px) {
+    .feature-card,
+    .stat-card,
+    .trainer-card {
+        background: rgba(13, 35, 41, 0.85); /* Slightly transparent to show background */
+        backdrop-filter: blur(10px); /* Blur effect for glass morphism */
+    }
+}
+
+/* Glass Morphism Effect for Cards - Desktop Only */
+@media (min-width: 769px) {
+    .feature-card,
+    .stat-card,
+    .trainer-card {
+        background: rgba(13, 35, 41, 0.85); /* Slightly transparent to show background */
+        backdrop-filter: blur(10px); /* Blur effect for glass morphism */
     }
 }
