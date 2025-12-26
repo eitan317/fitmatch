@@ -117,9 +117,10 @@ use Illuminate\Support\Facades\Storage;
             </div>
         </form>
 
-        <div id="public-trainers-container" class="trainers-grid">
-            @forelse($trainers as $trainer)
-                <div class="trainer-card">
+        <div class="trainers-slider-container" id="trainersSlider">
+            <div class="trainers-slider-track">
+                @forelse($trainers as $trainer)
+                    <div class="trainer-card">
                     <div class="trainer-card-image">
                         @if($trainer->profile_image_path)
                             <img src="{{ asset('storage/' . $trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -168,12 +169,13 @@ use Illuminate\Support\Facades\Storage;
                     <div class="trainer-card-actions">
                         <a href="{{ route('trainers.show', $trainer) }}" class="btn btn-primary">צפה בפרופיל</a>
                     </div>
-                </div>
-            @empty
-                <div class="no-trainers">
-                    <p>לא נמצאו מאמנים.</p>
-                </div>
-            @endforelse
+                    </div>
+                @empty
+                    <div class="no-trainers">
+                        <p>לא נמצאו מאמנים.</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </main>
 
@@ -188,6 +190,15 @@ use Illuminate\Support\Facades\Storage;
         }
         if (typeof initNavbarToggle === 'function') {
             initNavbarToggle();
+        }
+        
+        // Initialize trainer cards slider
+        if (typeof initMobileSlider === 'function') {
+            initMobileSlider('#trainersSlider', { 
+                cardsPerView: 1, 
+                gap: 24,
+                cardSelector: '.trainer-card'
+            });
         }
     </script>
 </body>

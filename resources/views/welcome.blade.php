@@ -50,68 +50,72 @@
         <!-- Why Choose Us Section -->
         <section class="why-choose-us">
             <h2 class="section-title">למה לבחור בנו?</h2>
-            <div class="features-grid">
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
+            <div class="features-slider-container" id="featuresSlider">
+                <div class="features-slider-track">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>מהירות</h3>
+                        <p>מצא מאמן תוך דקות. חיפוש פשוט ומהיר עם תוצאות מיידיות.</p>
                     </div>
-                    <h3>מהירות</h3>
-                    <p>מצא מאמן תוך דקות. חיפוש פשוט ומהיר עם תוצאות מיידיות.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="fas fa-star"></i>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>איכות מוכחת</h3>
+                        <p>כל המאמנים שלנו מאומתים ומקצועיים עם ניסיון מוכח.</p>
                     </div>
-                    <h3>איכות מוכחת</h3>
-                    <p>כל המאמנים שלנו מאומתים ומקצועיים עם ניסיון מוכח.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="fas fa-th-large"></i>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-th-large"></i>
+                        </div>
+                        <h3>מגוון רחב</h3>
+                        <p>מאות מאמנים מקצועיים בכל סוגי האימונים והתמחויות.</p>
                     </div>
-                    <h3>מגוון רחב</h3>
-                    <p>מאות מאמנים מקצועיים בכל סוגי האימונים והתמחויות.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <h3>תמיכה 24/7</h3>
+                        <p>צוות תמיכה מקצועי זמין בכל שעה לעזור ולסייע.</p>
                     </div>
-                    <h3>תמיכה 24/7</h3>
-                    <p>צוות תמיכה מקצועי זמין בכל שעה לעזור ולסייע.</p>
                 </div>
             </div>
         </section>
 
         <!-- Stats Section -->
         <section class="stats-section">
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
+            <div class="stats-slider-container" id="statsSlider">
+                <div class="stats-slider-track">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number" data-target="{{ $stats['active_trainers'] }}">0</div>
+                        <div class="stat-label">מאמנים פעילים</div>
                     </div>
-                    <div class="stat-number" data-target="{{ $stats['active_trainers'] }}">0</div>
-                    <div class="stat-label">מאמנים פעילים</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-check"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-number" data-target="{{ $stats['satisfied_trainees'] }}">0</div>
+                        <div class="stat-label">מתאמנים מרוצים</div>
                     </div>
-                    <div class="stat-number" data-target="{{ $stats['satisfied_trainees'] }}">0</div>
-                    <div class="stat-label">מתאמנים מרוצים</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-number" data-target="{{ number_format($stats['average_rating'], 1) }}">0</div>
+                        <div class="stat-label">דירוג ממוצע</div>
                     </div>
-                    <div class="stat-number" data-target="{{ number_format($stats['average_rating'], 1) }}">0</div>
-                    <div class="stat-label">דירוג ממוצע</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-comments"></i>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-number" data-target="{{ $stats['total_reviews'] }}">0</div>
+                        <div class="stat-label">ביקורות</div>
                     </div>
-                    <div class="stat-number" data-target="{{ $stats['total_reviews'] }}">0</div>
-                    <div class="stat-label">ביקורות</div>
                 </div>
             </div>
         </section>
@@ -234,6 +238,12 @@
     <script>
         initTheme && initTheme();
         initNavbarToggle && initNavbarToggle();
+        
+        // Initialize mobile sliders
+        if (typeof initMobileSlider === 'function') {
+            initMobileSlider('#featuresSlider', { cardsPerView: 1, gap: 32 });
+            initMobileSlider('#statsSlider', { cardsPerView: 1, gap: 32 });
+        }
     </script>
 </body>
 </html>
