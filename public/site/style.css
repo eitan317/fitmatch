@@ -1097,7 +1097,7 @@ button[type="submit"]:hover,
     margin-top: 1.5rem;
 }
 
-/* Trainer Cards Slider - VERTICAL */
+/* Trainer Cards Slider - HORIZONTAL */
 .trainers-slider-container {
     width: 100%;
     position: relative;
@@ -1106,7 +1106,6 @@ button[type="submit"]:hover,
 
 .trainers-slider-track {
     display: flex;
-    flex-direction: column;
     gap: 1.5rem;
     transition: transform 200ms ease-out;
 }
@@ -1128,15 +1127,13 @@ button[type="submit"]:hover,
 
 .trainers-slider-container .trainer-card {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .trainers-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .trainers-slider-track {
         display: grid;
@@ -1146,18 +1143,16 @@ button[type="submit"]:hover,
     }
     .trainers-slider-container .trainer-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .trainers-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
@@ -4572,7 +4567,7 @@ fieldset legend {
     padding: 0 1.5rem;
 }
 
-/* Feature Cards Slider - VERTICAL */
+/* Feature Cards Slider - HORIZONTAL */
 .features-slider-container {
     width: 100%;
     max-width: 1200px;
@@ -4583,7 +4578,6 @@ fieldset legend {
 
 .features-slider-track {
     display: flex;
-    flex-direction: column;
     gap: 2rem;
     transition: transform 200ms ease-out;
 }
@@ -4601,15 +4595,13 @@ fieldset legend {
 
 .features-slider-container .feature-card {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .features-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .features-slider-track {
         display: grid;
@@ -4619,18 +4611,16 @@ fieldset legend {
     }
     .features-slider-container .feature-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .features-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
@@ -4717,15 +4707,13 @@ fieldset legend {
 
 .stats-slider-container .stat-card {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .stats-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .stats-slider-track {
         display: grid;
@@ -4735,18 +4723,16 @@ fieldset legend {
     }
     .stats-slider-container .stat-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .stats-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
@@ -4920,9 +4906,7 @@ fieldset legend {
 
 @media (min-width: 768px) {
     .admin-stats-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .admin-stats-slider-track {
         display: grid;
@@ -4932,22 +4916,20 @@ fieldset legend {
     }
     .admin-stats-slider-container .admin-stat-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .admin-stats-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
-/* Admin Pending Trainers Slider - VERTICAL */
+/* Admin Pending Trainers Slider - HORIZONTAL */
 .admin-pending-slider-container {
     width: 100%;
     position: relative;
@@ -4955,9 +4937,9 @@ fieldset legend {
 
 .admin-pending-slider-track {
     display: flex;
-    flex-direction: column;
     gap: 1.5rem;
     transition: transform 200ms ease-out;
+    flex-direction: column;
 }
 
 .admin-pending-slider-track.dragging {
@@ -4972,15 +4954,13 @@ fieldset legend {
 
 .admin-pending-slider-container .admin-trainer-card {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .admin-pending-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .admin-pending-slider-track {
         display: block;
@@ -4989,22 +4969,20 @@ fieldset legend {
     }
     .admin-pending-slider-container .admin-trainer-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .admin-pending-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
-/* Admin Active Trainers Slider - VERTICAL */
+/* Admin Active Trainers Slider - HORIZONTAL */
 .admin-active-slider-container {
     width: 100%;
     position: relative;
@@ -5012,7 +4990,6 @@ fieldset legend {
 
 .admin-active-slider-track {
     display: flex;
-    flex-direction: column;
     gap: 1.5rem;
     transition: transform 200ms ease-out;
 }
@@ -5029,15 +5006,13 @@ fieldset legend {
 
 .admin-active-slider-container .admin-trainer-card {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .admin-active-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .admin-active-slider-track {
         display: grid;
@@ -5047,18 +5022,16 @@ fieldset legend {
     }
     .admin-active-slider-container .admin-trainer-card {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .admin-active-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
 
@@ -5087,15 +5060,13 @@ fieldset legend {
 
 .faq-slider-container .faq-item {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .faq-slider-container {
-        overflow-y: visible;
-        height: auto;
-        max-height: none;
+        overflow-x: visible;
     }
     .faq-slider-track {
         display: block;
@@ -5104,18 +5075,16 @@ fieldset legend {
     }
     .faq-slider-container .faq-item {
         flex: none;
-        min-height: auto;
+        min-width: auto;
         width: auto;
     }
 }
 
 @media (max-width: 767px) {
     .faq-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 }
     box-shadow: 0 2px 8px rgba(74, 158, 255, 0.2);
@@ -5636,7 +5605,7 @@ fieldset legend {
 
 .wizard-step {
     flex: 0 0 100%;
-    min-height: 100%;
+    min-width: 100%;
     width: 100%;
     background: var(--bg-card);
     border-radius: 12px;
@@ -5875,11 +5844,9 @@ fieldset legend {
 
 @media (max-width: 480px) {
     .wizard-slider-container {
-        height: 80vh;
-        max-height: 600px;
-        overflow-y: hidden;
-        touch-action: pan-x;
-        overscroll-behavior-y: none;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 
     .wizard-progress {

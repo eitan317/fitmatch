@@ -2017,13 +2017,13 @@ function initMobileSlider(containerSelector, options = {}) {
     // Slider state
     let currentIndex = 0;
     let isDragging = false;
-    let startY = 0; // Changed from startX for vertical swipe
-    let currentY = 0; // Changed from currentX
+    let startX = 0;
+    let currentX = 0;
     let startTime = 0;
     let currentPointerId = null;
-    let startX = 0; // Track X for horizontal scroll detection
+    let startY = 0; // Track Y for vertical scroll detection
 
-    // Update position - VERTICAL
+    // Update position - HORIZONTAL
     function updatePosition(index, animate = true) {
         if (!isMobile()) {
             track.style.transform = 'none';
@@ -2039,11 +2039,11 @@ function initMobileSlider(containerSelector, options = {}) {
             track.style.transition = 'none';
         }
 
-        const containerHeight = container.offsetHeight; // Changed from containerWidth
-        const cardHeight = containerHeight; // Changed from cardWidth
-        const offset = -currentIndex * cardHeight; // Changed calculation
+        const containerWidth = container.offsetWidth;
+        const cardWidth = containerWidth;
+        const offset = -currentIndex * cardWidth;
         
-        track.style.transform = `translateY(${offset}px)`; // Changed from translateX
+        track.style.transform = `translateX(${offset}px)`;
         
         if (showIndicators) updateIndicators();
     }
@@ -2096,7 +2096,7 @@ function initMobileSlider(containerSelector, options = {}) {
         return false;
     }
 
-    // Pointer events - VERTICAL swipe - attach to CONTAINER so it works everywhere
+    // Pointer events - HORIZONTAL swipe - attach to CONTAINER so it works everywhere
     function handleDown(e) {
         if (!isMobile() || e.isPrimary === false) return;
         
@@ -2108,9 +2108,9 @@ function initMobileSlider(containerSelector, options = {}) {
         }
         
         isDragging = true;
-        startY = e.clientY; // Changed from clientX
-        startX = e.clientX; // Track X for horizontal detection
-        currentY = startY; // Changed from currentX
+        startX = e.clientX;
+        startY = e.clientY; // Track Y for vertical scroll detection
+        currentX = startX;
         startTime = Date.now();
         currentPointerId = e.pointerId;
         container.setPointerCapture(e.pointerId);
@@ -2121,14 +2121,14 @@ function initMobileSlider(containerSelector, options = {}) {
     function handleMove(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
         
-        currentY = e.clientY; // Changed from clientX
-        const currentX = e.clientX; // Track X
-        const deltaY = currentY - startY; // Changed from deltaX
-        const deltaX = Math.abs(currentX - startX); // Track horizontal movement
+        currentX = e.clientX;
+        const currentY = e.clientY;
+        const deltaX = currentX - startX;
+        const deltaY = Math.abs(currentY - startY);
         
-        // If horizontal movement is greater than vertical, allow scrolling instead
-        if (deltaX > Math.abs(deltaY) && deltaX > 10) {
-            // This is a horizontal scroll, don't prevent it
+        // If vertical movement is greater than horizontal, allow scrolling instead
+        if (deltaY > Math.abs(deltaX) && deltaY > 10) {
+            // This is a vertical scroll, don't prevent it
             isDragging = false;
             track.classList.remove('dragging');
             container.releasePointerCapture(currentPointerId);
@@ -2136,21 +2136,21 @@ function initMobileSlider(containerSelector, options = {}) {
             return;
         }
         
-        // Only prevent default if we have significant vertical movement (slider swipe)
+        // Only prevent default if we have significant horizontal movement (slider swipe)
         // Small movements should allow page scrolling
-        if (Math.abs(deltaY) > 10) {
-            const containerHeight = container.offsetHeight; // Changed from containerWidth
-            const baseOffset = -currentIndex * containerHeight; // Changed calculation
-            let offset = baseOffset + deltaY; // Changed from deltaX
+        if (Math.abs(deltaX) > 10) {
+            const containerWidth = container.offsetWidth;
+            const baseOffset = -currentIndex * containerWidth;
+            let offset = baseOffset + deltaX;
             
             const maxIndex = cards.length - cardsPerView;
-            if (currentIndex === 0 && deltaY > 0) { // Swiping down at start
-                offset = baseOffset + deltaY * 0.3;
-            } else if (currentIndex >= maxIndex && deltaY < 0) { // Swiping up at end
-                offset = baseOffset + deltaY * 0.3;
+            if (currentIndex === 0 && deltaX > 0) {
+                offset = baseOffset + deltaX * 0.3;
+            } else if (currentIndex >= maxIndex && deltaX < 0) {
+                offset = baseOffset + deltaX * 0.3;
             }
             
-            track.style.transform = `translateY(${offset}px)`; // Changed from translateX
+            track.style.transform = `translateX(${offset}px)`;
             track.style.transition = 'none';
             e.preventDefault(); // Only prevent default for significant slider swipes
         }
@@ -2159,13 +2159,13 @@ function initMobileSlider(containerSelector, options = {}) {
     function handleUp(e) {
         if (!isDragging || !isMobile() || e.pointerId !== currentPointerId) return;
         
-        const deltaY = currentY - startY; // Changed from deltaX
-        const deltaX = Math.abs(e.clientX - startX); // Track horizontal
+        const deltaX = currentX - startX;
+        const deltaY = Math.abs(e.clientY - startY);
         const deltaTime = Date.now() - startTime;
-        const velocity = deltaTime > 0 ? Math.abs(deltaY) / deltaTime : 0;
+        const velocity = deltaTime > 0 ? Math.abs(deltaX) / deltaTime : 0;
         
-        // If it was more of a horizontal scroll, don't swipe
-        if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+        // If it was more of a vertical scroll, don't swipe
+        if (deltaY > Math.abs(deltaX) && deltaY > 10) {
             isDragging = false;
             track.classList.remove('dragging');
             container.releasePointerCapture(currentPointerId);
@@ -2175,13 +2175,14 @@ function initMobileSlider(containerSelector, options = {}) {
         }
         
         let newIndex = currentIndex;
+        const isRTL = document.documentElement.dir === 'rtl';
 
-        // Vertical swipe: swipe down = next, swipe up = previous
-        if (Math.abs(deltaY) > swipeThreshold || velocity > velocityThreshold) {
-            if (deltaY > 0) { // Swiping down (positive) = next
-                newIndex = Math.min(cards.length - cardsPerView, currentIndex + 1);
-            } else { // Swiping up (negative) = previous
-                newIndex = Math.max(0, currentIndex - 1);
+        // Horizontal swipe: swipe left = next, swipe right = previous (Instagram-style)
+        if (Math.abs(deltaX) > swipeThreshold || velocity > velocityThreshold) {
+            if (deltaX < 0) { // Swiping left
+                newIndex = isRTL ? Math.max(0, currentIndex - 1) : Math.min(cards.length - cardsPerView, currentIndex + 1);
+            } else { // Swiping right
+                newIndex = isRTL ? Math.min(cards.length - cardsPerView, currentIndex + 1) : Math.max(0, currentIndex - 1);
             }
         }
         

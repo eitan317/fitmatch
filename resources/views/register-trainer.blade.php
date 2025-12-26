@@ -229,13 +229,13 @@
             const stepText = document.getElementById('wizardStepText');
             const stepPercentage = document.getElementById('wizardStepPercentage');
 
-            // Swipe detection state - VERTICAL
+            // Swipe detection state - HORIZONTAL
             let isDragging = false;
-            let startY = 0; // Changed from startX for vertical swipe
-            let currentY = 0; // Changed from currentX
-            let startX = 0; // Track X for horizontal scroll detection
+            let startX = 0;
+            let currentX = 0;
             let startTime = 0;
             let currentPointerId = null;
+            let startY = 0; // Track Y for vertical scroll detection
             const SWIPE_THRESHOLD = 60; // pixels
             const VELOCITY_THRESHOLD = 0.3; // pixels per ms
 
@@ -333,7 +333,7 @@
                 if (stepPercentage) stepPercentage.textContent = Math.round(percentage) + '%';
             }
 
-            // Update slider position - VERTICAL
+            // Update slider position - HORIZONTAL
             function updateSliderPosition(step, animate = true) {
                 if (!animate) {
                     sliderTrack.style.transition = 'none';
@@ -342,7 +342,7 @@
                 }
                 
                 const offset = -step * 100;
-                sliderTrack.style.transform = `translateY(${offset}%)`; // Changed from translateX
+                sliderTrack.style.transform = `translateX(${offset}%)`;
                 
                 // Update active step
                 steps.forEach((s, index) => {
@@ -427,15 +427,15 @@
                 });
             }
 
-            // Pointer Events for VERTICAL swipe detection
+            // Pointer Events for HORIZONTAL swipe detection
             function handlePointerDown(e) {
                 // Only handle primary pointer (mouse or first touch)
                 if (e.isPrimary === false) return;
                 
                 isDragging = true;
-                startY = e.clientY; // Changed from clientX
-                startX = e.clientX; // Track X for horizontal detection
-                currentY = startY; // Changed from currentX
+                startX = e.clientX;
+                startY = e.clientY; // Track Y for vertical scroll detection
+                currentX = startX;
                 startTime = Date.now();
                 currentPointerId = e.pointerId;
                 
@@ -451,14 +451,14 @@
             function handlePointerMove(e) {
                 if (!isDragging || e.pointerId !== currentPointerId) return;
                 
-                currentY = e.clientY; // Changed from clientX
-                const currentX = e.clientX; // Track X
-                const deltaY = currentY - startY; // Changed from deltaX
-                const deltaX = Math.abs(currentX - startX); // Track horizontal movement
+                currentX = e.clientX;
+                const currentY = e.clientY;
+                const deltaX = currentX - startX;
+                const deltaY = Math.abs(currentY - startY);
                 
-                // If horizontal movement is greater than vertical, allow scrolling instead
-                if (deltaX > Math.abs(deltaY) && deltaX > 10) {
-                    // This is a horizontal scroll, don't prevent it
+                // If vertical movement is greater than horizontal, allow scrolling instead
+                if (deltaY > Math.abs(deltaX) && deltaY > 10) {
+                    // This is a vertical scroll, don't prevent it
                     isDragging = false;
                     sliderTrack.classList.remove('dragging');
                     sliderTrack.releasePointerCapture(currentPointerId);
@@ -466,22 +466,22 @@
                     return;
                 }
                 
-                // Only prevent default if we have significant vertical movement (slider swipe)
+                // Only prevent default if we have significant horizontal movement (slider swipe)
                 // Small movements should allow page scrolling
-                if (Math.abs(deltaY) > 10) {
-                    // Calculate position with resistance at boundaries - VERTICAL
-                    const containerHeight = sliderContainer.offsetHeight; // Changed from containerWidth
-                    const baseOffset = -currentStep * containerHeight; // Changed calculation
-                    let offset = baseOffset + deltaY; // Changed from deltaX
+                if (Math.abs(deltaX) > 10) {
+                    // Calculate position with resistance at boundaries - HORIZONTAL
+                    const containerWidth = sliderContainer.offsetWidth;
+                    const baseOffset = -currentStep * containerWidth;
+                    let offset = baseOffset + deltaX;
                     
                     // Add resistance at boundaries
-                    if (currentStep === 0 && deltaY > 0) {
-                        offset = baseOffset + deltaY * 0.3; // Resist down swipe on first step
-                    } else if (currentStep === totalSteps - 1 && deltaY < 0) {
-                        offset = baseOffset + deltaY * 0.3; // Resist up swipe on last step
+                    if (currentStep === 0 && deltaX > 0) {
+                        offset = baseOffset + deltaX * 0.3; // Resist right swipe on first step
+                    } else if (currentStep === totalSteps - 1 && deltaX < 0) {
+                        offset = baseOffset + deltaX * 0.3; // Resist left swipe on last step
                     }
                     
-                    sliderTrack.style.transform = `translateY(${offset}px)`; // Changed from translateX
+                    sliderTrack.style.transform = `translateX(${offset}px)`;
                     e.preventDefault(); // Only prevent default for significant slider swipes
                 }
             }
@@ -489,13 +489,13 @@
             function handlePointerUp(e) {
                 if (!isDragging || e.pointerId !== currentPointerId) return;
                 
-                const deltaY = currentY - startY; // Changed from deltaX
-                const deltaX = Math.abs(e.clientX - startX); // Track horizontal
+                const deltaX = currentX - startX;
+                const deltaY = Math.abs(e.clientY - startY);
                 const deltaTime = Date.now() - startTime;
-                const velocity = deltaTime > 0 ? Math.abs(deltaY) / deltaTime : 0;
+                const velocity = deltaTime > 0 ? Math.abs(deltaX) / deltaTime : 0;
                 
-                // If it was more of a horizontal scroll, don't swipe
-                if (deltaX > Math.abs(deltaY) && deltaX > 10) {
+                // If it was more of a vertical scroll, don't swipe
+                if (deltaY > Math.abs(deltaX) && deltaY > 10) {
                     isDragging = false;
                     sliderTrack.classList.remove('dragging');
                     sliderTrack.releasePointerCapture(currentPointerId);
@@ -504,23 +504,22 @@
                     return;
                 }
                 
-                // Determine if we should change steps - VERTICAL
+                // Determine if we should change steps - HORIZONTAL
                 let shouldChange = false;
                 let newStep = currentStep;
                 
-                // Check threshold or velocity - VERTICAL
-                if (Math.abs(deltaY) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-                    // Vertical swipe: swipe down (positive deltaY) = next, swipe up (negative deltaY) = prev
-                    if (deltaY > 0) {
-                        // Swipe down = next step
+                // Check threshold or velocity - HORIZONTAL
+                if (Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+                    // Horizontal swipe: swipe left (negative deltaX) = next, swipe right (positive deltaX) = prev
+                    const isRTL = document.documentElement.dir === 'rtl';
+                    if (deltaX < 0) { // Swiping left
                         if (currentStep < totalSteps - 1) {
-                            newStep = currentStep + 1;
+                            newStep = isRTL ? Math.max(0, currentStep - 1) : currentStep + 1;
                             shouldChange = true;
                         }
-                    } else {
-                        // Swipe up = previous step
+                    } else { // Swiping right
                         if (currentStep > 0) {
-                            newStep = currentStep - 1;
+                            newStep = isRTL ? currentStep + 1 : currentStep - 1;
                             shouldChange = true;
                         }
                     }
