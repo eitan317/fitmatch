@@ -1629,71 +1629,66 @@ button[type="submit"]:hover,
     }
     
     .sticky-submit {
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        width: 100% !important;
-        border-radius: 0 !important;
-        padding: 1.25rem !important;
-        font-size: 1.1rem !important;
-        z-index: 9999 !important;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-        margin: 0 !important;
+        position: sticky;
+        bottom: 1rem;
+        margin-top: 2rem;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        width: 100%;
+        z-index: 100;
     }
     
-    /* הוספת padding לתחתית העמוד כדי שהתוכן לא יוסתר */
-    .form-container {
-        padding-bottom: 100px !important;
-    }
-    
-    /* הגדלת שדות טקסט ומרווחים */
+    /* תיקון שדות טקסט - יותר מתון */
     .form-group input,
     .form-group select,
     .form-group textarea {
-        font-size: 16px !important; /* מונע zoom אוטומטי ב-iOS */
-        padding: 1rem !important; /* יותר נוח למגע */
-        min-height: 48px !important; /* גודל מינימלי למגע */
+        font-size: 16px; /* מונע zoom ב-iOS */
+        padding: 0.75rem;
+        min-height: 44px;
     }
     
     .form-group {
-        margin-bottom: 1.75rem !important; /* יותר רווח בין שדות */
+        margin-bottom: 1.25rem;
     }
     
     /* הגדלת accordion header */
     .accordion-header {
-        padding: 1.25rem 1rem !important; /* יותר מקום למגע */
-        min-height: 60px !important; /* גובה מינימלי */
+        min-height: 56px;
     }
     
     /* שיפור Progress Indicator */
     .progress-sections {
-        grid-template-columns: repeat(2, 1fr) !important; /* 2 עמודות במקום 4 */
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
     }
     
     .section-name {
-        font-size: 0.75rem !important; /* קטן יותר */
+        font-size: 0.75rem;
     }
     
-    /* הגדלת checkboxes בטלפון */
+    /* הגדלת checkboxes - מתון */
     .training-type-option input[type="checkbox"] {
-        width: 24px !important; /* במקום 16px */
-        height: 24px !important;
+        width: 20px;
+        height: 20px;
     }
     
-    /* שיפור כפתור העלאת תמונה בטלפון */
+    /* כפתור העלאת תמונה */
     .file-upload-btn {
-        padding: 2rem 1rem !important;
-        min-height: 120px;
+        padding: 1.5rem 1rem;
+        min-height: 100px;
     }
     
     .file-upload-btn i {
-        font-size: 2.5rem !important;
+        font-size: 2rem;
     }
     
     .file-upload-btn span {
-        font-size: 1rem !important;
+        font-size: 0.95rem;
+    }
+    
+    /* הוספת padding לתחתית */
+    .form-container {
+        padding-bottom: 2rem;
     }
 }
 

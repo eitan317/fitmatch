@@ -102,21 +102,6 @@
                     <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization') }}">
                 </div>
 
-                <div class="form-group">
-                    <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                    <label for="profile_image" class="file-upload-btn" style="display: block; padding: 1.5rem; border: 2px dashed var(--border-soft); border-radius: 12px; text-align: center; cursor: pointer; background: var(--bg-card); transition: all 0.2s ease;">
-                        <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--primary);"></i>
-                        <span style="color: var(--text-main); font-weight: 500;">לחץ להעלאת תמונה</span>
-                        <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
-                    </label>
-                    <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
-                        <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                    </div>
-                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">גודל מקסימלי: 5MB. פורמטים: JPG, PNG, GIF</small>
-                    @if($errors->has('profile_image'))
-                        <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
-                    @endif
-                </div>
                 </div>
             </div>
 
@@ -231,6 +216,23 @@
                     <label for="bio">תיאור קצר (אופציונלי)</label>
                     <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
                 </div>
+
+                <div class="form-group">
+                    <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
+                    <label for="profile_image" class="file-upload-btn" style="display: block; padding: 1.5rem; border: 2px dashed var(--border-soft); border-radius: 12px; text-align: center; cursor: pointer; background: var(--bg-card); transition: all 0.2s ease;">
+                        <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--primary);"></i>
+                        <span style="color: var(--text-main); font-weight: 500;">לחץ להעלאת תמונה</span>
+                        <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
+                    </label>
+                    <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
+                        <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    </div>
+                    <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
+                    <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">גודל מקסימלי: 5MB. פורמטים: JPG, PNG, GIF</small>
+                    @if($errors->has('profile_image'))
+                        <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
+                    @endif
+                </div>
                 </div>
             </div>
 
@@ -294,27 +296,63 @@
                 });
             }
             
-            // תצוגה מקדימה לתמונת פרופיל
+            // תצוגה מקדימה ותיקון שגיאות העלאת תמונה
             const profileImageInput = document.getElementById('profile_image');
             if (profileImageInput) {
                 profileImageInput.addEventListener('change', function(e) {
                     const file = e.target.files[0];
+                    const errorDiv = document.getElementById('imageUploadError');
+                    const preview = document.getElementById('imagePreview');
+                    const img = document.getElementById('previewImg');
+                    
+                    // הסתרת שגיאה קודמת
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                        errorDiv.textContent = '';
+                    }
+                    
                     if (file) {
+                        // בדיקת גודל (5MB)
+                        const maxSize = 5 * 1024 * 1024; // 5MB
+                        if (file.size > maxSize) {
+                            if (errorDiv) {
+                                errorDiv.textContent = 'הקובץ גדול מדי. גודל מקסימלי: 5MB';
+                                errorDiv.style.display = 'block';
+                            }
+                            this.value = ''; // איפוס השדה
+                            if (preview) preview.style.display = 'none';
+                            return;
+                        }
+                        
+                        // בדיקת סוג קובץ
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+                        if (!allowedTypes.includes(file.type)) {
+                            if (errorDiv) {
+                                errorDiv.textContent = 'סוג קובץ לא נתמך. אנא בחר תמונה בפורמט JPG, PNG או GIF';
+                                errorDiv.style.display = 'block';
+                            }
+                            this.value = '';
+                            if (preview) preview.style.display = 'none';
+                            return;
+                        }
+                        
+                        // הצגת תצוגה מקדימה
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            const preview = document.getElementById('imagePreview');
-                            const img = document.getElementById('previewImg');
                             if (preview && img) {
                                 img.src = e.target.result;
                                 preview.style.display = 'block';
                             }
-                        }
+                        };
+                        reader.onerror = function() {
+                            if (errorDiv) {
+                                errorDiv.textContent = 'שגיאה בקריאת הקובץ. אנא נסה שוב';
+                                errorDiv.style.display = 'block';
+                            }
+                        };
                         reader.readAsDataURL(file);
                     } else {
-                        const preview = document.getElementById('imagePreview');
-                        if (preview) {
-                            preview.style.display = 'none';
-                        }
+                        if (preview) preview.style.display = 'none';
                     }
                 });
             }
@@ -323,7 +361,7 @@
             if (window.innerWidth <= 480) {
                 setTimeout(function() {
                     const firstSection = document.querySelector('.accordion-section[data-section="1"]');
-                    if (firstSection) {
+                    if (firstSection && !firstSection.classList.contains('active')) {
                         firstSection.classList.add('active');
                         const content = firstSection.querySelector('.accordion-content');
                         if (content) {
