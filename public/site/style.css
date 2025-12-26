@@ -126,7 +126,7 @@ div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-c
 
 body {
     background: var(--bg-body);
-    /* Beautiful multi-layer background with trainer images */
+    /* Fast loading - gradients only (images loaded async via JS) */
     background-image: 
         /* Dark overlay gradient - ensures text readability */
         linear-gradient(
@@ -142,39 +142,16 @@ body {
             rgba(10, 26, 31, 0.9) 0%,
             rgba(0, 26, 26, 0.8) 50%,
             rgba(10, 26, 31, 0.9) 100%
-        ),
-        /* Trainer image 3 - positioned at top right */
-        var(--bg-image-3),
-        /* Trainer image 2 - positioned at center */
-        var(--bg-image-2),
-        /* Gym floor image 1 - base layer */
-        var(--bg-image-1);
+        );
     
-    /* Background sizing and positioning for layered effect */
-    background-size: 
-        cover,           /* overlay gradient */
-        cover,           /* gradient overlay */
-        800px 600px,     /* trainer image 3 - smaller, top right */
-        1200px 900px,    /* trainer image 2 - medium, center */
-        cover;           /* gym floor - full cover */
-    
-    background-position: 
-        center center,
-        center center,
-        top 10% right 5%,   /* trainer image 3 */
-        center 40%,         /* trainer image 2 */
-        center center;      /* gym floor */
-    
-    /* Blend modes for beautiful overlay effect */
-    background-blend-mode: 
-        normal,    /* overlay gradient */
-        multiply,  /* gradient overlay */
-        soft-light, /* trainer image 3 - subtle blend */
-        overlay,   /* trainer image 2 - medium blend */
-        normal;    /* gym floor - base */
+    /* Background sizing and positioning for gradients only initially */
+    background-size: cover, cover;
+    background-position: center center, center center;
+    background-blend-mode: normal, multiply;
     
     background-repeat: no-repeat;
-    background-attachment: scroll; /* Changed from fixed for better mobile performance */
+    background-attachment: scroll;
+    transition: background-image 0.5s ease-in-out;
     
     color: var(--text-main);
     font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -189,9 +166,9 @@ body {
     width: 100%;
 }
 
-/* Enhanced background for larger screens */
+/* Enhanced background for larger screens (applied after async load) */
 @media (min-width: 1200px) {
-    body {
+    body.bg-images-loaded {
         background-size: 
             cover,
             cover,
@@ -289,46 +266,34 @@ strong, b {
     
     body {
         font-size: 15px;
-        /* Simplified background for mobile - better performance */
+        /* Mobile: gradient only for fast loading */
         background-image: 
-            /* Dark overlay - stronger on mobile for text readability */
             linear-gradient(
                 to bottom,
                 rgba(10, 26, 31, 0.92) 0%,
                 rgba(10, 26, 31, 0.88) 50%,
                 rgba(10, 26, 31, 0.92) 100%
-            ),
-            /* Single trainer image on mobile for performance */
-            var(--bg-image-2);
+            );
         
-        background-size: 
-            cover,
-            cover;
-        
-        background-position: 
-            center center,
-            center center;
-        
-        background-blend-mode: 
-            normal,
-            multiply;
+        background-size: cover;
+        background-position: center center;
+        background-blend-mode: normal;
     }
 }
 
 /* Even more simplified for small mobile devices */
 @media (max-width: 480px) {
     body {
+        /* Mobile: gradient only for fast loading */
         background-image: 
-            /* Strong overlay for maximum readability on small screens */
             linear-gradient(
                 to bottom,
                 rgba(10, 26, 31, 0.95) 0%,
                 rgba(10, 26, 31, 0.90) 100%
-            ),
-            var(--bg-image-2);
+            );
         
         background-size: cover;
-        background-blend-mode: multiply;
+        background-blend-mode: normal;
     }
 }
 

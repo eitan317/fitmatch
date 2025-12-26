@@ -2246,8 +2246,63 @@ function initMobileSlider(containerSelector, options = {}) {
     });
 }
 
+// Load background images asynchronously for better performance
+function loadBackgroundImages() {
+    // Only load on desktop devices
+    if (window.innerWidth <= 768) {
+        return;
+    }
+    
+    const bgImages = [
+        'https://totalfusion.com.au/wp-content/uploads/elementor/thumbs/2023_02_08_SF_GymFloor-860-1024x683-1-qep3pa1r6s1f1ajydt3vni5ytgt0pju0tyjufoufzk.jpg',
+        'https://plus.unsplash.com/premium_photo-1661580282598-6883482b4c8e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29uYWwlMjB0cmFpbmVyfGVufDB8fDB8fHww',
+        'https://t3.ftcdn.net/jpg/03/17/91/76/360_F_317917629_HjBCyRlH1Hpwwg2HfEbExTdkbyWiGFuN.jpg'
+    ];
+    
+    // Preload images
+    const imagePromises = bgImages.map(src => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(src);
+            img.onerror = () => reject(src);
+            img.src = src;
+        });
+    });
+    
+    // After images are loaded, apply them to body background
+    Promise.allSettled(imagePromises).then(results => {
+        const loadedImages = results
+            .filter(r => r.status === 'fulfilled')
+            .map(r => r.value);
+        
+        if (loadedImages.length >= 2) {
+            const body = document.body;
+            // Apply multi-layer background
+            body.style.backgroundImage = `
+                linear-gradient(to bottom, rgba(10, 26, 31, 0.85) 0%, rgba(10, 26, 31, 0.75) 30%, rgba(10, 26, 31, 0.80) 70%, rgba(10, 26, 31, 0.85) 100%),
+                linear-gradient(135deg, rgba(10, 26, 31, 0.9) 0%, rgba(0, 26, 26, 0.8) 50%, rgba(10, 26, 31, 0.9) 100%),
+                url('${loadedImages[2] || loadedImages[1]}'),
+                url('${loadedImages[1] || loadedImages[0]}'),
+                url('${loadedImages[0]}')
+            `;
+            body.style.backgroundSize = 'cover, cover, 800px 600px, 1200px 900px, cover';
+            body.style.backgroundPosition = 'center center, center center, top 10% right 5%, center 40%, center center';
+            body.style.backgroundBlendMode = 'normal, multiply, soft-light, overlay, normal';
+            body.classList.add('bg-images-loaded');
+        }
+    });
+}
+
 // Initialize animations on page load
 document.addEventListener('DOMContentLoaded', function() {
     initStatsCounter();
+    
+    // Load background images asynchronously (after page load)
+    if (document.readyState === 'loading') {
+        window.addEventListener('load', loadBackgroundImages);
+    } else {
+        // Page already loaded, start loading images after a short delay
+        setTimeout(loadBackgroundImages, 100);
+    }
 });
 
