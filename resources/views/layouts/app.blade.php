@@ -30,7 +30,7 @@
                         "name": "Israel"
                     },
                     "sameAs": [
-                        "https://www.instagram.com/fitmatch"
+                        "https://www.instagram.com/fitmatch.org.il/"
                     ]
                 },
                 {

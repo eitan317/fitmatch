@@ -16,7 +16,7 @@
                 'url' => $baseUrl,
                 'logo' => $logoUrl,
                 'sameAs' => [
-                    'https://www.instagram.com/fitmatch.co.il/',
+                    'https://www.instagram.com/fitmatch.org.il/',
                     'https://www.tiktok.com/@fitmatch912'
                 ]
             ],

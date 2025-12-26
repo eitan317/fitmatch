@@ -3368,11 +3368,11 @@ fieldset legend {
     border-radius: 1rem;
     border: 1px solid rgba(148,163,184,0.5);
     box-shadow: 0 18px 40px rgba(0,0,0,0.95);
-    padding: 0.5rem 0.75rem 0.75rem;
+    padding: 0.5rem 0.75rem 0.5rem;
     z-index: 10000; /* very high, above other cards including pricing section */
     display: none;
     backdrop-filter: blur(18px);
-    max-height: 400px; /* הגבלת גובה מקסימלי */
+    max-height: 280px; /* הגבלת גובה מקסימלי - קומפקטי ולא מתנגש עם הכפתור */
     overflow-y: auto; /* scroll פנימי אנכי */
     overflow-x: hidden; /* מונע scroll אופקי */
 }
