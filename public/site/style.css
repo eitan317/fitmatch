@@ -1297,9 +1297,11 @@ button[type="submit"]:hover,
     max-width: 600px;
     margin: 0 auto;
     padding: 2.5rem;
+    padding-bottom: 0; /* Remove padding, we'll add margin */
     overflow: visible;
     position: relative;
     scroll-behavior: smooth;
+    margin-bottom: 2rem; /* Space before submit button */
     /* Smooth vertical scroll only */
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
@@ -1325,7 +1327,7 @@ button[type="submit"]:hover,
     position: relative;
     z-index: 100; /* Increased to ensure dropdown appears above pricing section */
     overflow: visible;
-    margin-bottom: 3.5rem; /* Extra space before submit button to prevent overlap */
+    margin-bottom: 1.5rem; /* Same as other sections, uniform spacing */
 }
 
 /* Also add padding-bottom to accordion content in training types */
@@ -1338,6 +1340,7 @@ button[type="submit"]:hover,
     position: relative;
     z-index: 1;
     overflow: visible !important; /* Force visible - no scroll containers */
+    margin-bottom: 1.5rem; /* Same as other sections, uniform spacing */
 }
 
 /* ============================================
@@ -1427,7 +1430,7 @@ button[type="submit"]:hover,
     background: var(--bg-card);
     border-radius: 12px;
     border: 1px solid var(--border-soft);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem; /* Uniform spacing - same for all sections */
     overflow: visible;
     position: relative;
 }
@@ -1525,11 +1528,12 @@ button[type="submit"]:hover,
 
 /* Sticky Submit Button */
 .sticky-submit {
-    position: sticky;
-    bottom: 1rem;
-    z-index: 100;
-    margin-top: 3rem;
+    display: block;
     width: 100%;
+    max-width: 600px;
+    margin: 2rem auto 1rem auto; /* Top margin for separation, centered */
+    position: relative; /* Change from sticky to relative for better control */
+    z-index: 10; /* Lower z-index since it's not overlapping */
 }
 
 /* ============================================
@@ -1636,24 +1640,33 @@ button[type="submit"]:hover,
         padding: 0 1.25rem 1rem 1.25rem;
     }
     
-    /* Extra spacing for training types section */
+    /* Uniform spacing for all sections on mobile */
+    .accordion-section {
+        margin-bottom: 1.25rem; /* Uniform spacing */
+    }
+    
     .training-types-card {
-        margin-bottom: 4rem !important;
+        margin-bottom: 1.25rem !important; /* Same as others */
+    }
+    
+    .pricing-card {
+        margin-bottom: 1.25rem !important; /* Same as others */
+    }
+    
+    /* Submit button separate with spacing */
+    .form-container {
+        margin-bottom: 2rem !important;
+        padding-bottom: 1rem !important;
     }
     
     .sticky-submit {
-        position: sticky;
-        bottom: 1rem;
-        margin-top: 3.5rem !important;
+        margin-top: 0 !important;
+        margin-bottom: 1rem !important;
         padding: 0.875rem 1.25rem;
         font-size: 0.95rem;
         width: 100%;
-        z-index: 100;
-    }
-    
-    /* Add padding to form container bottom */
-    .form-container {
-        padding-bottom: 3rem !important;
+        position: relative;
+        z-index: 10;
     }
     
     /* תיקון שדות טקסט - מותאם לממוצע */
