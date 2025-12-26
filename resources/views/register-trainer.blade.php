@@ -43,10 +43,13 @@
         <form action="{{ route('trainers.store') }}" method="POST" enctype="multipart/form-data" class="wizard-form" id="trainerRegistrationForm">
             @csrf
             
-            <!-- Step 1: Personal Details -->
-            <div class="wizard-step active" data-step="1">
+            <!-- Slider Container -->
+            <div class="wizard-slider-container" id="wizardSliderContainer">
+                <div class="wizard-slider-track" id="wizardSliderTrack">
+                    <!-- Step 1: Personal Details -->
+                    <div class="wizard-step active" data-step="1" role="tabpanel" aria-labelledby="step-1-title" tabindex="0">
                 <div class="wizard-step-header">
-                    <h2>📋 פרטים אישיים</h2>
+                    <h2 id="step-1-title">📋 פרטים אישיים</h2>
                 </div>
                 <div class="wizard-step-content">
                     <div class="form-group">
@@ -81,10 +84,10 @@
                 </div>
             </div>
 
-            <!-- Step 2: Training Types -->
-            <div class="wizard-step" data-step="2">
-                <div class="wizard-step-header">
-                    <h2>💪 סוגי אימונים</h2>
+                    <!-- Step 2: Training Types -->
+                    <div class="wizard-step" data-step="2" role="tabpanel" aria-labelledby="step-2-title" tabindex="0">
+                        <div class="wizard-step-header">
+                            <h2 id="step-2-title">💪 סוגי אימונים</h2>
                     <p class="wizard-step-subtitle">בחר את סוגי האימונים שאתה מציע (אפשר לבחור כמה)</p>
                 </div>
                 <div class="wizard-step-content">
@@ -134,27 +137,25 @@
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="kids"><span>ילדים</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="seniors"><span>גיל שלישי</span></label>
                         </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Step 3: Pricing -->
-            <div class="wizard-step" data-step="3">
-                <div class="wizard-step-header">
-                    <h2>💰 תמחור</h2>
+                    <!-- Step 3: Pricing -->
+                    <div class="wizard-step" data-step="3" role="tabpanel" aria-labelledby="step-3-title" tabindex="0">
+                        <div class="wizard-step-header">
+                            <h2 id="step-3-title">💰 תמחור</h2>
                 </div>
                 <div class="wizard-step-content">
                     <div class="form-group">
                         <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
                         <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session') }}">
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Step 4: Additional Details -->
-            <div class="wizard-step" data-step="4">
-                <div class="wizard-step-header">
-                    <h2>📸 פרטים נוספים</h2>
+                    <!-- Step 4: Additional Details -->
+                    <div class="wizard-step" data-step="4" role="tabpanel" aria-labelledby="step-4-title" tabindex="0">
+                        <div class="wizard-step-header">
+                            <h2 id="step-4-title">📸 פרטים נוספים</h2>
                 </div>
                 <div class="wizard-step-content">
                     <div class="form-group">
@@ -187,19 +188,20 @@
                         @if($errors->has('profile_image'))
                             <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
                         @endif
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Navigation Buttons -->
             <div class="wizard-navigation">
-                <button type="button" class="btn btn-secondary wizard-btn-back" id="wizardBtnBack" style="display: none;">
+                <button type="button" class="btn btn-secondary wizard-btn-back" id="wizardBtnBack" style="display: none;" aria-label="חזרה לשלב הקודם">
                     ← חזרה
                 </button>
-                <button type="button" class="btn btn-primary wizard-btn-next" id="wizardBtnNext">
+                <button type="button" class="btn btn-primary wizard-btn-next" id="wizardBtnNext" aria-label="המשך לשלב הבא">
                     הבא →
                 </button>
-                <button type="submit" class="btn btn-primary wizard-btn-submit" id="wizardBtnSubmit" style="display: none;">
+                <button type="submit" class="btn btn-primary wizard-btn-submit" id="wizardBtnSubmit" style="display: none;" aria-label="שלח את הבקשה לאישור">
                     שלח בקשה לאישור
                 </button>
             </div>
@@ -208,20 +210,33 @@
 
     <script src="/site/script.js"></script>
     <script>
-        // Step-based Wizard Implementation
+        // Mobile-first Slider Wizard with Pointer Events
         (function() {
             const form = document.getElementById('trainerRegistrationForm');
             if (!form) return;
 
-            let currentStep = 1;
+            const sliderContainer = document.getElementById('wizardSliderContainer');
+            const sliderTrack = document.getElementById('wizardSliderTrack');
+            if (!sliderContainer || !sliderTrack) return;
+
+            let currentStep = 0; // 0-indexed for easier calculations
             const totalSteps = 4;
-            const steps = form.querySelectorAll('.wizard-step');
+            const steps = Array.from(sliderTrack.querySelectorAll('.wizard-step'));
             const btnNext = document.getElementById('wizardBtnNext');
             const btnBack = document.getElementById('wizardBtnBack');
             const btnSubmit = document.getElementById('wizardBtnSubmit');
             const progressFill = document.getElementById('wizardProgressFill');
             const stepText = document.getElementById('wizardStepText');
             const stepPercentage = document.getElementById('wizardStepPercentage');
+
+            // Swipe detection state
+            let isDragging = false;
+            let startX = 0;
+            let currentX = 0;
+            let startTime = 0;
+            let currentPointerId = null;
+            const SWIPE_THRESHOLD = 60; // pixels
+            const VELOCITY_THRESHOLD = 0.3; // pixels per ms
 
             // Form state persistence
             const formState = {
@@ -310,48 +325,94 @@
             }
 
             // Update progress
-            function updateProgress() {
-                const percentage = (currentStep / totalSteps) * 100;
+            function updateProgress(step) {
+                const percentage = (step / totalSteps) * 100;
                 if (progressFill) progressFill.style.width = percentage + '%';
-                if (stepText) stepText.textContent = `שלב ${currentStep} מתוך ${totalSteps}`;
+                if (stepText) stepText.textContent = `שלב ${step} מתוך ${totalSteps}`;
                 if (stepPercentage) stepPercentage.textContent = Math.round(percentage) + '%';
             }
 
-            // Show step
-            function showStep(step) {
+            // Update slider position
+            function updateSliderPosition(step, animate = true) {
+                if (!animate) {
+                    sliderTrack.style.transition = 'none';
+                } else {
+                    sliderTrack.style.transition = 'transform 200ms ease-out';
+                }
+                
+                const offset = -step * 100;
+                sliderTrack.style.transform = `translateX(${offset}%)`;
+                
+                // Update active step
                 steps.forEach((s, index) => {
-                    if (index + 1 === step) {
+                    if (index === step) {
                         s.classList.add('active');
+                        s.setAttribute('aria-hidden', 'false');
                     } else {
                         s.classList.remove('active');
+                        s.setAttribute('aria-hidden', 'true');
                     }
                 });
 
-                // Update buttons
+                // Update buttons (step is 1-indexed for display)
+                const displayStep = step + 1;
                 if (btnBack) {
-                    btnBack.style.display = step > 1 ? 'inline-block' : 'none';
+                    btnBack.style.display = step > 0 ? 'inline-block' : 'none';
                 }
                 if (btnNext) {
-                    btnNext.style.display = step < totalSteps ? 'inline-block' : 'none';
+                    btnNext.style.display = step < totalSteps - 1 ? 'inline-block' : 'none';
                 }
                 if (btnSubmit) {
-                    btnSubmit.style.display = step === totalSteps ? 'inline-block' : 'none';
+                    btnSubmit.style.display = step === totalSteps - 1 ? 'inline-block' : 'none';
                 }
 
-                updateProgress();
+                updateProgress(displayStep);
+                
+                // Announce step change for accessibility
+                announceStep(displayStep);
+            }
 
-                // Scroll to top (no animation for reliability)
-                window.scrollTo(0, 0);
+            // Announce step change
+            function announceStep(step) {
+                const announcement = `שלב ${step} מתוך ${totalSteps}`;
+                const announcer = document.getElementById('wizardAnnouncer') || createAnnouncer();
+                announcer.textContent = announcement;
+            }
+
+            function createAnnouncer() {
+                const announcer = document.createElement('div');
+                announcer.id = 'wizardAnnouncer';
+                announcer.setAttribute('role', 'status');
+                announcer.setAttribute('aria-live', 'polite');
+                announcer.setAttribute('aria-atomic', 'true');
+                announcer.style.position = 'absolute';
+                announcer.style.left = '-10000px';
+                announcer.style.width = '1px';
+                announcer.style.height = '1px';
+                announcer.style.overflow = 'hidden';
+                document.body.appendChild(announcer);
+                return announcer;
+            }
+
+            // Navigate to step
+            function goToStep(step, validate = true) {
+                const displayStep = currentStep + 1;
+                if (validate && !validateStep(displayStep)) {
+                    return false;
+                }
+                
+                saveFormState();
+                currentStep = Math.max(0, Math.min(totalSteps - 1, step));
+                restoreFormState();
+                updateSliderPosition(currentStep, true);
+                return true;
             }
 
             // Next button
             if (btnNext) {
                 btnNext.addEventListener('click', function() {
-                    saveFormState();
-                    if (validateStep(currentStep)) {
-                        currentStep++;
-                        restoreFormState();
-                        showStep(currentStep);
+                    if (currentStep < totalSteps - 1) {
+                        goToStep(currentStep + 1, true);
                     }
                 });
             }
@@ -359,10 +420,144 @@
             // Back button
             if (btnBack) {
                 btnBack.addEventListener('click', function() {
-                    saveFormState();
-                    currentStep--;
-                    restoreFormState();
-                    showStep(currentStep);
+                    if (currentStep > 0) {
+                        goToStep(currentStep - 1, false);
+                    }
+                });
+            }
+
+            // Pointer Events for swipe detection
+            function handlePointerDown(e) {
+                // Only handle primary pointer (mouse or first touch)
+                if (e.isPrimary === false) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                currentX = startX;
+                startTime = Date.now();
+                currentPointerId = e.pointerId;
+                
+                // Capture pointer to track it even if it leaves the element
+                sliderTrack.setPointerCapture(e.pointerId);
+                
+                // Prevent text selection while dragging
+                sliderTrack.classList.add('dragging');
+                
+                e.preventDefault();
+            }
+
+            function handlePointerMove(e) {
+                if (!isDragging || e.pointerId !== currentPointerId) return;
+                
+                currentX = e.clientX;
+                const deltaX = currentX - startX;
+                
+                // Calculate position with resistance at boundaries
+                const containerWidth = sliderContainer.offsetWidth;
+                const baseOffset = -currentStep * containerWidth;
+                let offset = baseOffset + deltaX;
+                
+                // Add resistance at boundaries
+                if (currentStep === 0 && deltaX > 0) {
+                    offset = baseOffset + deltaX * 0.3; // Resist right swipe on first step
+                } else if (currentStep === totalSteps - 1 && deltaX < 0) {
+                    offset = baseOffset + deltaX * 0.3; // Resist left swipe on last step
+                }
+                
+                sliderTrack.style.transform = `translateX(${offset}px)`;
+                
+                e.preventDefault();
+            }
+
+            function handlePointerUp(e) {
+                if (!isDragging || e.pointerId !== currentPointerId) return;
+                
+                const deltaX = currentX - startX;
+                const deltaTime = Date.now() - startTime;
+                const velocity = Math.abs(deltaX) / deltaTime;
+                
+                // Determine if we should change steps
+                let shouldChange = false;
+                let newStep = currentStep;
+                
+                // Check threshold or velocity
+                if (Math.abs(deltaX) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+                    // RTL: swipe left (negative deltaX) = next, swipe right (positive deltaX) = prev
+                    // This matches Instagram behavior regardless of RTL
+                    if (deltaX < -SWIPE_THRESHOLD || (deltaX < 0 && velocity > VELOCITY_THRESHOLD)) {
+                        // Swipe left = next step
+                        if (currentStep < totalSteps - 1) {
+                            newStep = currentStep + 1;
+                            shouldChange = true;
+                        }
+                    } else if (deltaX > SWIPE_THRESHOLD || (deltaX > 0 && velocity > VELOCITY_THRESHOLD)) {
+                        // Swipe right = previous step
+                        if (currentStep > 0) {
+                            newStep = currentStep - 1;
+                            shouldChange = true;
+                        }
+                    }
+                }
+                
+                // Cleanup
+                isDragging = false;
+                sliderTrack.classList.remove('dragging');
+                if (currentPointerId !== null) {
+                    sliderTrack.releasePointerCapture(currentPointerId);
+                    currentPointerId = null;
+                }
+                
+                // Navigate or snap back
+                if (shouldChange) {
+                    goToStep(newStep, newStep > currentStep);
+                } else {
+                    updateSliderPosition(currentStep, true);
+                }
+                
+                e.preventDefault();
+            }
+
+            function handlePointerCancel(e) {
+                isDragging = false;
+                sliderTrack.classList.remove('dragging');
+                if (currentPointerId !== null) {
+                    sliderTrack.releasePointerCapture(currentPointerId);
+                    currentPointerId = null;
+                }
+                updateSliderPosition(currentStep, true);
+            }
+
+            // Attach pointer events to slider track
+            sliderTrack.addEventListener('pointerdown', handlePointerDown);
+            sliderTrack.addEventListener('pointermove', handlePointerMove);
+            sliderTrack.addEventListener('pointerup', handlePointerUp);
+            sliderTrack.addEventListener('pointercancel', handlePointerCancel);
+            
+            // Keyboard navigation
+            sliderTrack.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    const isRTL = document.documentElement.dir === 'rtl';
+                    const isNext = (e.key === 'ArrowLeft' && !isRTL) || (e.key === 'ArrowRight' && isRTL);
+                    
+                    if (isNext && currentStep < totalSteps - 1) {
+                        goToStep(currentStep + 1, true);
+                    } else if (!isNext && currentStep > 0) {
+                        goToStep(currentStep - 1, false);
+                    }
+                }
+            });
+
+            // Form submission with loading state
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (btnSubmit) {
+                        btnSubmit.disabled = true;
+                        btnSubmit.textContent = 'שולח...';
+                        btnSubmit.style.opacity = '0.6';
+                        btnSubmit.style.cursor = 'not-allowed';
+                    }
+                    // Allow form to submit normally
                 });
             }
 
@@ -426,7 +621,7 @@
             }
 
             // Initialize
-            showStep(1);
+            updateSliderPosition(0, false);
 
             // Initialize theme if available
             if (typeof initTheme === 'function') {

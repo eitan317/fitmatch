@@ -5105,11 +5105,42 @@ fieldset legend {
     margin: 0 auto;
     padding: 0;
     position: relative;
-    overflow-x: hidden !important;
-    overflow-y: visible;
-    touch-action: pan-y !important;
-    overscroll-behavior: none !important;
     width: 100%;
+}
+
+/* Slider Container - Mobile-first swipe */
+.wizard-slider-container {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+    touch-action: pan-y;
+    overscroll-behavior-x: none;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wizard-slider-track {
+    display: flex;
+    will-change: transform;
+    transition: transform 200ms ease-out;
+    width: 100%;
+}
+
+.wizard-slider-track.dragging {
+    transition: none;
+    cursor: grabbing;
+}
+
+.wizard-slider-track.dragging * {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.wizard-slider-track.dragging input,
+.wizard-slider-track.dragging textarea,
+.wizard-slider-track.dragging select,
+.wizard-slider-track.dragging button {
+    pointer-events: none;
 }
 
 .wizard-progress {
@@ -5148,26 +5179,25 @@ fieldset legend {
 }
 
 .wizard-step {
-    display: none;
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
     background: var(--bg-card);
     border-radius: 12px;
     border: 1px solid var(--border-soft);
     padding: 2rem;
     margin-bottom: 2rem;
-    overflow-x: hidden !important;
-    overflow-y: visible;
-    touch-action: pan-y !important;
-    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    touch-action: pan-y;
     box-sizing: border-box;
-    position: static;
-    transform: none !important;
-    transition: none !important;
+    position: relative;
+    outline: none;
 }
 
-.wizard-step.active {
-    display: block;
-    transform: none !important;
-    transition: none !important;
+.wizard-step:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .wizard-step-header {
@@ -5237,6 +5267,13 @@ fieldset legend {
 .wizard-btn-next:active,
 .wizard-btn-submit:active {
     background: var(--primary-dark);
+}
+
+.wizard-btn-next:disabled,
+.wizard-btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .wizard-btn-back {
@@ -5387,10 +5424,10 @@ fieldset legend {
 }
 
 @media (max-width: 480px) {
-    html, body, main, .page-container, .wizard-form, .wizard-step {
-        overflow-x: hidden !important;
-        touch-action: pan-y !important;
-        overscroll-behavior: none !important;
+    .wizard-slider-container {
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior-x: none;
     }
 
     .wizard-progress {
@@ -5407,13 +5444,6 @@ fieldset legend {
         overflow-x: hidden !important;
         width: 100%;
         box-sizing: border-box;
-        transform: none !important;
-        transition: none !important;
-    }
-
-    .wizard-step.active {
-        transform: none !important;
-        transition: none !important;
     }
 
     .wizard-step-header {
