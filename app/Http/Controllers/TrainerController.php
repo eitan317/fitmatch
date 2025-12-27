@@ -135,17 +135,55 @@ class TrainerController extends Controller
                     File::makeDirectory($trainersPath, 0755, true);
                 }
                 
-                // Store in public storage under trainers directory
-                $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+                // Store file - try multiple methods for reliability
+                $profileImagePath = null;
+                $fullPath = null;
                 
-                if (!$profileImagePath) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
+                // Method 1: Try storeAs (works with UploadedFile)
+                try {
+                    $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+                    if ($profileImagePath) {
+                        $fullPath = storage_path('app/public/' . $profileImagePath);
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('storeAs failed, trying direct move', [
+                        'error' => $e->getMessage(),
+                        'filename' => $filename
+                    ]);
+                }
+                
+                // Method 2: Fallback - direct file move if storeAs didn't work or file doesn't exist
+                if (!$profileImagePath || !file_exists($fullPath)) {
+                    try {
+                        $fullPath = $trainersPath . '/' . $filename;
+                        $movedPath = $file->move($trainersPath, $filename);
+                        
+                        if ($movedPath && file_exists($fullPath)) {
+                            $profileImagePath = 'trainers/' . $filename;
+                            \Log::info('File saved using direct move method', [
+                                'path' => $profileImagePath,
+                                'full_path' => $fullPath
+                            ]);
+                        } else {
+                            throw new \Exception('Direct move also failed');
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('All file save methods failed', [
+                            'error' => $e->getMessage(),
+                            'filename' => $filename,
+                            'trainers_path' => $trainersPath,
+                            'trainers_path_exists' => File::exists($trainersPath),
+                            'trainers_path_writable' => is_writable($trainersPath),
+                            'storage_path' => storage_path('app/public'),
+                            'storage_writable' => is_writable(storage_path('app/public'))
+                        ]);
+                        return redirect()->back()
+                            ->withInput()
+                            ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
+                    }
                 }
                 
                 // Verify file was actually saved
-                $fullPath = storage_path('app/public/' . $profileImagePath);
                 if (!file_exists($fullPath)) {
                     \Log::error('Image file not found after save', [
                         'path' => $profileImagePath,
