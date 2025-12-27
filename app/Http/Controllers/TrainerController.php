@@ -144,11 +144,25 @@ class TrainerController extends Controller
                         ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
                 }
                 
+                // Verify file was actually saved
+                $fullPath = storage_path('app/public/' . $profileImagePath);
+                if (!file_exists($fullPath)) {
+                    \Log::error('Image file not found after save', [
+                        'path' => $profileImagePath,
+                        'full_path' => $fullPath
+                    ]);
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['profile_image' => 'התמונה נשמרה אבל לא נמצאה. אנא נסה שוב.']);
+                }
+                
                 // Log for debugging
                 \Log::info('Image saved successfully', [
                     'path' => $profileImagePath,
-                    'full_path' => storage_path('app/public/' . $profileImagePath),
-                    'url' => Storage::disk('public')->url($profileImagePath)
+                    'full_path' => $fullPath,
+                    'file_exists' => file_exists($fullPath),
+                    'file_size' => filesize($fullPath),
+                    'url' => asset('storage/' . $profileImagePath)
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Profile image upload failed: ' . $e->getMessage(), [

@@ -13,6 +13,71 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
+// Fallback route to serve storage files if symbolic link doesn't work
+Route::get('/storage/{path}', function ($path) {
+    // Security: Prevent directory traversal
+    $path = str_replace('..', '', $path);
+    $path = ltrim($path, '/');
+    
+    $filePath = storage_path('app/public/' . $path);
+    
+    // Log for debugging
+    \Log::info('Storage route accessed', [
+        'requested_path' => $path,
+        'file_path' => $filePath,
+        'file_exists' => file_exists($filePath),
+        'is_file' => is_file($filePath)
+    ]);
+    
+    // Security: Ensure file is within public storage directory
+    $publicStoragePath = storage_path('app/public');
+    $realFilePath = realpath($filePath);
+    $realPublicPath = realpath($publicStoragePath);
+    
+    if (!$realFilePath || !$realPublicPath) {
+        \Log::warning('Storage route: Invalid paths', [
+            'file_path' => $filePath,
+            'real_file_path' => $realFilePath,
+            'real_public_path' => $realPublicPath
+        ]);
+        abort(404);
+    }
+    
+    if (!str_starts_with($realFilePath, $realPublicPath)) {
+        \Log::warning('Storage route: Path outside public storage', [
+            'file_path' => $filePath,
+            'real_file_path' => $realFilePath,
+            'real_public_path' => $realPublicPath
+        ]);
+        abort(404);
+    }
+    
+    if (!file_exists($filePath) || !is_file($filePath)) {
+        \Log::warning('Storage route: File not found', [
+            'file_path' => $filePath,
+            'file_exists' => file_exists($filePath),
+            'is_file' => is_file($filePath)
+        ]);
+        abort(404);
+    }
+    
+    $mimeType = mime_content_type($filePath);
+    if (!$mimeType) {
+        $mimeType = 'application/octet-stream';
+    }
+    
+    \Log::info('Storage route: Serving file', [
+        'file_path' => $filePath,
+        'mime_type' => $mimeType,
+        'file_size' => filesize($filePath)
+    ]);
+    
+    return response()->file($filePath, [
+        'Content-Type' => $mimeType,
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*');
+
 // Temporary route to download hero image (remove after use)
 Route::get('/download-hero-image', function () {
     $url = "https://media.istockphoto.com/id/972833328/photo/male-personal-trainer-helping-sportswoman-to-do-exercises-with-barbell-at-gym.jpg?s=612x612&w=0&k=20&c=5kIxaobVDjjDrYvv8qNB2lGJoBImzHvj-csu30o_lZY=";

@@ -209,9 +209,17 @@ use Illuminate\Support\Facades\Storage;
                                             // Use asset() for reliable URL generation
                                             $imageUrl = asset('storage/' . $trainer->profile_image_path);
                                             $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                                            
+                                            // Fallback: check if file exists directly
+                                            $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
+                                            $fileExists = file_exists($fullPath);
+                                            
+                                            if (!$imageExists && $fileExists) {
+                                                $imageExists = true;
+                                            }
                                         @endphp
                                         @if($imageExists)
-                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="console.error('Image failed to load:', '{{ $imageUrl }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                             <div class="admin-trainer-avatar-placeholder" style="display: none;">
                                                 {{ substr($trainer->full_name, 0, 1) }}
                                             </div>
@@ -434,9 +442,17 @@ use Illuminate\Support\Facades\Storage;
                                                 // Use asset() for reliable URL generation
                                                 $imageUrl = asset('storage/' . $trainer->profile_image_path);
                                                 $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                                                
+                                                // Fallback: check if file exists directly
+                                                $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
+                                                $fileExists = file_exists($fullPath);
+                                                
+                                                if (!$imageExists && $fileExists) {
+                                                    $imageExists = true;
+                                                }
                                             @endphp
                                             @if($imageExists)
-                                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="console.error('Image failed to load:', '{{ $imageUrl }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                                 <div class="admin-trainer-avatar-placeholder" style="display: none;">
                                                     {{ substr($trainer->full_name, 0, 1) }}
                                                 </div>

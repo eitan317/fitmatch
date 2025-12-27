@@ -127,12 +127,26 @@ use Illuminate\Support\Facades\Storage;
                                 // Use asset() for reliable URL generation
                                 $imageUrl = asset('storage/' . $trainer->profile_image_path);
                                 $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                                
+                                // Fallback: check if file exists directly
+                                $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
+                                $fileExists = file_exists($fullPath);
+                                
+                                // If Storage says it doesn't exist but file does, use it anyway
+                                if (!$imageExists && $fileExists) {
+                                    $imageExists = true;
+                                }
                             @endphp
                             @if($imageExists)
-                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="console.error('Image failed to load:', '{{ $imageUrl }}', 'Path: {{ $trainer->profile_image_path }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="trainer-avatar" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
                             @else
                                 <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
+                                @if(config('app.debug'))
+                                    <small style="color: red; font-size: 10px; position: absolute; bottom: 0; left: 0; background: white; padding: 2px; z-index: 10;">
+                                        Not found: {{ $trainer->profile_image_path }}
+                                    </small>
+                                @endif
                             @endif
                         @else
                             <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
