@@ -14,6 +14,7 @@ Route::get('/health', function () {
 });
 
 // Fallback route to serve storage files if symbolic link doesn't work
+// This route MUST be before other routes to catch storage requests
 Route::get('/storage/{path}', function ($path) {
     // Security: Prevent directory traversal
     $path = str_replace('..', '', $path);
@@ -26,7 +27,8 @@ Route::get('/storage/{path}', function ($path) {
         'requested_path' => $path,
         'file_path' => $filePath,
         'file_exists' => file_exists($filePath),
-        'is_file' => is_file($filePath)
+        'is_file' => is_file($filePath),
+        'realpath' => realpath($filePath) ?: 'not found'
     ]);
     
     // Security: Ensure file is within public storage directory

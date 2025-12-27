@@ -183,17 +183,26 @@ class TrainerController extends Controller
                     }
                 }
                 
-                // Verify file was actually saved
+                // Verify file was actually saved - CRITICAL CHECK
                 if (!file_exists($fullPath)) {
-                    \Log::error('Image file not found after save', [
+                    // List all files in trainers directory for debugging
+                    $trainersDir = storage_path('app/public/trainers');
+                    $filesInDir = [];
+                    if (is_dir($trainersDir)) {
+                        $filesInDir = array_diff(scandir($trainersDir), ['.', '..']);
+                    }
+                    
+                    \Log::error('Image file not found after save - CRITICAL', [
                         'path' => $profileImagePath,
                         'full_path' => $fullPath,
                         'directory_exists' => is_dir(dirname($fullPath)),
                         'directory_writable' => is_writable(dirname($fullPath)),
                         'storage_path' => storage_path('app/public'),
                         'storage_writable' => is_writable(storage_path('app/public')),
-                        'trainers_dir_exists' => is_dir(storage_path('app/public/trainers')),
-                        'trainers_dir_writable' => is_writable(storage_path('app/public/trainers'))
+                        'trainers_dir_exists' => is_dir($trainersDir),
+                        'trainers_dir_writable' => is_writable($trainersDir),
+                        'files_in_trainers_dir' => $filesInDir,
+                        'expected_filename' => $filename
                     ]);
                     return redirect()->back()
                         ->withInput()
