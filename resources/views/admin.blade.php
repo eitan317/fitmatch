@@ -205,10 +205,20 @@ use Illuminate\Support\Facades\Storage;
                             <div class="admin-trainer-identity">
                                 <div class="admin-trainer-avatar">
                                     @if($trainer->profile_image_path)
-                                        <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                        <div class="admin-trainer-avatar-placeholder" style="display: none;">
-                                            {{ substr($trainer->full_name, 0, 1) }}
-                                        </div>
+                                        @php
+                                            $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                            $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                                        @endphp
+                                        @if($imageExists)
+                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                                {{ substr($trainer->full_name, 0, 1) }}
+                                            </div>
+                                        @else
+                                            <div class="admin-trainer-avatar-placeholder">
+                                                {{ substr($trainer->full_name, 0, 1) }}
+                                            </div>
+                                        @endif
                                     @else
                                         <div class="admin-trainer-avatar-placeholder">
                                             {{ substr($trainer->full_name, 0, 1) }}
@@ -419,10 +429,20 @@ use Illuminate\Support\Facades\Storage;
                                 <div class="admin-trainer-identity">
                                     <div class="admin-trainer-avatar admin-trainer-avatar-small">
                                         @if($trainer->profile_image_path)
-                                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                            <div class="admin-trainer-avatar-placeholder" style="display: none;">
-                                                {{ substr($trainer->full_name, 0, 1) }}
-                                            </div>
+                                            @php
+                                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                                $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                                            @endphp
+                                            @if($imageExists)
+                                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                                    {{ substr($trainer->full_name, 0, 1) }}
+                                                </div>
+                                            @else
+                                                <div class="admin-trainer-avatar-placeholder">
+                                                    {{ substr($trainer->full_name, 0, 1) }}
+                                                </div>
+                                            @endif
                                         @else
                                             <div class="admin-trainer-avatar-placeholder">
                                                 {{ substr($trainer->full_name, 0, 1) }}

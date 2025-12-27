@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ session('locale', 'he') }}" dir="{{ in_array(session('locale', 'he'), ['he', 'ar']) ? 'rtl' : 'ltr' }}">
 <head>
@@ -120,8 +123,16 @@
                     <div class="trainer-card">
                     <div class="trainer-card-image">
                         @if($trainer->profile_image_path)
-                            <img src="{{ Storage::url($trainer->profile_image_path) }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="trainer-avatar" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
+                            @php
+                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
+                            @endphp
+                            @if($imageExists)
+                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="trainer-avatar" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
+                            @else
+                                <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
+                            @endif
                         @else
                             <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @endif

@@ -1475,6 +1475,7 @@ button[type="submit"]:hover,
     object-fit: cover;
     border-radius: 16px;
     z-index: 0;
+    display: block;
 }
 
 .trainer-card-header {
@@ -2667,6 +2668,8 @@ select:focus {
     object-fit: cover;
     border-radius: 12px;
     display: block;
+    position: relative;
+    z-index: 1;
 }
 
 .admin-trainer-avatar-small {
@@ -5711,6 +5714,25 @@ fieldset legend {
     color: var(--primary);
 }
 
+.file-upload-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
 .file-upload-btn {
     display: block;
     padding: 2rem 1.5rem;
@@ -5722,11 +5744,24 @@ fieldset legend {
     min-height: 120px;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 1;
+}
+
+.file-upload-btn:hover,
+.file-upload-btn:focus {
+    border-color: var(--primary);
+    background: rgba(74, 158, 255, 0.05);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
 }
 
 .file-upload-btn:active {
     border-color: var(--primary);
-    background: rgba(74, 158, 255, 0.05);
+    background: rgba(74, 158, 255, 0.1);
+    transform: scale(0.98);
 }
 
 .file-upload-btn i {

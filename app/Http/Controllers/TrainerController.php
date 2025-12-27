@@ -98,12 +98,12 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480', // 20MB מקסימום
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480', // 20MB מקסימום
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
             'profile_image.image' => 'הקובץ חייב להיות תמונה',
-            'profile_image.mimes' => 'פורמטי תמונה מותרים: JPEG, PNG, JPG, GIF',
+            'profile_image.mimes' => 'פורמטי תמונה מותרים: JPEG, PNG, JPG, GIF, WebP',
             'profile_image.max' => 'גודל התמונה לא יכול להיות יותר מ-20MB',
         ]);
 
@@ -143,8 +143,17 @@ class TrainerController extends Controller
                         ->withInput()
                         ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
                 }
+                
+                // Log for debugging
+                \Log::info('Image saved successfully', [
+                    'path' => $profileImagePath,
+                    'full_path' => storage_path('app/public/' . $profileImagePath),
+                    'url' => Storage::disk('public')->url($profileImagePath)
+                ]);
             } catch (\Exception $e) {
-                \Log::error('Profile image upload failed: ' . $e->getMessage());
+                \Log::error('Profile image upload failed: ' . $e->getMessage(), [
+                    'exception' => $e->getTraceAsString()
+                ]);
                 return redirect()->back()
                     ->withInput()
                     ->withErrors(['profile_image' => 'שגיאה בהעלאת התמונה. אנא נסה שוב.']);

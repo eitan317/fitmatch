@@ -179,16 +179,18 @@
 
                     <div class="form-group">
                         <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                        <label for="profile_image" class="file-upload-btn">
-                            <i class="fas fa-camera"></i>
-                            <span>לחץ להעלאת תמונה</span>
-                            <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif" style="display: none;">
-                        </label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="file-input-hidden">
+                            <label for="profile_image" class="file-upload-btn">
+                                <i class="fas fa-camera"></i>
+                                <span>לחץ להעלאת תמונה</span>
+                            </label>
+                        </div>
                         <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
                             <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
                         </div>
                         <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
-                        <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF</small>
+                        <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF, WebP (עד 20MB)</small>
                         @if($errors->has('profile_image'))
                             <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
                         @endif
@@ -229,7 +231,7 @@
                 });
             }
 
-            // Image preview
+            // Image preview and validation
             const profileImageInput = document.getElementById('profile_image');
             if (profileImageInput) {
                 profileImageInput.addEventListener('change', function(e) {
@@ -244,10 +246,11 @@
                     }
                     
                     if (file) {
-                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+                        // Check file type
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
                         if (!allowedTypes.includes(file.type)) {
                             if (errorDiv) {
-                                errorDiv.textContent = 'סוג קובץ לא נתמך. אנא בחר תמונה בפורמט JPG, PNG או GIF';
+                                errorDiv.textContent = 'סוג קובץ לא נתמך. אנא בחר תמונה בפורמט JPG, PNG, GIF או WebP';
                                 errorDiv.style.display = 'block';
                             }
                             this.value = '';
@@ -255,6 +258,19 @@
                             return;
                         }
                         
+                        // Check file size (20MB = 20 * 1024 * 1024 bytes)
+                        const maxSize = 20 * 1024 * 1024; // 20MB
+                        if (file.size > maxSize) {
+                            if (errorDiv) {
+                                errorDiv.textContent = 'גודל הקובץ גדול מדי. מקסימום 20MB';
+                                errorDiv.style.display = 'block';
+                            }
+                            this.value = '';
+                            if (preview) preview.style.display = 'none';
+                            return;
+                        }
+                        
+                        // Read and preview image
                         const reader = new FileReader();
                         reader.onload = function(e) {
                             if (preview && img) {
@@ -273,6 +289,16 @@
                         if (preview) preview.style.display = 'none';
                     }
                 });
+                
+                // Add click event to label for better mobile support
+                const fileUploadBtn = document.querySelector('.file-upload-btn');
+                if (fileUploadBtn) {
+                    fileUploadBtn.addEventListener('click', function(e) {
+                        // Prevent double trigger
+                        e.preventDefault();
+                        profileImageInput.click();
+                    });
+                }
             }
 
             // Form submission validation
