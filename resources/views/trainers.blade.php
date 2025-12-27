@@ -124,7 +124,8 @@ use Illuminate\Support\Facades\Storage;
                     <div class="trainer-card-image">
                         @if($trainer->profile_image_path)
                             @php
-                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                // Use asset() for reliable URL generation
+                                $imageUrl = asset('storage/' . $trainer->profile_image_path);
                                 $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
                             @endphp
                             @if($imageExists)
