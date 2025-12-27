@@ -149,11 +149,28 @@ class TrainerController extends Controller
                 if (!file_exists($fullPath)) {
                     \Log::error('Image file not found after save', [
                         'path' => $profileImagePath,
-                        'full_path' => $fullPath
+                        'full_path' => $fullPath,
+                        'directory_exists' => is_dir(dirname($fullPath)),
+                        'directory_writable' => is_writable(dirname($fullPath)),
+                        'storage_path' => storage_path('app/public'),
+                        'storage_writable' => is_writable(storage_path('app/public')),
+                        'trainers_dir_exists' => is_dir(storage_path('app/public/trainers')),
+                        'trainers_dir_writable' => is_writable(storage_path('app/public/trainers'))
                     ]);
                     return redirect()->back()
                         ->withInput()
                         ->withErrors(['profile_image' => 'התמונה נשמרה אבל לא נמצאה. אנא נסה שוב.']);
+                }
+                
+                // Double check - try to read the file
+                if (filesize($fullPath) === 0) {
+                    \Log::error('Image file is empty after save', [
+                        'path' => $profileImagePath,
+                        'full_path' => $fullPath
+                    ]);
+                    return redirect()->back()
+                        ->withInput()
+                        ->withErrors(['profile_image' => 'התמונה נשמרה אבל היא ריקה. אנא נסה שוב.']);
                 }
                 
                 // Log for debugging
@@ -162,7 +179,13 @@ class TrainerController extends Controller
                     'full_path' => $fullPath,
                     'file_exists' => file_exists($fullPath),
                     'file_size' => filesize($fullPath),
-                    'url' => asset('storage/' . $profileImagePath)
+                    'url' => asset('storage/' . $profileImagePath),
+                    'asset_url' => asset('storage/' . $profileImagePath),
+                    'storage_url' => Storage::disk('public')->url($profileImagePath),
+                    'directory_permissions' => substr(sprintf('%o', fileperms(dirname($fullPath))), -4),
+                    'file_permissions' => substr(sprintf('%o', fileperms($fullPath)), -4),
+                    'readable' => is_readable($fullPath),
+                    'writable' => is_writable($fullPath)
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Profile image upload failed: ' . $e->getMessage(), [

@@ -54,9 +54,11 @@ Route::get('/storage/{path}', function ($path) {
     
     if (!file_exists($filePath) || !is_file($filePath)) {
         \Log::warning('Storage route: File not found', [
+            'requested_path' => $path,
             'file_path' => $filePath,
             'file_exists' => file_exists($filePath),
-            'is_file' => is_file($filePath)
+            'is_file' => is_file($filePath),
+            'directory_listing' => is_dir(dirname($filePath)) ? array_slice(scandir(dirname($filePath)), 2) : 'directory_not_exists'
         ]);
         abort(404);
     }
