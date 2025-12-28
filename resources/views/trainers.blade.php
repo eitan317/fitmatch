@@ -127,18 +127,10 @@ use Illuminate\Support\Facades\Storage;
                         @php
                             $imageUrl = null;
                             if ($trainer->profile_image_path) {
-                                // Try multiple URL generation methods
-                                try {
-                                    // Method 1: Use Storage::url() (uses APP_URL from config)
-                                    $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
-                                } catch (\Exception $e) {
-                                    // Method 2: Fallback to asset() helper
-                                    try {
-                                        $imageUrl = asset('storage/' . $trainer->profile_image_path);
-                                    } catch (\Exception $e2) {
-                                        // Method 3: Direct URL construction
-                                        $imageUrl = url('storage/' . $trainer->profile_image_path);
-                                    }
+                                $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
+                                if (file_exists($fullPath) && is_file($fullPath) && filesize($fullPath) > 0) {
+                                    // Use direct storage route
+                                    $imageUrl = url('/storage/' . $trainer->profile_image_path);
                                 }
                             }
                         @endphp
