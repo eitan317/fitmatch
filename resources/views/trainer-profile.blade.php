@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Storage;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>פרופיל מאמן - {{ $trainer->full_name }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/site/style.css">
@@ -120,17 +121,37 @@ use Illuminate\Support\Facades\Storage;
 
                 <div id="reviews-list" class="reviews-list">
                     @forelse($trainer->reviews as $review)
-                        <div class="review-card">
+                        <div class="review-card" data-review-id="{{ $review->id }}">
                             <div class="review-header">
                                 <span class="review-author">{{ $review->author_name }}</span>
                                 <span class="review-date">{{ $review->created_at->format('d/m/Y') }}</span>
                             </div>
-                            <div class="review-stars">
+                            <div class="review-stars" data-rating="{{ $review->rating }}">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <span class="star {{ $i <= $review->rating ? 'filled' : '' }}">★</span>
+                                    <span class="star {{ $i <= $review->rating ? 'filled' : '' }}" data-star-value="{{ $i }}">★</span>
                                 @endfor
+                                @auth
+                                    @if(Auth::user()->isAdmin())
+                                        <span class="admin-edit-rating" style="margin-right: 10px; cursor: pointer; color: #3b82f6;" title="לחץ על כוכב לעדכון דירוג">
+                                            <i class="fas fa-edit"></i>
+                                        </span>
+                                    @endif
+                                @endauth
                             </div>
                             <p class="review-text">{{ $review->text }}</p>
+                            @auth
+                                @if(Auth::user()->isAdmin())
+                                    <div class="admin-review-actions" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+                                        <form action="{{ route('reviews.destroy', $review) }}" method="POST" style="display: inline;" onsubmit="return confirm('האם אתה בטוח שברצונך למחוק ביקורת זו?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                                <i class="fas fa-trash"></i> מחק ביקורת
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
                         </div>
                     @empty
                         <p>אין ביקורות עדיין</p>
@@ -195,6 +216,115 @@ use Illuminate\Support\Facades\Storage;
     <script>
         initTheme && initTheme();
         initNavbarToggle && initNavbarToggle();
+
+        // Admin review rating update
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewCards = document.querySelectorAll('.review-card');
+            
+            reviewCards.forEach(card => {
+                const stars = Array.from(card.querySelectorAll('.star[data-star-value]'));
+                const editIcon = card.querySelector('.admin-edit-rating');
+                
+                if (editIcon && stars.length > 0) {
+                    let isEditMode = false;
+                    const originalRating = parseInt(card.querySelector('.review-stars').dataset.rating);
+                    let handlers = [];
+                    
+                    editIcon.addEventListener('click', function() {
+                        isEditMode = !isEditMode;
+                        
+                        if (isEditMode) {
+                            // Enable edit mode
+                            stars.forEach(star => {
+                                star.style.cursor = 'pointer';
+                                star.style.opacity = '0.7';
+                                
+                                const mouseEnterHandler = function() {
+                                    const value = parseInt(this.getAttribute('data-star-value'));
+                                    highlightStars(stars, value);
+                                };
+                                
+                                const clickHandler = function() {
+                                    const newRating = parseInt(this.getAttribute('data-star-value'));
+                                    updateReviewRating(card.dataset.reviewId, newRating, stars);
+                                    isEditMode = false;
+                                    // Remove all handlers
+                                    stars.forEach((s, idx) => {
+                                        s.removeEventListener('mouseenter', handlers[idx].mouseenter);
+                                        s.removeEventListener('click', handlers[idx].click);
+                                        s.style.cursor = 'default';
+                                        s.style.opacity = '1';
+                                    });
+                                    handlers = [];
+                                };
+                                
+                                star.addEventListener('mouseenter', mouseEnterHandler);
+                                star.addEventListener('click', clickHandler);
+                                
+                                handlers.push({ mouseenter: mouseEnterHandler, click: clickHandler });
+                            });
+                        } else {
+                            // Disable edit mode
+                            stars.forEach((star, idx) => {
+                                if (handlers[idx]) {
+                                    star.removeEventListener('mouseenter', handlers[idx].mouseenter);
+                                    star.removeEventListener('click', handlers[idx].click);
+                                }
+                                star.style.cursor = 'default';
+                                star.style.opacity = '1';
+                            });
+                            highlightStars(stars, originalRating);
+                            handlers = [];
+                        }
+                    });
+                }
+            });
+        });
+
+        function highlightStars(stars, rating) {
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.style.opacity = '1';
+                    star.classList.add('filled');
+                } else {
+                    star.style.opacity = '0.3';
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateReviewRating(reviewId, rating, stars) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
+                              document.querySelector('input[name="_token"]')?.value;
+            
+            fetch(`/reviews/${reviewId}/rating`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ rating: rating })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update stars display
+                    stars.forEach((star, index) => {
+                        if (index < rating) {
+                            star.classList.add('filled');
+                        } else {
+                            star.classList.remove('filled');
+                        }
+                    });
+                    alert('הדירוג עודכן בהצלחה');
+                    location.reload(); // Reload to update average rating
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('שגיאה בעדכון הדירוג');
+            });
+        }
     </script>
 </body>
 </html>

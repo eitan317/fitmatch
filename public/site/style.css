@@ -4433,6 +4433,120 @@ fieldset legend {
         width: 160px;
         height: 160px;
     }
+
+    /* Reset profile layout for mobile - fix overlapping */
+    .profile-layout {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        margin-top: 1rem !important;
+    }
+
+    .trainer-profile {
+        padding: 1.5rem !important;
+        margin-top: 0 !important;
+    }
+
+    .trainer-profile-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .trainer-profile-image-container {
+        width: 160px !important;
+        height: 160px !important;
+        margin: 0 auto !important;
+    }
+
+    .trainer-profile-info {
+        width: 100% !important;
+        min-width: unset !important;
+        text-align: center !important;
+    }
+
+    .trainer-profile-info h1 {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .trainer-location,
+    .trainer-experience,
+    .trainer-specialization {
+        font-size: 0.9rem !important;
+        margin: 0.4rem 0 !important;
+    }
+
+    .trainer-profile-badges {
+        justify-content: center !important;
+        margin-top: 0.5rem !important;
+    }
+
+    .trainer-profile-details {
+        margin-top: 1rem !important;
+    }
+
+    .price-large {
+        font-size: 1.5rem !important;
+        text-align: center !important;
+        margin: 1rem 0 !important;
+    }
+
+    .trainer-bio {
+        margin-top: 1rem !important;
+        padding: 1rem !important;
+    }
+
+    .trainer-bio h3 {
+        font-size: 1.2rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .contact-buttons {
+        flex-direction: column !important;
+        margin-top: 1rem !important;
+    }
+
+    .contact-buttons .btn {
+        width: 100% !important;
+    }
+
+    /* Review section mobile fixes */
+    .profile-section {
+        margin-top: 1.5rem !important;
+        padding: 0 !important;
+    }
+
+    .section-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .reviews-list {
+        gap: 0.75rem !important;
+        margin: 1rem 0 !important;
+    }
+
+    .review-card {
+        padding: 0.9rem !important;
+    }
+
+    .review-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.25rem !important;
+    }
+
+    .review-form {
+        padding: 1rem !important;
+        margin-top: 1.5rem !important;
+    }
+
+    .review-form h3 {
+        font-size: 1.1rem !important;
+    }
 }
 
 /* Responsive Styles - Small Mobile (480px and below) */
@@ -4490,6 +4604,24 @@ fieldset legend {
 
     .contact-buttons .btn {
         width: 100%;
+    }
+
+    .trainer-profile {
+        padding: 1rem !important;
+        border-radius: 12px !important;
+    }
+
+    .trainer-profile-image-container {
+        width: 140px !important;
+        height: 140px !important;
+    }
+
+    .trainer-profile-info h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .section-title {
+        font-size: 1.3rem !important;
     }
 }
 
@@ -4553,6 +4685,25 @@ fieldset legend {
     color: #facc15;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-edit-rating {
+    transition: all 0.2s ease;
+}
+
+.admin-edit-rating:hover {
+    color: #2563eb !important;
+    transform: scale(1.1);
+}
+
+.admin-review-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .review-text {

@@ -166,6 +166,12 @@ Route::middleware('auth')->group(function () {
     // Review routes
     Route::post('/trainers/{trainer}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
+    // Admin review management routes
+    Route::middleware('auth')->group(function () {
+        Route::patch('/reviews/{review}/rating', [ReviewController::class, 'updateRating'])->name('reviews.update-rating');
+        Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    });
+
     // Subscription routes
     Route::get('/subscriptions/choose', [\App\Http\Controllers\SubscriptionController::class, 'choosePlan'])->name('subscriptions.choose');
     Route::post('/subscriptions/subscribe', [\App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscriptions.subscribe');

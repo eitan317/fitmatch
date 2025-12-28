@@ -30,5 +30,45 @@ class ReviewController extends Controller
         return redirect()->route('trainers.show', $trainer)
             ->with('success', 'הביקורת נוספה בהצלחה.');
     }
+
+    /**
+     * Update review rating (admin only).
+     */
+    public function updateRating(Request $request, Review $review)
+    {
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            abort(403, 'רק מנהל יכול לערוך דירוגים');
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        $review->update([
+            'rating' => $validated['rating'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'הדירוג עודכן בהצלחה',
+            'rating' => $review->rating,
+        ]);
+    }
+
+    /**
+     * Delete a review (admin only).
+     */
+    public function destroy(Review $review)
+    {
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            abort(403, 'רק מנהל יכול למחוק ביקורות');
+        }
+
+        $trainerId = $review->trainer_id;
+        $review->delete();
+
+        return redirect()->route('trainers.show', $trainerId)
+            ->with('success', 'הביקורת נמחקה בהצלחה.');
+    }
 }
 
