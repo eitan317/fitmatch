@@ -13,71 +13,74 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-// Route to serve storage files - works even if symbolic link doesn't exist
+// Route to serve storage files - IMPROVED VERSION
 // This route MUST be before other routes to catch storage requests
 Route::get('/storage/{path}', function ($path) {
     // Security: Prevent directory traversal
     $path = str_replace('..', '', $path);
-    $path = str_replace('\\', '/', $path); // Normalize path separators
+    $path = str_replace('\\', '/', $path);
     $path = ltrim($path, '/');
     
-    // Handle nested paths (e.g., trainers/image.jpg)
-    $filePath = storage_path('app/public/' . $path);
+    // Try multiple locations for the file
+    $possiblePaths = [
+        storage_path('app/public/' . $path), // Primary location
+        public_path('storage/' . $path), // Symlink location
+        storage_path('app/' . $path), // Alternative location
+    ];
     
-    // Security: Ensure file is within public storage directory
+    $filePath = null;
+    
+    // Try to find the file in any of the possible locations
+    foreach ($possiblePaths as $possiblePath) {
+        if (file_exists($possiblePath) && is_file($possiblePath)) {
+            $fileSize = @filesize($possiblePath);
+            // Accept file even if size is 0 (might be valid)
+            if ($fileSize !== false) {
+                $filePath = $possiblePath;
+                break;
+            }
+        }
+    }
+    
+    // If file not found, return 404
+    if (!$filePath) {
+        if (config('app.debug')) {
+            \Log::warning('Storage route: File not found', [
+                'requested_path' => $path,
+                'possible_paths' => $possiblePaths,
+            ]);
+        }
+        abort(404, 'File not found: ' . basename($path));
+    }
+    
+    // Security: Ensure file is within allowed directories
     $publicStoragePath = realpath(storage_path('app/public')) ?: storage_path('app/public');
     $realFilePath = realpath($filePath);
     $realPublicPath = realpath($publicStoragePath);
     
-    // Log for debugging (only in debug mode to avoid log spam)
-    if (config('app.debug')) {
-        \Log::info('Storage route accessed', [
-            'requested_path' => $path,
-            'file_path' => $filePath,
-            'file_exists' => file_exists($filePath),
-            'is_file' => is_file($filePath),
-            'realpath' => $realFilePath ?: 'not found'
-        ]);
+    if (!$realFilePath) {
+        abort(404, 'File path could not be resolved');
     }
     
-    if (!$realFilePath || !$realPublicPath) {
-        if (config('app.debug')) {
-            \Log::warning('Storage route: Invalid paths', [
-                'file_path' => $filePath,
-                'real_file_path' => $realFilePath,
-                'real_public_path' => $realPublicPath
-            ]);
+    // Check if file is within allowed directories
+    $isInStorage = $realPublicPath && str_starts_with($realFilePath, $realPublicPath);
+    
+    if (!$isInStorage) {
+        // Also check public/storage symlink
+        $publicStorageSymlink = realpath(public_path('storage'));
+        if (!$publicStorageSymlink || !str_starts_with($realFilePath, $publicStorageSymlink)) {
+            if (config('app.debug')) {
+                \Log::warning('Storage route: Path outside allowed directories', [
+                    'file_path' => $filePath,
+                    'real_file_path' => $realFilePath,
+                ]);
+            }
+            abort(403, 'Access denied');
         }
-        abort(404);
     }
     
-    if (!str_starts_with($realFilePath, $realPublicPath)) {
-        if (config('app.debug')) {
-            \Log::warning('Storage route: Path outside public storage', [
-                'file_path' => $filePath,
-                'real_file_path' => $realFilePath,
-                'real_public_path' => $realPublicPath
-            ]);
-        }
-        abort(404);
-    }
-    
-    if (!file_exists($filePath) || !is_file($filePath)) {
-        if (config('app.debug')) {
-            \Log::warning('Storage route: File not found', [
-                'requested_path' => $path,
-                'file_path' => $filePath,
-                'file_exists' => file_exists($filePath),
-                'is_file' => is_file($filePath),
-                'directory_exists' => is_dir(dirname($filePath)),
-                'directory_listing' => is_dir(dirname($filePath)) ? array_slice(scandir(dirname($filePath)), 2) : 'directory_not_exists'
-            ]);
-        }
-        abort(404);
-    }
-    
-    // Detect MIME type
-    $mimeType = mime_content_type($filePath);
+    // Detect MIME type - accept any file type!
+    $mimeType = @mime_content_type($filePath);
     if (!$mimeType) {
         // Fallback based on extension
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -87,25 +90,21 @@ Route::get('/storage/{path}', function ($path) {
             'png' => 'image/png',
             'gif' => 'image/gif',
             'webp' => 'image/webp',
+            'bmp' => 'image/bmp',
             'svg' => 'image/svg+xml',
+            'pdf' => 'application/pdf',
+            'txt' => 'text/plain',
         ];
         $mimeType = $mimeTypes[$extension] ?? 'application/octet-stream';
     }
     
-    if (config('app.debug')) {
-        \Log::info('Storage route: Serving file', [
-            'file_path' => $filePath,
-            'mime_type' => $mimeType,
-            'file_size' => filesize($filePath)
-        ]);
-    }
-    
+    // Return file with proper headers
     return response()->file($filePath, [
         'Content-Type' => $mimeType,
+        'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
         'Cache-Control' => 'public, max-age=31536000',
-        'Accept-Ranges' => 'bytes',
     ]);
-})->where('path', '.*');
+})->where('path', '.*'); // Accept any path
 
 // Temporary route to download hero image (remove after use)
 Route::get('/download-hero-image', function () {

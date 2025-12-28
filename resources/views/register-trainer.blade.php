@@ -235,7 +235,8 @@
                 });
             }
 
-            // Image preview and validation
+            // Image preview - NO VALIDATION!
+            // הסר את כל הבדיקות על סוג קובץ וגודל!
             const profileImageInput = document.getElementById('profile_image');
             if (profileImageInput) {
                 profileImageInput.addEventListener('change', function(e) {
@@ -250,45 +251,21 @@
                     }
                     
                     if (file) {
-                        // Check file type
-                        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
-                        if (!allowedTypes.includes(file.type)) {
-                            if (errorDiv) {
-                                errorDiv.textContent = 'סוג קובץ לא נתמך. אנא בחר תמונה בפורמט JPG, PNG, GIF או WebP';
-                                errorDiv.style.display = 'block';
-                            }
-                            this.value = '';
-                            if (preview) preview.style.display = 'none';
-                            return;
-                        }
-                        
-                        // Check file size (20MB = 20 * 1024 * 1024 bytes)
-                        const maxSize = 20 * 1024 * 1024; // 20MB
-                        if (file.size > maxSize) {
-                            if (errorDiv) {
-                                errorDiv.textContent = 'גודל הקובץ גדול מדי. מקסימום 20MB';
-                                errorDiv.style.display = 'block';
-                            }
-                            this.value = '';
-                            if (preview) preview.style.display = 'none';
-                            return;
-                        }
-                        
-                        // Read and preview image
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            if (preview && img) {
+                        // לא בודקים כלום - כל קובץ יתקבל!
+                        // רק מציגים תצוגה מקדימה אם אפשר
+                        if (preview && img) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
                                 img.src = e.target.result;
                                 preview.style.display = 'block';
+                            };
+                            // נסה לקרוא - אם זה לא תמונה, פשוט לא נציג תצוגה מקדימה
+                            try {
+                                reader.readAsDataURL(file);
+                            } catch (err) {
+                                // לא משנה - נמשיך
                             }
-                        };
-                        reader.onerror = function() {
-                            if (errorDiv) {
-                                errorDiv.textContent = 'שגיאה בקריאת הקובץ. אנא נסה שוב';
-                                errorDiv.style.display = 'block';
-                            }
-                        };
-                        reader.readAsDataURL(file);
+                        }
                     } else {
                         if (preview) preview.style.display = 'none';
                     }

@@ -107,13 +107,12 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:20480', // 20MB מקסימום
+            // הסרת כל ההגבלות - כל קובץ יתקבל!
+            'profile_image' => 'nullable|file', // רק בודק שזה קובץ, לא משנה מה
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
-            'profile_image.image' => 'הקובץ חייב להיות תמונה',
-            'profile_image.mimes' => 'פורמטי תמונה מותרים: JPEG, PNG, JPG, GIF, WebP',
-            'profile_image.max' => 'גודל התמונה לא יכול להיות יותר מ-20MB',
+            // הסרת כל הודעות השגיאה על תמונה
         ]);
 
         // Note: Training types validation will be done after subscription is selected
@@ -122,171 +121,136 @@ class TrainerController extends Controller
         // Get owner email from authenticated user
         $ownerEmail = Auth::user()->email;
 
-        // Handle profile image upload with error handling
+        // Handle profile image upload - NO RESTRICTIONS!
         $profileImagePath = null;
-        
-        // Check if file was uploaded (diagnostics for upload failures)
-        if ($request->has('profile_image') && !$request->hasFile('profile_image')) {
-            // File field exists but no file was uploaded - likely PHP upload limit exceeded
-            $phpMaxUpload = ini_get('upload_max_filesize');
-            $phpMaxPost = ini_get('post_max_size');
-            \Log::warning('Profile image upload failed - file not received', [
-                'upload_max_filesize' => $phpMaxUpload,
-                'post_max_size' => $phpMaxPost,
-                'content_length' => $request->header('Content-Length'),
-                'has_file' => $request->hasFile('profile_image'),
-                'all_files' => $request->allFiles(),
-            ]);
-            
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['profile_image' => 'הקובץ לא הועלה. ייתכן שהקובץ גדול מדי (מקסימום: ' . $phpMaxUpload . ')']);
-        }
         
         if ($request->hasFile('profile_image')) {
             try {
                 $file = $request->file('profile_image');
                 
-                // Check if file is valid
-                if (!$file->isValid()) {
-                    $error = $file->getError();
-                    $errorMessages = [
-                        UPLOAD_ERR_INI_SIZE => 'הקובץ גדול מדי (חרג ממגבלת PHP)',
-                        UPLOAD_ERR_FORM_SIZE => 'הקובץ גדול מדי (חרג ממגבלת הטופס)',
-                        UPLOAD_ERR_PARTIAL => 'הקובץ הועלה באופן חלקי בלבד',
-                        UPLOAD_ERR_NO_FILE => 'לא הועלה קובץ',
-                        UPLOAD_ERR_NO_TMP_DIR => 'חסר תיקיית זמני',
-                        UPLOAD_ERR_CANT_WRITE => 'שגיאה בכתיבה לדיסק',
-                        UPLOAD_ERR_EXTENSION => 'העלאת הקובץ נעצרה על ידי תוסף PHP',
-                    ];
+                // לא בודקים אם הקובץ תקין - כל קובץ יתקבל!
+                // רק בודקים שיש קובץ
+                if ($file && $file->getSize() > 0) {
                     
-                    \Log::error('Profile image upload - invalid file', [
-                        'error_code' => $error,
-                        'error_message' => $errorMessages[$error] ?? 'שגיאה לא ידועה',
-                        'file_size' => $file->getSize(),
-                        'file_mime' => $file->getMimeType(),
-                    ]);
-                    
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['profile_image' => $errorMessages[$error] ?? 'הקובץ לא תקין. אנא נסה שוב.']);
-                }
-                
-                // Generate unique filename
-                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                
-                // Ensure trainers directory exists
-                $trainersPath = storage_path('app/public/trainers');
-                if (!File::exists($trainersPath)) {
-                    File::makeDirectory($trainersPath, 0755, true);
-                }
-                
-                // Store file - try multiple methods for reliability
-                $profileImagePath = null;
-                $fullPath = null;
-                
-                // Method 1: Try storeAs (works with UploadedFile)
-                try {
-                    $profileImagePath = $file->storeAs('trainers', $filename, 'public');
-                    if ($profileImagePath) {
-                        $fullPath = storage_path('app/public/' . $profileImagePath);
+                    // קבל את הסיומת המקורית או השתמש ב-extension
+                    $originalExtension = $file->getClientOriginalExtension();
+                    if (empty($originalExtension)) {
+                        // אם אין סיומת, נסה לזהות לפי MIME type
+                        $mimeType = $file->getMimeType();
+                        $extensionMap = [
+                            'image/jpeg' => 'jpg',
+                            'image/png' => 'png',
+                            'image/gif' => 'gif',
+                            'image/webp' => 'webp',
+                            'image/bmp' => 'bmp',
+                            'image/svg+xml' => 'svg',
+                        ];
+                        $originalExtension = $extensionMap[$mimeType] ?? 'jpg';
                     }
-                } catch (\Exception $e) {
-                    \Log::warning('storeAs failed, trying direct move', [
-                        'error' => $e->getMessage(),
-                        'filename' => $filename
-                    ]);
-                }
-                
-                // Method 2: Fallback - direct file move if storeAs didn't work or file doesn't exist
-                if (!$profileImagePath || !file_exists($fullPath)) {
-                    try {
-                        $fullPath = $trainersPath . '/' . $filename;
-                        $movedPath = $file->move($trainersPath, $filename);
-                        
-                        if ($movedPath && file_exists($fullPath)) {
-                            $profileImagePath = 'trainers/' . $filename;
-                            \Log::info('File saved using direct move method', [
-                                'path' => $profileImagePath,
-                                'full_path' => $fullPath
-                            ]);
-                        } else {
-                            throw new \Exception('Direct move also failed');
+                    
+                    // Generate unique filename - תמיד עם סיומת
+                    $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                    
+                    // Ensure trainers directory exists with proper permissions
+                    $trainersPath = storage_path('app/public/trainers');
+                    if (!File::exists($trainersPath)) {
+                        File::makeDirectory($trainersPath, 0755, true);
+                    }
+                    
+                    // בדוק הרשאות - אם אין הרשאות, נסה לתקן
+                    if (!is_writable($trainersPath)) {
+                        @chmod($trainersPath, 0755);
+                    }
+                    
+                    // Method 1: Try move_uploaded_file - הכי אמין!
+                    $fullPath = $trainersPath . DIRECTORY_SEPARATOR . $filename;
+                    $saved = false;
+                    
+                    // נסה עם move_uploaded_file (עובד ישירות עם הקובץ שהועלה)
+                    if (function_exists('move_uploaded_file')) {
+                        $tmpPath = $file->getRealPath();
+                        if ($tmpPath && file_exists($tmpPath)) {
+                            if (@move_uploaded_file($tmpPath, $fullPath)) {
+                                $saved = true;
+                                $profileImagePath = 'trainers/' . $filename;
+                            }
                         }
-                    } catch (\Exception $e) {
-                        \Log::error('All file save methods failed', [
-                            'error' => $e->getMessage(),
+                    }
+                    
+                    // Method 2: Fallback - use Laravel's move method
+                    if (!$saved) {
+                        try {
+                            $movedPath = $file->move($trainersPath, $filename);
+                            if ($movedPath && file_exists($fullPath)) {
+                                $saved = true;
+                                $profileImagePath = 'trainers/' . $filename;
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('File move failed, trying storeAs', [
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+                    
+                    // Method 3: Fallback - use storeAs
+                    if (!$saved) {
+                        try {
+                            $profileImagePath = $file->storeAs('trainers', $filename, 'public');
+                            if ($profileImagePath) {
+                                $fullPath = storage_path('app/public/' . $profileImagePath);
+                                if (file_exists($fullPath)) {
+                                    $saved = true;
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('storeAs failed', [
+                                'error' => $e->getMessage()
+                            ]);
+                        }
+                    }
+                    
+                    // Method 4: Last resort - copy file content directly
+                    if (!$saved) {
+                        try {
+                            $fileContent = file_get_contents($file->getRealPath());
+                            if ($fileContent !== false && file_put_contents($fullPath, $fileContent) !== false) {
+                                $saved = true;
+                                $profileImagePath = 'trainers/' . $filename;
+                            }
+                        } catch (\Exception $e) {
+                            \Log::error('All file save methods failed', [
+                                'error' => $e->getMessage(),
+                                'filename' => $filename,
+                                'trainers_path' => $trainersPath,
+                            ]);
+                        }
+                    }
+                    
+                    // Verify file was saved
+                    if ($saved && file_exists($fullPath) && filesize($fullPath) > 0) {
+                        // Set proper permissions
+                        @chmod($fullPath, 0644);
+                        
+                        \Log::info('Image saved successfully - NO RESTRICTIONS', [
+                            'path' => $profileImagePath,
+                            'full_path' => $fullPath,
+                            'file_size' => filesize($fullPath),
+                            'file_type' => $file->getMimeType(),
+                            'original_name' => $file->getClientOriginalName(),
+                        ]);
+                    } else {
+                        // אם לא נשמר - לא נכשל, פשוט לא נשמור תמונה
+                        \Log::warning('Image could not be saved, continuing without image', [
                             'filename' => $filename,
                             'trainers_path' => $trainersPath,
-                            'trainers_path_exists' => File::exists($trainersPath),
-                            'trainers_path_writable' => is_writable($trainersPath),
-                            'storage_path' => storage_path('app/public'),
-                            'storage_writable' => is_writable(storage_path('app/public'))
                         ]);
-                        return redirect()->back()
-                            ->withInput()
-                            ->withErrors(['profile_image' => 'שגיאה בשמירת התמונה. אנא נסה שוב.']);
+                        $profileImagePath = null;
                     }
                 }
-                
-                // Verify file was actually saved - CRITICAL CHECK
-                if (!file_exists($fullPath)) {
-                    // List all files in trainers directory for debugging
-                    $trainersDir = storage_path('app/public/trainers');
-                    $filesInDir = [];
-                    if (is_dir($trainersDir)) {
-                        $filesInDir = array_diff(scandir($trainersDir), ['.', '..']);
-                    }
-                    
-                    \Log::error('Image file not found after save - CRITICAL', [
-                        'path' => $profileImagePath,
-                        'full_path' => $fullPath,
-                        'directory_exists' => is_dir(dirname($fullPath)),
-                        'directory_writable' => is_writable(dirname($fullPath)),
-                        'storage_path' => storage_path('app/public'),
-                        'storage_writable' => is_writable(storage_path('app/public')),
-                        'trainers_dir_exists' => is_dir($trainersDir),
-                        'trainers_dir_writable' => is_writable($trainersDir),
-                        'files_in_trainers_dir' => $filesInDir,
-                        'expected_filename' => $filename
-                    ]);
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['profile_image' => 'התמונה נשמרה אבל לא נמצאה. אנא נסה שוב.']);
-                }
-                
-                // Double check - try to read the file
-                if (filesize($fullPath) === 0) {
-                    \Log::error('Image file is empty after save', [
-                        'path' => $profileImagePath,
-                        'full_path' => $fullPath
-                    ]);
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['profile_image' => 'התמונה נשמרה אבל היא ריקה. אנא נסה שוב.']);
-                }
-                
-                // Log for debugging
-                \Log::info('Image saved successfully', [
-                    'path' => $profileImagePath,
-                    'full_path' => $fullPath,
-                    'file_exists' => file_exists($fullPath),
-                    'file_size' => filesize($fullPath),
-                    'url' => asset('storage/' . $profileImagePath),
-                    'asset_url' => asset('storage/' . $profileImagePath),
-                    'storage_url' => Storage::disk('public')->url($profileImagePath),
-                    'directory_permissions' => substr(sprintf('%o', fileperms(dirname($fullPath))), -4),
-                    'file_permissions' => substr(sprintf('%o', fileperms($fullPath)), -4),
-                    'readable' => is_readable($fullPath),
-                    'writable' => is_writable($fullPath)
-                ]);
             } catch (\Exception $e) {
-                \Log::error('Profile image upload failed: ' . $e->getMessage(), [
-                    'exception' => $e->getTraceAsString()
-                ]);
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['profile_image' => 'שגיאה בהעלאת התמונה. אנא נסה שוב.']);
+                // לא נכשל - פשוט נמשיך בלי תמונה
+                \Log::error('Profile image upload error (non-critical): ' . $e->getMessage());
+                $profileImagePath = null;
             }
         }
 
