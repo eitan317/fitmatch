@@ -26,9 +26,11 @@ class TrainerController extends Controller
             ->with(['reviews', 'subscriptionPlan'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by city
+        // Filter by city - case-insensitive partial match
+        // MySQL with utf8mb4_unicode_ci collation is case-insensitive by default
         if ($request->has('city') && $request->city) {
-            $query->where('city', $request->city);
+            $citySearch = trim($request->city);
+            $query->where('city', 'LIKE', '%' . $citySearch . '%');
         }
 
         // Filter by specialization
@@ -49,9 +51,16 @@ class TrainerController extends Controller
             $query->whereJsonContains('training_types', $request->training_type);
         }
 
-        // Search by name
+        // Search by name OR city - case-insensitive partial match
+        // MySQL with utf8mb4_unicode_ci collation handles case-insensitive search automatically
         if ($request->has('search') && $request->search) {
-            $query->where('full_name', 'like', '%' . $request->search . '%');
+            $searchTerm = trim($request->search);
+            $query->where(function($q) use ($searchTerm) {
+                // Search in full_name
+                $q->where('full_name', 'LIKE', '%' . $searchTerm . '%')
+                  // Also search in city field
+                  ->orWhere('city', 'LIKE', '%' . $searchTerm . '%');
+            });
         }
 
         $trainers = $query->get();

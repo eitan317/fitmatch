@@ -23,17 +23,27 @@ use Illuminate\Support\Facades\Storage;
             <div class="trainer-profile">
                 <div class="trainer-profile-header">
                     <div class="trainer-profile-image-container">
-                        @if($trainer->profile_image_path)
-                            @php
-                                $imageUrl = asset('storage/' . $trainer->profile_image_path);
-                                $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
-                            @endphp
-                            @if($imageExists)
-                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-profile-image-large" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                <div class="trainer-avatar-large" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
-                            @else
-                                <div class="trainer-avatar-large">{{ substr($trainer->full_name, 0, 1) }}</div>
-                            @endif
+                        @php
+                            $imageUrl = null;
+                            if ($trainer->profile_image_path) {
+                                // Try multiple URL generation methods
+                                try {
+                                    // Method 1: Use Storage::url() (uses APP_URL from config)
+                                    $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                } catch (\Exception $e) {
+                                    // Method 2: Fallback to asset() helper
+                                    try {
+                                        $imageUrl = asset('storage/' . $trainer->profile_image_path);
+                                    } catch (\Exception $e2) {
+                                        // Method 3: Direct URL construction
+                                        $imageUrl = url('storage/' . $trainer->profile_image_path);
+                                    }
+                                }
+                            }
+                        @endphp
+                        @if($imageUrl)
+                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-profile-image-large" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; console.error('Failed to load image:', '{{ $imageUrl }}');">
+                            <div class="trainer-avatar-large" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @else
                             <div class="trainer-avatar-large">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @endif

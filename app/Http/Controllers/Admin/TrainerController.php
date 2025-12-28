@@ -16,12 +16,20 @@ class TrainerController extends Controller
     {
         // Platform Statistics
         $totalReviews = \App\Models\Review::count();
+        // Calculate trial and active trainers separately for display
+        $trialTrainersCount = Trainer::where('status', 'trial')->where('approved_by_admin', true)->count();
+        $activeTrainersCount = Trainer::where('status', 'active')->where('approved_by_admin', true)->count();
+        
+        // Total visible trainers = active + trial (this matches what users see on trainers page)
+        $totalVisibleTrainers = $trialTrainersCount + $activeTrainersCount;
+        
         $stats = [
             'total_users' => \App\Models\User::count(),
             'total_trainers' => Trainer::count(),
-            'trial_trainers' => Trainer::where('status', 'trial')->where('approved_by_admin', true)->count(),
+            'trial_trainers' => $trialTrainersCount,
             'pending_payment_trainers' => Trainer::where('status', 'pending_payment')->count(),
-            'active_trainers' => Trainer::where('status', 'active')->where('approved_by_admin', true)->count(),
+            'active_trainers' => $activeTrainersCount,
+            'total_visible_trainers' => $totalVisibleTrainers, // Active + Trial combined (what users see)
             'blocked_trainers' => Trainer::where('status', 'blocked')->count(),
             'pending_trainers' => Trainer::where('status', 'pending')->count(),
             'total_reviews' => $totalReviews,

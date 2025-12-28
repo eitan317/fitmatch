@@ -79,7 +79,9 @@ use Illuminate\Support\Facades\Storage;
                                 <div class="admin-stat-trend">
                                     <i class="fas fa-info-circle"></i>
                                     <span>
-                                        @if($stats['active_trainers'] > 0 || $stats['trial_trainers'] > 0)
+                                        @if(isset($stats['total_visible_trainers']) && $stats['total_visible_trainers'] > 0)
+                                            {{ $stats['total_visible_trainers'] }} נראים למשתמשים ({{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון)
+                                        @elseif($stats['active_trainers'] > 0 || $stats['trial_trainers'] > 0)
                                             {{ $stats['active_trainers'] }} פעילים, {{ $stats['trial_trainers'] }} ניסיון
                                         @else
                                             אין מאמנים פעילים
@@ -204,30 +206,29 @@ use Illuminate\Support\Facades\Storage;
                         <div class="admin-trainer-card-header">
                             <div class="admin-trainer-identity">
                                 <div class="admin-trainer-avatar">
-                                    @if($trainer->profile_image_path)
-                                        @php
-                                            // Use asset() for reliable URL generation
-                                            $imageUrl = asset('storage/' . $trainer->profile_image_path);
-                                            $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
-                                            
-                                            // Fallback: check if file exists directly
-                                            $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
-                                            $fileExists = file_exists($fullPath);
-                                            
-                                            if (!$imageExists && $fileExists) {
-                                                $imageExists = true;
+                                    @php
+                                        $imageUrl = null;
+                                        if ($trainer->profile_image_path) {
+                                            // Try multiple URL generation methods
+                                            try {
+                                                // Method 1: Use Storage::url() (uses APP_URL from config)
+                                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                            } catch (\Exception $e) {
+                                                // Method 2: Fallback to asset() helper
+                                                try {
+                                                    $imageUrl = asset('storage/' . $trainer->profile_image_path);
+                                                } catch (\Exception $e2) {
+                                                    // Method 3: Direct URL construction
+                                                    $imageUrl = url('storage/' . $trainer->profile_image_path);
+                                                }
                                             }
-                                        @endphp
-                                        @if($imageExists)
-                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="console.error('Image failed to load:', '{{ $imageUrl }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                            <div class="admin-trainer-avatar-placeholder" style="display: none;">
-                                                {{ substr($trainer->full_name, 0, 1) }}
-                                            </div>
-                                        @else
-                                            <div class="admin-trainer-avatar-placeholder">
-                                                {{ substr($trainer->full_name, 0, 1) }}
-                                            </div>
-                                        @endif
+                                        }
+                                    @endphp
+                                    @if($imageUrl)
+                                        <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; console.error('Failed to load image:', '{{ $imageUrl }}');">
+                                        <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                            {{ substr($trainer->full_name, 0, 1) }}
+                                        </div>
                                     @else
                                         <div class="admin-trainer-avatar-placeholder">
                                             {{ substr($trainer->full_name, 0, 1) }}
@@ -437,30 +438,29 @@ use Illuminate\Support\Facades\Storage;
                             <div class="admin-trainer-card-header">
                                 <div class="admin-trainer-identity">
                                     <div class="admin-trainer-avatar admin-trainer-avatar-small">
-                                        @if($trainer->profile_image_path)
-                                            @php
-                                                // Use asset() for reliable URL generation
-                                                $imageUrl = asset('storage/' . $trainer->profile_image_path);
-                                                $imageExists = Storage::disk('public')->exists($trainer->profile_image_path);
-                                                
-                                                // Fallback: check if file exists directly
-                                                $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
-                                                $fileExists = file_exists($fullPath);
-                                                
-                                                if (!$imageExists && $fileExists) {
-                                                    $imageExists = true;
+                                        @php
+                                            $imageUrl = null;
+                                            if ($trainer->profile_image_path) {
+                                                // Try multiple URL generation methods
+                                                try {
+                                                    // Method 1: Use Storage::url() (uses APP_URL from config)
+                                                    $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                                } catch (\Exception $e) {
+                                                    // Method 2: Fallback to asset() helper
+                                                    try {
+                                                        $imageUrl = asset('storage/' . $trainer->profile_image_path);
+                                                    } catch (\Exception $e2) {
+                                                        // Method 3: Direct URL construction
+                                                        $imageUrl = url('storage/' . $trainer->profile_image_path);
+                                                    }
                                                 }
-                                            @endphp
-                                            @if($imageExists)
-                                                <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" onerror="console.error('Image failed to load:', '{{ $imageUrl }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                <div class="admin-trainer-avatar-placeholder" style="display: none;">
-                                                    {{ substr($trainer->full_name, 0, 1) }}
-                                                </div>
-                                            @else
-                                                <div class="admin-trainer-avatar-placeholder">
-                                                    {{ substr($trainer->full_name, 0, 1) }}
-                                                </div>
-                                            @endif
+                                            }
+                                        @endphp
+                                        @if($imageUrl)
+                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; console.error('Failed to load image:', '{{ $imageUrl }}');">
+                                            <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                                {{ substr($trainer->full_name, 0, 1) }}
+                                            </div>
                                         @else
                                             <div class="admin-trainer-avatar-placeholder">
                                                 {{ substr($trainer->full_name, 0, 1) }}

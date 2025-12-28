@@ -1368,9 +1368,25 @@ button[type="submit"]:hover,
 
 @media (max-width: 767px) {
     .trainers-slider-container {
-        overflow-x: hidden;
-        touch-action: pan-y;
+        overflow-x: visible; /* Changed from hidden */
+        overflow-y: visible; /* Allow vertical scroll */
+        touch-action: pan-y; /* Keep vertical scrolling */
         overscroll-behavior-x: none;
+    }
+    
+    /* Change to vertical column layout on mobile */
+    .trainers-slider-track {
+        display: flex;
+        flex-direction: column; /* Stack trainers vertically */
+        gap: 1.5rem;
+        transform: none !important; /* Disable horizontal transform */
+    }
+    
+    .trainers-slider-container .trainer-card {
+        flex: 0 0 auto; /* Changed from 0 0 100% */
+        min-width: 100%;
+        width: 100%;
+        max-width: 100%;
     }
 }
 
