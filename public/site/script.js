@@ -1179,11 +1179,22 @@ function initLoginPage() {
 function initNavbarToggle() {
     const toggle = document.getElementById("navToggle");
     const links = document.getElementById("navLinks");
+    const body = document.body;
+    
     if (!toggle || !links) return;
 
-    toggle.addEventListener("click", function () {
+    toggle.addEventListener("click", function (e) {
+        e.stopPropagation(); // מונע סגירה מיידית
         toggle.classList.toggle("active"); // Toggle hamburger animation
         links.classList.toggle("nav-open");
+        
+        // מונע scroll של body כשהתפריט פתוח
+        if (links.classList.contains("nav-open")) {
+            body.style.overflow = "hidden";
+        } else {
+            body.style.overflow = "";
+        }
+        
         // Close language menu when opening nav
         const languageMenu = document.getElementById('languageMenu');
         if (languageMenu) {
@@ -1197,8 +1208,21 @@ function initNavbarToggle() {
             if (!toggle.contains(e.target) && !links.contains(e.target)) {
                 toggle.classList.remove('active');
                 links.classList.remove('nav-open');
+                body.style.overflow = "";
             }
         }
+    });
+    
+    // Close nav when clicking on a link
+    const navLinks = links.querySelectorAll('a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                toggle.classList.remove('active');
+                links.classList.remove('nav-open');
+                body.style.overflow = "";
+            }
+        });
     });
 }
 
@@ -2307,4 +2331,5 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(loadBackgroundImages, 100);
     }
 });
+
 
