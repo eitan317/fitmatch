@@ -314,9 +314,9 @@ class TrainerController extends Controller
 
         $trainer = Trainer::create($trainerData);
 
-        // Redirect to choose plan page
-        return redirect()->route('trainers.choose-plan')
-            ->with('success', 'ההרשמה הושלמה בהצלחה! בחר את האופציה המתאימה לך');
+        // Redirect to welcome page
+        return redirect()->route('trainers.welcome')
+            ->with('success', 'ההרשמה הושלמה בהצלחה! ברוכים הבאים!');
     }
 
     /**
@@ -405,6 +405,16 @@ class TrainerController extends Controller
         $trainer->rating_count = $trainer->rating_count;
 
         return view('trainer-profile', compact('trainer'));
+    }
+
+    /**
+     * Display welcome page after trainer registration.
+     */
+    public function welcome()
+    {
+        $trainer = Trainer::where('owner_email', Auth::user()->email)->firstOrFail();
+        
+        return view('trainer-welcome', compact('trainer'));
     }
 
     /**

@@ -158,10 +158,13 @@ Route::middleware('auth')->group(function () {
     // Trainer registration and management routes
     Route::get('/register-trainer', [TrainerController::class, 'create'])->name('trainers.create');
     Route::post('/register-trainer', [TrainerController::class, 'store'])->name('trainers.store');
-    Route::get('/trainer/choose-plan', [TrainerController::class, 'choosePlan'])->name('trainers.choose-plan');
-    Route::post('/trainer/choose-plan', [TrainerController::class, 'storePlanChoice'])->name('trainers.store-plan-choice');
-    Route::get('/trainer/trial-info', [TrainerController::class, 'trialInfo'])->name('trainers.trial-info');
-    Route::get('/trainer/payment-info', [TrainerController::class, 'paymentInfo'])->name('trainers.payment-info');
+    Route::get('/trainer/welcome', [TrainerController::class, 'welcome'])->name('trainers.welcome');
+    
+    // Old routes - commented out (no longer used)
+    // Route::get('/trainer/choose-plan', [TrainerController::class, 'choosePlan'])->name('trainers.choose-plan');
+    // Route::post('/trainer/choose-plan', [TrainerController::class, 'storePlanChoice'])->name('trainers.store-plan-choice');
+    // Route::get('/trainer/trial-info', [TrainerController::class, 'trialInfo'])->name('trainers.trial-info');
+    // Route::get('/trainer/payment-info', [TrainerController::class, 'paymentInfo'])->name('trainers.payment-info');
 
     // Review routes
     Route::post('/trainers/{trainer}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
