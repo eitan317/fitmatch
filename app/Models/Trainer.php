@@ -107,6 +107,7 @@ class Trainer extends Model
     public static function getTrainingTypeLabels(): array
     {
         return [
+            'strength_training' => 'אימוני כוח',
             'gym_basic' => 'חדר כושר בסיסי',
             'hypertrophy' => 'מסת שריר',
             'powerlifting' => 'פאוורליפטינג',
@@ -124,6 +125,7 @@ class Trainer extends Model
             'home_bodyweight' => 'אימוני בית (משקל גוף)',
             'trx' => 'אימוני TRX',
             'short20' => 'אימונים קצרים (20 דק׳)',
+            'cardiovascular_endurance' => 'סיבולת לב ריאה',
             'running' => 'ריצה',
             'sprints' => 'ספרינטים',
             'marathon' => 'הכנה למרתון / חצי מרתון',

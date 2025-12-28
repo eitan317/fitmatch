@@ -124,15 +124,52 @@ class TrainerController extends Controller
 
         // Handle profile image upload with error handling
         $profileImagePath = null;
+        
+        // Check if file was uploaded (diagnostics for upload failures)
+        if ($request->has('profile_image') && !$request->hasFile('profile_image')) {
+            // File field exists but no file was uploaded - likely PHP upload limit exceeded
+            $phpMaxUpload = ini_get('upload_max_filesize');
+            $phpMaxPost = ini_get('post_max_size');
+            \Log::warning('Profile image upload failed - file not received', [
+                'upload_max_filesize' => $phpMaxUpload,
+                'post_max_size' => $phpMaxPost,
+                'content_length' => $request->header('Content-Length'),
+                'has_file' => $request->hasFile('profile_image'),
+                'all_files' => $request->allFiles(),
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['profile_image' => 'הקובץ לא הועלה. ייתכן שהקובץ גדול מדי (מקסימום: ' . $phpMaxUpload . ')']);
+        }
+        
         if ($request->hasFile('profile_image')) {
             try {
                 $file = $request->file('profile_image');
                 
                 // Check if file is valid
                 if (!$file->isValid()) {
+                    $error = $file->getError();
+                    $errorMessages = [
+                        UPLOAD_ERR_INI_SIZE => 'הקובץ גדול מדי (חרג ממגבלת PHP)',
+                        UPLOAD_ERR_FORM_SIZE => 'הקובץ גדול מדי (חרג ממגבלת הטופס)',
+                        UPLOAD_ERR_PARTIAL => 'הקובץ הועלה באופן חלקי בלבד',
+                        UPLOAD_ERR_NO_FILE => 'לא הועלה קובץ',
+                        UPLOAD_ERR_NO_TMP_DIR => 'חסר תיקיית זמני',
+                        UPLOAD_ERR_CANT_WRITE => 'שגיאה בכתיבה לדיסק',
+                        UPLOAD_ERR_EXTENSION => 'העלאת הקובץ נעצרה על ידי תוסף PHP',
+                    ];
+                    
+                    \Log::error('Profile image upload - invalid file', [
+                        'error_code' => $error,
+                        'error_message' => $errorMessages[$error] ?? 'שגיאה לא ידועה',
+                        'file_size' => $file->getSize(),
+                        'file_mime' => $file->getMimeType(),
+                    ]);
+                    
                     return redirect()->back()
                         ->withInput()
-                        ->withErrors(['profile_image' => 'הקובץ לא תקין. אנא נסה שוב.']);
+                        ->withErrors(['profile_image' => $errorMessages[$error] ?? 'הקובץ לא תקין. אנא נסה שוב.']);
                 }
                 
                 // Generate unique filename

@@ -48,6 +48,7 @@ use Illuminate\Support\Facades\Storage;
                         <option value="">כל הסוגים</option>
                         
                         <optgroup label="🏋️ חדר כושר וכוח">
+                            <option value="strength_training" {{ request('training_type') == 'strength_training' ? 'selected' : '' }}>אימוני כוח</option>
                             <option value="gym_basic" {{ request('training_type') == 'gym_basic' ? 'selected' : '' }}>חדר כושר בסיסי</option>
                             <option value="hypertrophy" {{ request('training_type') == 'hypertrophy' ? 'selected' : '' }}>מסת שריר</option>
                             <option value="powerlifting" {{ request('training_type') == 'powerlifting' ? 'selected' : '' }}>פאוורליפטינג</option>
@@ -78,7 +79,8 @@ use Illuminate\Support\Facades\Storage;
                         </optgroup>
                         
                         <optgroup label="🏃 אירובי וסיבולת">
-                        <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
+                            <option value="cardiovascular_endurance" {{ request('training_type') == 'cardiovascular_endurance' ? 'selected' : '' }}>סיבולת לב ריאה</option>
+                            <option value="running" {{ request('training_type') == 'running' ? 'selected' : '' }}>ריצה</option>
                             <option value="sprints" {{ request('training_type') == 'sprints' ? 'selected' : '' }}>ספרינטים</option>
                             <option value="marathon" {{ request('training_type') == 'marathon' ? 'selected' : '' }}>הכנה למרתון</option>
                             <option value="cycling" {{ request('training_type') == 'cycling' ? 'selected' : '' }}>רכיבה על אופניים</option>

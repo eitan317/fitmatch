@@ -94,6 +94,8 @@
                         />
                         
                         <div class="training-types-list">
+                            <!-- כוח וחוזק -->
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="strength_training"><span>אימוני כוח</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="gym_basic"><span>חדר כושר בסיסי</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="hypertrophy"><span>מסת שריר</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="powerlifting"><span>פאוורליפטינג</span></label>
@@ -111,6 +113,8 @@
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="home_bodyweight"><span>אימוני בית (משקל גוף)</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="trx"><span>אימוני TRX</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="short20"><span>אימונים קצרים (20 דק׳)</span></label>
+                            <!-- אירובי וסיבולת לב ריאה -->
+                            <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="cardiovascular_endurance"><span>סיבולת לב ריאה</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="running"><span>ריצה</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="sprints"><span>ספרינטים</span></label>
                             <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="marathon"><span>הכנה למרתון</span></label>

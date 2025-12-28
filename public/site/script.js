@@ -4,6 +4,7 @@ const ADMIN_EMAIL = "eitansheli2019@gmail.com";
 // Training types labels
 const TRAINING_TYPE_LABELS = {
     // Gym / Strength
+    "strength_training": "אימוני כוח",
     "gym_basic": "חדר כושר בסיסי",
     "hypertrophy": "מסת שריר",
     "powerlifting": "פאוורליפטינג",
@@ -29,6 +30,7 @@ const TRAINING_TYPE_LABELS = {
     "short20": "אימונים קצרים (20 דק׳)",
     
     // Endurance / cardio
+    "cardiovascular_endurance": "סיבולת לב ריאה",
     "running": "ריצה",
     "sprints": "ספרינטים",
     "marathon": "הכנה למרתון / חצי מרתון",
