@@ -22,7 +22,7 @@
                 {
                     "@type": "Organization",
                     "name": "FitMatch",
-                    "url": "https://fitmatch-production-8912.up.railway.app",
+                    "url": "{{ config('app.url') }}",
                     "email": "fitmatchcoil@gmail.com",
                     "telephone": "+972527020113",
                     "areaServed": {
@@ -36,12 +36,12 @@
                 {
                     "@type": "WebSite",
                     "name": "FitMatch",
-                    "url": "https://fitmatch-production-8912.up.railway.app",
+                    "url": "{{ config('app.url') }}",
                     "potentialAction": {
                         "@type": "SearchAction",
                         "target": {
                             "@type": "EntryPoint",
-                            "urlTemplate": "https://fitmatch-production-8912.up.railway.app/trainers?search={search_term_string}"
+                            "urlTemplate": "{{ url('/trainers') }}?search={search_term_string}"
                         },
                         "query-input": "required name=search_term_string"
                     }
