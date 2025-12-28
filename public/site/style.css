@@ -2560,6 +2560,41 @@ select:focus {
     border: 1px solid rgba(40, 167, 69, 0.3);
 }
 
+.admin-section-badge-info {
+    background: rgba(0, 123, 255, 0.15);
+    color: #007bff;
+    border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+/* All Trainers Container */
+.admin-all-trainers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.admin-trainer-status-other {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.admin-trainer-status-blocked {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.admin-trainer-status-payment {
+    background: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+@media (max-width: 768px) {
+    .admin-all-trainers-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Statistics Grid */
 .admin-stats-grid {
     display: grid;

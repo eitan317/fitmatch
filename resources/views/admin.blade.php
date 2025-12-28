@@ -535,6 +535,164 @@ use Illuminate\Support\Facades\Storage;
                     </div>
                 </div>
             </section>
+
+            <!-- All Trainers Section -->
+            <section class="admin-section">
+                <div class="admin-section-header">
+                    <div>
+                        <h2 class="admin-section-title">כל המאמנים ({{ count($allTrainers) }})</h2>
+                        <p class="admin-section-subtitle">כל המאמנים במערכת ללא פילטרים</p>
+                    </div>
+                    <div class="admin-section-badge admin-section-badge-info">
+                        {{ $stats['total_trainers'] }} סה"כ
+                    </div>
+                </div>
+
+                <div class="admin-all-trainers-container">
+                    @forelse($allTrainers as $trainer)
+                        <div class="admin-trainer-card admin-trainer-card-all">
+                            <div class="admin-trainer-card-header">
+                                <div class="admin-trainer-identity">
+                                    <div class="admin-trainer-avatar">
+                                        @php
+                                            $imageUrl = null;
+                                            if ($trainer->profile_image_path) {
+                                                try {
+                                                    $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                                } catch (\Exception $e) {
+                                                    try {
+                                                        $imageUrl = asset('storage/' . $trainer->profile_image_path);
+                                                    } catch (\Exception $e2) {
+                                                        $imageUrl = url('storage/' . $trainer->profile_image_path);
+                                                    }
+                                                }
+                                            }
+                                        @endphp
+                                        @if($imageUrl)
+                                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="admin-trainer-avatar-placeholder" style="display: none;">
+                                                    {{ substr($trainer->full_name, 0, 1) }}
+                                                </div>
+                                            @else
+                                                <div class="admin-trainer-avatar-placeholder">
+                                                    {{ substr($trainer->full_name, 0, 1) }}
+                                                </div>
+                                            @endif
+                                    </div>
+                                    <div class="admin-trainer-identity-info">
+                                        <h3 class="admin-trainer-name">{{ $trainer->full_name }}</h3>
+                                        <div class="admin-trainer-meta">
+                                            <span class="admin-trainer-location">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                {{ $trainer->city }}
+                                            </span>
+                                            <span class="admin-trainer-date">
+                                                <i class="fas fa-calendar"></i>
+                                                {{ $trainer->created_at->format('d/m/Y') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="admin-trainer-status-badge 
+                                    @if($trainer->status === 'active') admin-trainer-status-approved
+                                    @elseif($trainer->status === 'trial') admin-trainer-status-trial
+                                    @elseif($trainer->status === 'pending') admin-trainer-status-pending
+                                    @elseif($trainer->status === 'pending_payment') admin-trainer-status-payment
+                                    @elseif($trainer->status === 'blocked') admin-trainer-status-blocked
+                                    @else admin-trainer-status-other
+                                    @endif">
+                                    <i class="fas 
+                                        @if($trainer->status === 'active') fa-check-circle
+                                        @elseif($trainer->status === 'trial') fa-clock
+                                        @elseif($trainer->status === 'pending') fa-hourglass-half
+                                        @elseif($trainer->status === 'pending_payment') fa-credit-card
+                                        @elseif($trainer->status === 'blocked') fa-ban
+                                        @else fa-info-circle
+                                        @endif"></i>
+                                    @if($trainer->status === 'active')
+                                        פעיל
+                                    @elseif($trainer->status === 'trial')
+                                        ניסיון
+                                    @elseif($trainer->status === 'pending')
+                                        ממתין לאישור
+                                    @elseif($trainer->status === 'pending_payment')
+                                        ממתין לתשלום
+                                    @elseif($trainer->status === 'blocked')
+                                        חסום
+                                    @else
+                                        {{ $trainer->status }}
+                                    @endif
+                                    @if(!$trainer->approved_by_admin)
+                                        <span style="color: #ffc107; margin-right: 5px;">(לא מאושר)</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="admin-trainer-card-body">
+                                <div class="admin-trainer-quick-info">
+                                    @if($trainer->main_specialization)
+                                        <div class="admin-quick-info-item">
+                                            <i class="fas fa-briefcase"></i>
+                                            <span>{{ $trainer->main_specialization }}</span>
+                                        </div>
+                                    @endif
+                                    @if($trainer->phone)
+                                        <div class="admin-quick-info-item">
+                                            <i class="fas fa-phone"></i>
+                                            <span>{{ $trainer->phone }}</span>
+                                        </div>
+                                    @endif
+                                    @if($trainer->price_per_session)
+                                        <div class="admin-quick-info-item">
+                                            <i class="fas fa-shekel-sign"></i>
+                                            <span>{{ number_format($trainer->price_per_session) }} ₪</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="admin-trainer-card-footer">
+                                <div class="admin-trainer-actions">
+                                    <a href="{{ route('trainers.show', $trainer) }}" class="admin-btn admin-btn-secondary">
+                                        <i class="fas fa-eye"></i>
+                                        צפה בפרופיל
+                                    </a>
+                                    @if($trainer->status === 'pending' && !$trainer->approved_by_admin)
+                                        <form action="{{ route('admin.trainers.approve', $trainer) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="admin-btn admin-btn-primary">
+                                                <i class="fas fa-check"></i>
+                                                אשר
+                                            </button>
+                                        </form>
+                                    @endif
+                                    @if($trainer->status === 'pending_payment')
+                                        <form action="{{ route('admin.trainers.approve-payment', $trainer) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="admin-btn admin-btn-success">
+                                                <i class="fas fa-credit-card"></i>
+                                                אשר תשלום
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <button type="button" class="admin-btn admin-btn-danger" onclick="openDeleteModal({{ $trainer->id }}, '{{ addslashes($trainer->full_name) }}')">
+                                        <i class="fas fa-trash"></i>
+                                        מחק
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="admin-empty-state">
+                            <div class="admin-empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <h3 class="admin-empty-title">אין מאמנים במערכת</h3>
+                            <p class="admin-empty-description">עדיין לא נרשמו מאמנים</p>
+                        </div>
+                    @endforelse
+                </div>
+            </section>
         </main>
     </div>
 

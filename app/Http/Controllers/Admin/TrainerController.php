@@ -73,7 +73,12 @@ class TrainerController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers'));
+        // Get all trainers (for admin to see everything)
+        $allTrainers = Trainer::orderBy('created_at', 'desc')
+            ->with('reviews')
+            ->get();
+
+        return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers', 'allTrainers'));
     }
 
     /**
