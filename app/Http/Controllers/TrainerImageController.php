@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Intervention\Image\ImageManager;
 
 class TrainerImageController extends Controller
 {
@@ -60,10 +61,36 @@ class TrainerImageController extends Controller
             
             // Save file
             $imagePath = $file->storeAs('trainer-images', $filename, 'public');
+            $fullPath = storage_path('app/public/' . $imagePath);
             
-            if (!$imagePath) {
+            if (!$imagePath || !file_exists($fullPath)) {
                 return redirect()->back()
                     ->with('error', 'שגיאה בשמירת התמונה.');
+            }
+
+            try {
+                // Create ImageManager instance
+                $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                
+                // Resize main image to max 1000x1000px
+                $image = $manager->read($fullPath);
+                $image->scale(width: 1000, height: 1000);
+                $image->save($fullPath, quality: 90);
+                
+                // Create thumbnail directory if needed
+                $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
+                if (!File::exists($thumbnailDir)) {
+                    File::makeDirectory($thumbnailDir, 0755, true);
+                }
+                
+                // Create thumbnail 200x200px
+                $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
+                $thumbnail = $manager->read($fullPath);
+                $thumbnail->cover(200, 200);
+                $thumbnail->save($thumbnailPath, quality: 85);
+            } catch (\Exception $e) {
+                \Log::warning('Error resizing image: ' . $e->getMessage());
+                // Continue even if resize fails
             }
 
             // If this is set as primary, remove primary from other images

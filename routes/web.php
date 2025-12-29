@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrainerController;
+use App\Http\Controllers\TrainerDashboardController;
 use App\Http\Controllers\TrainerImageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
@@ -164,6 +165,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/register-trainer', [TrainerController::class, 'create'])->name('trainers.create');
     Route::post('/register-trainer', [TrainerController::class, 'store'])->name('trainers.store');
     Route::get('/trainer/welcome', [TrainerController::class, 'welcome'])->name('trainers.welcome');
+
+    // Trainer dashboard routes
+    Route::prefix('trainer')->name('trainer.')->group(function () {
+        Route::get('/dashboard', [TrainerDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/reviews', [TrainerDashboardController::class, 'reviews'])->name('reviews');
+        Route::get('/statistics', [TrainerDashboardController::class, 'statistics'])->name('statistics');
+        Route::get('/profile/edit', [TrainerDashboardController::class, 'editProfile'])->name('profile.edit');
+        Route::post('/profile/update', [TrainerDashboardController::class, 'updateProfile'])->name('profile.update');
+    });
     
     // Old routes - commented out (no longer used)
     // Route::get('/trainer/choose-plan', [TrainerController::class, 'choosePlan'])->name('trainers.choose-plan');
@@ -210,6 +220,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/trainers/{trainer}/approve', [AdminTrainerController::class, 'approve'])->name('trainers.approve');
     Route::post('/trainers/{trainer}/approve-payment', [AdminTrainerController::class, 'approvePayment'])->name('trainers.approve-payment');
     Route::post('/trainers/{trainer}/reject', [AdminTrainerController::class, 'reject'])->name('trainers.reject');
+    Route::post('/trainers/{trainer}/block', [AdminTrainerController::class, 'block'])->name('trainers.block');
+    Route::post('/trainers/{trainer}/unblock', [AdminTrainerController::class, 'unblock'])->name('trainers.unblock');
+    Route::post('/trainers/{trainer}/change-subscription', [AdminTrainerController::class, 'changeSubscription'])->name('trainers.change-subscription');
+    Route::delete('/trainers/{trainer}/images/{image}', [AdminTrainerController::class, 'deleteImage'])->name('trainers.images.delete');
+    Route::post('/trainers/{trainer}/images/{image}/set-primary', [AdminTrainerController::class, 'setPrimaryImage'])->name('trainers.images.set-primary');
     Route::delete('/trainers/{trainer}', [AdminTrainerController::class, 'destroy'])->name('trainers.destroy');
 });
 

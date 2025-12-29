@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Trainer;
+use App\Models\TrainerImage;
+use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class TrainerController extends Controller
 {
@@ -261,9 +265,15 @@ class TrainerController extends Controller
             'age.integer' => 'הגיל חייב להיות מספר שלם',
         ]);
 
+        // Handle subscription plan change
+        if ($request->has('subscription_plan_id')) {
+            $validated['subscription_plan_id'] = $request->subscription_plan_id ?: null;
+        }
+
         // Validate training types count based on subscription plan
-        if ($trainer->subscription_plan_id) {
-            $plan = $trainer->subscriptionPlan;
+        if ($validated['subscription_plan_id'] ?? $trainer->subscription_plan_id) {
+            $planId = $validated['subscription_plan_id'] ?? $trainer->subscription_plan_id;
+            $plan = SubscriptionPlan::find($planId);
             if ($plan && $plan->max_training_types !== null) {
                 $trainingTypesCount = count($validated['training_types'] ?? []);
                 if ($trainingTypesCount > $plan->max_training_types) {
@@ -276,8 +286,163 @@ class TrainerController extends Controller
 
         $trainer->update($validated);
 
+        // Handle new image upload
+        if ($request->hasFile('new_image')) {
+            $file = $request->file('new_image');
+            if ($file && $file->getSize() > 0) {
+                try {
+                    $originalExtension = $file->getClientOriginalExtension();
+                    if (empty($originalExtension)) {
+                        $mimeType = $file->getMimeType();
+                        $extensionMap = [
+                            'image/jpeg' => 'jpg',
+                            'image/png' => 'png',
+                            'image/gif' => 'gif',
+                            'image/webp' => 'webp',
+                            'image/bmp' => 'bmp',
+                        ];
+                        $originalExtension = $extensionMap[$mimeType] ?? 'jpg';
+                    }
+                    
+                    $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                    $imagePath = $file->storeAs('trainer-images', $filename, 'public');
+                    $fullPath = storage_path('app/public/' . $imagePath);
+                    
+                    if ($imagePath && file_exists($fullPath)) {
+                        // Resize image if Intervention Image is available
+                        if (class_exists(\Intervention\Image\ImageManager::class)) {
+                            try {
+                                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                                
+                                $image = $manager->read($fullPath);
+                                $image->scale(width: 1000, height: 1000);
+                                $image->save($fullPath, quality: 90);
+                                
+                                // Create thumbnail
+                                $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
+                                if (!File::exists($thumbnailDir)) {
+                                    File::makeDirectory($thumbnailDir, 0755, true);
+                                }
+                                $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
+                                $thumbnail = $manager->read($fullPath);
+                                $thumbnail->cover(200, 200);
+                                $thumbnail->save($thumbnailPath, quality: 85);
+                            } catch (\Exception $e) {
+                                \Log::warning('Error resizing image in admin update: ' . $e->getMessage());
+                            }
+                        }
+                        
+                        TrainerImage::create([
+                            'trainer_id' => $trainer->id,
+                            'image_path' => $imagePath,
+                            'image_type' => 'profile',
+                            'sort_order' => 0,
+                            'is_primary' => false,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error uploading image in admin update: ' . $e->getMessage());
+                }
+            }
+        }
+
         return redirect()->route('admin.trainers.index')
             ->with('success', 'המאמן עודכן בהצלחה.');
+    }
+
+    /**
+     * Block a trainer.
+     */
+    public function block(Trainer $trainer)
+    {
+        $trainer->update(['status' => 'blocked']);
+
+        return redirect()->back()
+            ->with('success', 'המאמן נחסם בהצלחה.');
+    }
+
+    /**
+     * Unblock a trainer.
+     */
+    public function unblock(Trainer $trainer)
+    {
+        // Restore to pending if was blocked, or keep current status
+        if ($trainer->status === 'blocked') {
+            $trainer->update(['status' => 'pending']);
+        }
+
+        return redirect()->back()
+            ->with('success', 'המאמן שוחרר בהצלחה.');
+    }
+
+    /**
+     * Change trainer subscription plan.
+     */
+    public function changeSubscription(Request $request, Trainer $trainer)
+    {
+        $validated = $request->validate([
+            'subscription_plan_id' => 'nullable|exists:subscription_plans,id',
+        ]);
+
+        $trainer->update($validated);
+
+        $planName = $trainer->subscriptionPlan ? $trainer->subscriptionPlan->name : 'ללא מנוי';
+        
+        return redirect()->back()
+            ->with('success', "מנוי המאמן עודכן ל: {$planName}.");
+    }
+
+    /**
+     * Delete a trainer image.
+     */
+    public function deleteImage(Trainer $trainer, TrainerImage $image)
+    {
+        // Verify the image belongs to this trainer
+        if ($image->trainer_id !== $trainer->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Delete the image file
+        try {
+            if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            // Delete thumbnail if exists
+            if ($image->thumbnail_path && Storage::disk('public')->exists($image->thumbnail_path)) {
+                Storage::disk('public')->delete($image->thumbnail_path);
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Error deleting image file: ' . $e->getMessage());
+        }
+
+        // Delete the database record
+        $image->delete();
+
+        return redirect()->back()
+            ->with('success', 'התמונה נמחקה בהצלחה.');
+    }
+
+    /**
+     * Set an image as primary.
+     */
+    public function setPrimaryImage(Trainer $trainer, TrainerImage $image)
+    {
+        // Verify the image belongs to this trainer
+        if ($image->trainer_id !== $trainer->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Remove primary from all other images
+        TrainerImage::where('trainer_id', $trainer->id)
+            ->where('id', '!=', $image->id)
+            ->update(['is_primary' => false]);
+
+        // Set this image as primary
+        $image->update(['is_primary' => true]);
+
+        return redirect()->back()
+            ->with('success', 'התמונה הוגדרה כתמונה ראשית.');
     }
 }
 

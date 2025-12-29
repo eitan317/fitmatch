@@ -105,6 +105,43 @@ class Trainer extends Model
     }
 
     /**
+     * Get all profile views for this trainer.
+     */
+    public function profileViews(): HasMany
+    {
+        return $this->hasMany(TrainerProfileView::class);
+    }
+
+    /**
+     * Get total views count for this trainer.
+     */
+    public function getTotalViewsAttribute(): int
+    {
+        return $this->profileViews()->count();
+    }
+
+    /**
+     * Get views count for today.
+     */
+    public function getViewsTodayAttribute(): int
+    {
+        return $this->profileViews()
+            ->whereDate('viewed_at', today())
+            ->count();
+    }
+
+    /**
+     * Get views count for this month.
+     */
+    public function getViewsThisMonthAttribute(): int
+    {
+        return $this->profileViews()
+            ->whereMonth('viewed_at', now()->month)
+            ->whereYear('viewed_at', now()->year)
+            ->count();
+    }
+
+    /**
      * Get the average rating for the trainer.
      */
     public function getAverageRatingAttribute(): ?float

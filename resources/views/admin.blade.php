@@ -379,6 +379,10 @@ use Illuminate\Support\Facades\Storage;
 
                         <div class="admin-trainer-card-footer">
                             <div class="admin-trainer-actions">
+                                <a href="{{ route('admin.trainers.edit', $trainer) }}" class="admin-btn admin-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-edit"></i>
+                                    ערוך
+                                </a>
                                 <form action="{{ route('admin.trainers.approve', $trainer) }}" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="admin-btn admin-btn-primary" onclick="return confirm('האם אתה בטוח שברצונך לאשר את המאמן?')">
@@ -500,6 +504,10 @@ use Illuminate\Support\Facades\Storage;
 
                             <div class="admin-trainer-card-footer">
                                 <div class="admin-trainer-actions">
+                                    <a href="{{ route('admin.trainers.edit', $trainer) }}" class="admin-btn admin-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fas fa-edit"></i>
+                                        ערוך
+                                    </a>
                                     <a href="{{ route('trainers.show', $trainer) }}" target="_blank" class="admin-btn admin-btn-secondary">
                                         <i class="fas fa-external-link-alt"></i>
                                         צפה בפרופיל
@@ -634,6 +642,10 @@ use Illuminate\Support\Facades\Storage;
 
                             <div class="admin-trainer-card-footer">
                                 <div class="admin-trainer-actions">
+                                    <a href="{{ route('admin.trainers.edit', $trainer) }}" class="admin-btn admin-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fas fa-edit"></i>
+                                        ערוך
+                                    </a>
                                     <a href="{{ route('trainers.show', $trainer) }}" class="admin-btn admin-btn-secondary">
                                         <i class="fas fa-eye"></i>
                                         צפה בפרופיל

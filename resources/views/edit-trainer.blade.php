@@ -1,115 +1,280 @@
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ session('locale', 'he') }}" dir="{{ in_array(session('locale', 'he'), ['he', 'ar']) ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>עריכת פרופיל מאמן</title>
+    <title>עריכת מאמן - פאנל מנהל</title>
     <link rel="stylesheet" href="/site/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     @include('partials.schema-ld')
 </head>
-<body>
+<body class="admin-dashboard-body">
     @include('partials.navbar')
 
-    <main class="page-container">
-        <h1>עריכת פרופיל מאמן</h1>
-        <p>עדכן את הפרטים שלך ושמור.</p>
+    <div class="admin-dashboard-wrapper">
+        <div class="admin-top-bar">
+            <div class="admin-top-bar-content">
+                <div class="admin-breadcrumbs">
+                    <a href="{{ route('admin.trainers.index') }}" class="admin-breadcrumb-item" style="text-decoration: none; color: var(--text-muted);">פאנל מנהל</a>
+                    <span class="admin-breadcrumb-separator">/</span>
+                    <span class="admin-breadcrumb-item active">עריכת מאמן</span>
+                </div>
+                <div class="admin-user-info">
+                    <span class="admin-user-name">{{ Auth::user()->name }}</span>
+                    <span class="admin-user-badge">מנהל מערכת</span>
+                </div>
+            </div>
+        </div>
 
-        @php
-            $currentTrainer = \App\Models\Trainer::where('owner_email', Auth::user()->email)->first();
-        @endphp
+        <main class="admin-dashboard-main">
+            @if(session('success'))
+                <div class="admin-notification admin-notification-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+            @endif
 
-        @if($currentTrainer)
-            <div class="form-message {{ $currentTrainer->status === 'active' ? 'success' : ($currentTrainer->status === 'pending_payment' ? 'error' : 'warning') }}" style="margin-bottom: 2rem; padding: 1rem; border-radius: 10px;">
-                @if($currentTrainer->status === 'trial')
-                    <h3 style="margin-top: 0;"><i class="fas fa-hourglass-half"></i> חודש ניסיון</h3>
-                    <p>אתה כעת בחודש ניסיון. לאחר {{ $currentTrainer->trial_ends_at ? $currentTrainer->trial_ends_at->diffForHumans() : '30 יום' }} תתבקש לשלם 20₪ בביט.</p>
-                    @if($currentTrainer->trial_ends_at)
-                        <p><strong>תאריך סיום ניסיון:</strong> {{ $currentTrainer->trial_ends_at->format('d/m/Y') }}</p>
-                    @endif
-                @elseif($currentTrainer->status === 'pending_payment')
-                    <h3 style="margin-top: 0;"><i class="fas fa-money-bill-wave"></i> נדרש תשלום</h3>
-                    <p><strong>יש לשלם 20₪ בביט כדי להמשיך להציג את הפרופיל שלך באתר.</strong></p>
-                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                        <p style="margin: 0.5rem 0;"><strong>סכום:</strong> 20₪</p>
-                        <p style="margin: 0.5rem 0;"><strong>אמצעי תשלום:</strong> Bit בלבד</p>
-                        <p style="margin: 0.5rem 0;"><strong>מספר Bit:</strong> 0527020113</p>
-                        <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.9;">לאחר התשלום, שלח הודעה למנהל המערכת לאישור.</p>
+            @if(session('error'))
+                <div class="admin-notification admin-notification-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            <section class="admin-section">
+                <div class="admin-section-header">
+                    <div>
+                        <h1 class="admin-section-title">עריכת מאמן: {{ $trainer->full_name }}</h1>
+                        <p class="admin-section-subtitle">עדכן את פרטי המאמן</p>
                     </div>
-                @elseif($currentTrainer->status === 'blocked')
-                    <h3 style="margin-top: 0;"><i class="fas fa-ban"></i> חשבון חסום</h3>
-                    <p>החשבון שלך נחסם. אנא צור קשר עם מנהל המערכת למידע נוסף.</p>
-                @elseif($currentTrainer->status === 'active')
-                    <h3 style="margin-top: 0;"><i class="fas fa-check-circle"></i> חשבון פעיל</h3>
-                    <p>החשבון שלך פעיל והפרופיל שלך מוצג באתר.</p>
-                    @if($currentTrainer->last_payment_at)
-                        <p><strong>תאריך תשלום אחרון:</strong> {{ $currentTrainer->last_payment_at->format('d/m/Y') }}</p>
-                    @endif
-                @endif
-            </div>
-        @endif
+                </div>
 
-        <form id="edit-trainer-form">
-            <div class="form-group">
-                <label for="edit-fullName">שם מלא *</label>
-                <input type="text" id="edit-fullName" required>
-            </div>
+                <form action="{{ route('admin.trainers.update', $trainer) }}" method="POST" enctype="multipart/form-data" class="form-container">
+                    @csrf
 
-            <div class="form-group">
-                <label for="edit-age">גיל *</label>
-                <input type="number" id="edit-age" min="16" max="80" required>
-            </div>
+                    <!-- Trainer Status -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">סטטוס מאמן</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                                <span style="color: var(--text-muted);">סטטוס נוכחי: <strong style="color: var(--text-main);">{{ $trainer->status }}</strong></span>
+                                @if($trainer->status !== 'blocked')
+                                    <form action="{{ route('admin.trainers.block', $trainer) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="admin-btn admin-btn-danger" onclick="return confirm('האם אתה בטוח שברצונך לחסום את המאמן?');">
+                                            <i class="fas fa-ban"></i> חסום מאמן
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.trainers.unblock', $trainer) }}" method="POST" style="display: inline;">
+                                        @csrf
+                                        <button type="submit" class="admin-btn admin-btn-success">
+                                            <i class="fas fa-unlock"></i> שחרר מאמן
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="edit-city">עיר *</label>
-                <input type="text" id="edit-city" required>
-            </div>
+                    <!-- Subscription Plan -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">מנוי</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            <div class="form-group">
+                                <label for="subscription_plan_id">תכנית מנוי</label>
+                                <select name="subscription_plan_id" id="subscription_plan_id" class="form-control">
+                                    <option value="">ללא מנוי</option>
+                                    @foreach(\App\Models\SubscriptionPlan::all() as $plan)
+                                        <option value="{{ $plan->id }}" {{ $trainer->subscription_plan_id == $plan->id ? 'selected' : '' }}>
+                                            {{ $plan->name }} ({{ $plan->max_training_types ?? 'ללא הגבלה' }} סוגי אימונים)
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="edit-phone">טלפון *</label>
-                <input type="tel" id="edit-phone" required placeholder="050-1234567">
-            </div>
+                    <!-- Personal Details -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">פרטים אישיים</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            <div class="form-group">
+                                <label for="full_name">שם מלא *</label>
+                                <input type="text" id="full_name" name="full_name" value="{{ old('full_name', $trainer->full_name) }}" required>
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-experienceYears">שנות ניסיון *</label>
-                <input type="number" id="edit-experienceYears" min="0" max="60" required>
-            </div>
+                            <div class="form-group">
+                                <label for="city">עיר *</label>
+                                <input type="text" id="city" name="city" value="{{ old('city', $trainer->city) }}" required>
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-mainSpecialization">התמחות עיקרית *</label>
-                <input type="text" id="edit-mainSpecialization" required>
-            </div>
+                            <div class="form-group">
+                                <label for="phone">טלפון</label>
+                                <input type="tel" id="phone" name="phone" value="{{ old('phone', $trainer->phone) }}" placeholder="050-1234567">
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-pricePerSession">מחיר לאימון בודד (ש"ח) *</label>
-                <input type="number" id="edit-pricePerSession" min="0" required>
-            </div>
+                            <div class="form-group">
+                                <label for="age">גיל</label>
+                                <input type="number" id="age" name="age" min="18" max="120" value="{{ old('age', $trainer->age) }}">
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-instagram">אינסטגרם (אופציונלי)</label>
-                <input type="text" id="edit-instagram">
-            </div>
+                            <div class="form-group">
+                                <label for="experience_years">שנות ניסיון</label>
+                                <input type="number" id="experience_years" name="experience_years" min="0" max="60" value="{{ old('experience_years', $trainer->experience_years) }}">
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-tiktok">טיקטוק (אופציונלי)</label>
-                <input type="text" id="edit-tiktok">
-            </div>
+                            <div class="form-group">
+                                <label for="main_specialization">התמחות עיקרית</label>
+                                <input type="text" id="main_specialization" name="main_specialization" value="{{ old('main_specialization', $trainer->main_specialization) }}">
+                            </div>
 
-            <div class="form-group">
-                <label for="edit-bio">תיאור קצר (אופציונלי)</label>
-                <textarea id="edit-bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך."></textarea>
-            </div>
+                            <div class="form-group">
+                                <label for="price_per_session">מחיר לאימון בודד (ש"ח)</label>
+                                <input type="number" id="price_per_session" name="price_per_session" min="0" value="{{ old('price_per_session', $trainer->price_per_session) }}">
+                            </div>
+                        </div>
+                    </div>
 
-            <button type="submit" class="btn btn-primary">שמור שינויים</button>
-            <div id="edit-trainer-message" class="form-message"></div>
-        </form>
-    </main>
+                    <!-- Training Types -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">סוגי אימונים</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            @php
+                                $selectedTypes = old('training_types', $trainer->training_types ?? []);
+                            @endphp
+                            <div class="training-types-list">
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="strength_training" {{ in_array('strength_training', $selectedTypes) ? 'checked' : '' }}><span>אימוני כוח</span></label>
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="gym_basic" {{ in_array('gym_basic', $selectedTypes) ? 'checked' : '' }}><span>חדר כושר בסיסי</span></label>
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="hypertrophy" {{ in_array('hypertrophy', $selectedTypes) ? 'checked' : '' }}><span>מסת שריר</span></label>
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="weightloss" {{ in_array('weightloss', $selectedTypes) ? 'checked' : '' }}><span>חיטוב / ירידה במשקל</span></label>
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="hiit" {{ in_array('hiit', $selectedTypes) ? 'checked' : '' }}><span>אימוני HIIT</span></label>
+                                <label class="training-type-checkbox"><input type="checkbox" name="training_types[]" value="online" {{ in_array('online', $selectedTypes) ? 'checked' : '' }}><span>אימונים אונליין (זום)</span></label>
+                                <!-- Add more training types as needed -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media & Bio -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">פרטים נוספים</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            <div class="form-group">
+                                <label for="instagram">אינסטגרם</label>
+                                <input type="text" id="instagram" name="instagram" value="{{ old('instagram', $trainer->instagram) }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tiktok">טיקטוק</label>
+                                <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok', $trainer->tiktok) }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bio">תיאור קצר</label>
+                                <textarea id="bio" name="bio" rows="4">{{ old('bio', $trainer->bio) }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Images Management -->
+                    <div class="admin-trainer-card" style="margin-bottom: 2rem;">
+                        <div class="admin-trainer-card-header">
+                            <h3 style="color: var(--text-main); margin: 0;">ניהול תמונות</h3>
+                        </div>
+                        <div class="admin-trainer-card-body">
+                            @php
+                                $trainer->load('images');
+                            @endphp
+                            
+                            @if($trainer->images->count() > 0)
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                                    @foreach($trainer->images as $image)
+                                        <div style="position: relative; border: 2px solid {{ $image->is_primary ? 'var(--primary)' : 'rgba(74, 158, 255, 0.1)' }}; border-radius: 8px; padding: 0.5rem; background: rgba(30, 41, 59, 0.6);">
+                                            @php
+                                                $imageUrl = null;
+                                                if ($image->image_path) {
+                                                    try {
+                                                        $imageUrl = \Storage::url($image->image_path);
+                                                        if (!str_starts_with($imageUrl, 'http')) {
+                                                            $imageUrl = url($imageUrl);
+                                                        }
+                                                    } catch (\Exception $e) {
+                                                        $imageUrl = url('/storage/' . $image->image_path);
+                                                    }
+                                                }
+                                            @endphp
+                                            @if($imageUrl)
+                                                <img src="{{ $imageUrl }}" alt="תמונה" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;">
+                                            @endif
+                                            @if($image->is_primary)
+                                                <div style="position: absolute; top: 0.5rem; left: 0.5rem; background: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
+                                                    ראשית
+                                                </div>
+                                            @endif
+                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                                @if(!$image->is_primary)
+                                                    <form action="{{ route('admin.trainers.images.set-primary', [$trainer, $image]) }}" method="POST" style="flex: 1;">
+                                                        @csrf
+                                                        <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;">
+                                                            <i class="fas fa-star"></i> הגדר ראשית
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <form action="{{ route('admin.trainers.images.delete', [$trainer, $image]) }}" method="POST" style="flex: 1;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="admin-btn admin-btn-danger" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;" onclick="return confirm('האם אתה בטוח שברצונך למחוק את התמונה?');">
+                                                        <i class="fas fa-trash"></i> מחק
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p style="color: var(--text-muted);">אין תמונות למאמן זה</p>
+                            @endif
+
+                            <div class="form-group">
+                                <label for="new_image">הוסף תמונה חדשה</label>
+                                <input type="file" id="new_image" name="new_image" accept="image/*">
+                                <small style="color: var(--text-muted);">התמונה תתאים אוטומטית לגודל 1000x1000px</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-save"></i> שמור שינויים
+                        </button>
+                        <a href="{{ route('admin.trainers.index') }}" class="admin-btn admin-btn-secondary">
+                            <i class="fas fa-arrow-right"></i> חזור לרשימה
+                        </a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
 
     <script src="/site/script.js"></script>
     <script>
         initTheme && initTheme();
         initNavbarToggle && initNavbarToggle();
-        initEditTrainerPage && initEditTrainerPage();
     </script>
+    @include('partials.cookie-consent')
+    @include('partials.accessibility-panel')
 </body>
 </html>
-
