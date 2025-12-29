@@ -56,26 +56,29 @@ class TrainerController extends Controller
         // Get trainers by status - only approved trainers
         $trialTrainers = Trainer::where('status', 'trial')
             ->where('approved_by_admin', true)
+            ->with('profileImage')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingPaymentTrainers = Trainer::where('status', 'pending_payment')
+            ->with('profileImage')
             ->orderBy('created_at', 'desc')
             ->get();
 
         $activeTrainers = Trainer::where('status', 'active')
             ->where('approved_by_admin', true)
-            ->with('reviews')
+            ->with(['reviews', 'profileImage'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingTrainers = Trainer::where('status', 'pending')
+            ->with('profileImage')
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Get all trainers (for admin to see everything)
         $allTrainers = Trainer::orderBy('created_at', 'desc')
-            ->with('reviews')
+            ->with(['reviews', 'profileImage'])
             ->get();
 
         return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers', 'allTrainers'));

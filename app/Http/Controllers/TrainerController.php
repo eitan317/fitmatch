@@ -8,8 +8,6 @@ use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class TrainerController extends Controller
@@ -23,7 +21,7 @@ class TrainerController extends Controller
         // Only show trainers approved by admin
         $query = Trainer::whereIn('status', ['active', 'trial'])
             ->where('approved_by_admin', true)
-            ->with(['reviews', 'subscriptionPlan'])
+            ->with(['reviews', 'subscriptionPlan', 'profileImage'])
             ->orderBy('created_at', 'desc');
 
         // Filter by city - case-insensitive partial match
@@ -107,8 +105,6 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            // הסרת כל ההגבלות - כל קובץ יתקבל!
-            'profile_image' => 'nullable|file', // רק בודק שזה קובץ, לא משנה מה
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
@@ -120,139 +116,6 @@ class TrainerController extends Controller
 
         // Get owner email from authenticated user
         $ownerEmail = Auth::user()->email;
-
-        // Handle profile image upload - NO RESTRICTIONS!
-        $profileImagePath = null;
-        
-        if ($request->hasFile('profile_image')) {
-            try {
-                $file = $request->file('profile_image');
-                
-                // לא בודקים אם הקובץ תקין - כל קובץ יתקבל!
-                // רק בודקים שיש קובץ
-                if ($file && $file->getSize() > 0) {
-                    
-                    // קבל את הסיומת המקורית או השתמש ב-extension
-                    $originalExtension = $file->getClientOriginalExtension();
-                    if (empty($originalExtension)) {
-                        // אם אין סיומת, נסה לזהות לפי MIME type
-                        $mimeType = $file->getMimeType();
-                        $extensionMap = [
-                            'image/jpeg' => 'jpg',
-                            'image/png' => 'png',
-                            'image/gif' => 'gif',
-                            'image/webp' => 'webp',
-                            'image/bmp' => 'bmp',
-                            'image/svg+xml' => 'svg',
-                        ];
-                        $originalExtension = $extensionMap[$mimeType] ?? 'jpg';
-                    }
-                    
-                    // Generate unique filename - תמיד עם סיומת
-                    $filename = time() . '_' . uniqid() . '.' . $originalExtension;
-                    
-                    // Ensure trainers directory exists with proper permissions
-                    $trainersPath = storage_path('app/public/trainers');
-                    if (!File::exists($trainersPath)) {
-                        File::makeDirectory($trainersPath, 0755, true);
-                    }
-                    
-                    // בדוק הרשאות - אם אין הרשאות, נסה לתקן
-                    if (!is_writable($trainersPath)) {
-                        @chmod($trainersPath, 0755);
-                    }
-                    
-                    // Method 1: Try move_uploaded_file - הכי אמין!
-                    $fullPath = $trainersPath . DIRECTORY_SEPARATOR . $filename;
-                    $saved = false;
-                    
-                    // נסה עם move_uploaded_file (עובד ישירות עם הקובץ שהועלה)
-                    if (function_exists('move_uploaded_file')) {
-                        $tmpPath = $file->getRealPath();
-                        if ($tmpPath && file_exists($tmpPath)) {
-                            if (@move_uploaded_file($tmpPath, $fullPath)) {
-                                $saved = true;
-                                $profileImagePath = 'trainers/' . $filename;
-                            }
-                        }
-                    }
-                    
-                    // Method 2: Fallback - use Laravel's move method
-                    if (!$saved) {
-                        try {
-                            $movedPath = $file->move($trainersPath, $filename);
-                            if ($movedPath && file_exists($fullPath)) {
-                                $saved = true;
-                                $profileImagePath = 'trainers/' . $filename;
-                            }
-                        } catch (\Exception $e) {
-                            \Log::warning('File move failed, trying storeAs', [
-                                'error' => $e->getMessage()
-                            ]);
-                        }
-                    }
-                    
-                    // Method 3: Fallback - use storeAs
-                    if (!$saved) {
-                        try {
-                            $profileImagePath = $file->storeAs('trainers', $filename, 'public');
-                            if ($profileImagePath) {
-                                $fullPath = storage_path('app/public/' . $profileImagePath);
-                                if (file_exists($fullPath)) {
-                                    $saved = true;
-                                }
-                            }
-                        } catch (\Exception $e) {
-                            \Log::warning('storeAs failed', [
-                                'error' => $e->getMessage()
-                            ]);
-                        }
-                    }
-                    
-                    // Method 4: Last resort - copy file content directly
-                    if (!$saved) {
-                        try {
-                            $fileContent = file_get_contents($file->getRealPath());
-                            if ($fileContent !== false && file_put_contents($fullPath, $fileContent) !== false) {
-                                $saved = true;
-                                $profileImagePath = 'trainers/' . $filename;
-                            }
-                        } catch (\Exception $e) {
-                            \Log::error('All file save methods failed', [
-                                'error' => $e->getMessage(),
-                                'filename' => $filename,
-                                'trainers_path' => $trainersPath,
-                            ]);
-                        }
-                    }
-                    
-                    // Verify file was saved
-                    if ($saved && file_exists($fullPath) && filesize($fullPath) > 0) {
-                        // Set proper permissions
-                        @chmod($fullPath, 0644);
-                        
-                        \Log::info('Image saved successfully - NO RESTRICTIONS', [
-                            'path' => $profileImagePath,
-                            'full_path' => $fullPath,
-                            'file_size' => filesize($fullPath),
-                            'file_type' => $file->getMimeType(),
-                            'original_name' => $file->getClientOriginalName(),
-                        ]);
-                    } else {
-                        // אם לא נשמר - לא נכשל, פשוט לא נשמור תמונה
-                        \Log::warning('Image could not be saved, continuing without image', [
-                            'filename' => $filename,
-                            'trainers_path' => $trainersPath,
-                        ]);
-                        $profileImagePath = null;
-                    }
-                }
-            } catch (\Exception $e) {
-                // לא נכשל - פשוט נמשיך בלי תמונה
-                \Log::error('Profile image upload error (non-critical): ' . $e->getMessage());
-                $profileImagePath = null;
-            }
-        }
 
         $trainerData = [
             'owner_email' => $ownerEmail,
@@ -267,7 +130,6 @@ class TrainerController extends Controller
             'instagram' => $validated['instagram'] ?? null,
             'tiktok' => $validated['tiktok'] ?? null,
             'bio' => $validated['bio'] ?? null,
-            'profile_image_path' => $profileImagePath, // הוספת נתיב התמונה
             'status' => 'pending',
             'approved_by_admin' => false,
         ];
@@ -364,7 +226,7 @@ class TrainerController extends Controller
             abort(404);
         }
 
-        $trainer->load('reviews');
+        $trainer->load(['reviews', 'profileImage']);
         $trainer->average_rating = $trainer->average_rating;
         $trainer->rating_count = $trainer->rating_count;
 

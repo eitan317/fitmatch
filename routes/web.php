@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrainerController;
+use App\Http\Controllers\TrainerImageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
@@ -167,6 +168,12 @@ Route::middleware('auth')->group(function () {
 
     // Review routes
     Route::post('/trainers/{trainer}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+    // Trainer image routes
+    Route::post('/trainers/{trainer}/images', [TrainerImageController::class, 'store'])->name('trainer-images.store');
+    Route::put('/trainers/images/{image}', [TrainerImageController::class, 'update'])->name('trainer-images.update');
+    Route::delete('/trainers/images/{image}', [TrainerImageController::class, 'destroy'])->name('trainer-images.destroy');
+    Route::post('/trainers/images/{image}/set-primary', [TrainerImageController::class, 'setPrimary'])->name('trainer-images.set-primary');
 
     // Admin review management routes
     Route::middleware('auth')->group(function () {

@@ -181,24 +181,6 @@
                         <textarea id="bio" name="bio" rows="4" placeholder="ספר קצת עליך, סגנון האימונים שלך והניסיון שלך.">{{ old('bio') }}</textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" id="profile_image" name="profile_image" accept="image/jpeg,image/png,image/jpg,image/gif,image/webp" class="file-input-hidden">
-                            <label for="profile_image" class="file-upload-btn">
-                                <i class="fas fa-camera"></i>
-                                <span>לחץ להעלאת תמונה</span>
-                            </label>
-                        </div>
-                        <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
-                            <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                        </div>
-                        <div id="imageUploadError" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--accent); border-radius: 8px; color: var(--accent); font-size: 0.85rem;"></div>
-                        <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">פורמטים מותרים: JPG, PNG, GIF, WebP (עד 20MB)</small>
-                        @if($errors->has('profile_image'))
-                            <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
-                        @endif
-                    </div>
                 </div>
             </div>
 
@@ -235,52 +217,6 @@
                 });
             }
 
-            // Image preview - NO VALIDATION!
-            // הסר את כל הבדיקות על סוג קובץ וגודל!
-            const profileImageInput = document.getElementById('profile_image');
-            if (profileImageInput) {
-                profileImageInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    const errorDiv = document.getElementById('imageUploadError');
-                    const preview = document.getElementById('imagePreview');
-                    const img = document.getElementById('previewImg');
-                    
-                    if (errorDiv) {
-                        errorDiv.style.display = 'none';
-                        errorDiv.textContent = '';
-                    }
-                    
-                    if (file) {
-                        // לא בודקים כלום - כל קובץ יתקבל!
-                        // רק מציגים תצוגה מקדימה אם אפשר
-                        if (preview && img) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                img.src = e.target.result;
-                                preview.style.display = 'block';
-                            };
-                            // נסה לקרוא - אם זה לא תמונה, פשוט לא נציג תצוגה מקדימה
-                            try {
-                                reader.readAsDataURL(file);
-                            } catch (err) {
-                                // לא משנה - נמשיך
-                            }
-                        }
-                    } else {
-                        if (preview) preview.style.display = 'none';
-                    }
-                });
-                
-                // Add click event to label for better mobile support
-                const fileUploadBtn = document.querySelector('.file-upload-btn');
-                if (fileUploadBtn) {
-                    fileUploadBtn.addEventListener('click', function(e) {
-                        // Prevent double trigger
-                        e.preventDefault();
-                        profileImageInput.click();
-                    });
-                }
-            }
 
             // Form submission validation
             const form = document.getElementById('trainerRegistrationForm');

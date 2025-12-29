@@ -126,16 +126,16 @@ use Illuminate\Support\Facades\Storage;
                     <div class="trainer-card-image">
                         @php
                             $imageUrl = null;
-                            if ($trainer->profile_image_path) {
-                                $fullPath = storage_path('app/public/' . $trainer->profile_image_path);
+                            $profileImage = $trainer->profileImage;
+                            if ($profileImage && $profileImage->image_path) {
+                                $fullPath = storage_path('app/public/' . $profileImage->image_path);
                                 if (file_exists($fullPath) && is_file($fullPath) && filesize($fullPath) > 0) {
-                                    // Use direct storage route
-                                    $imageUrl = url('/storage/' . $trainer->profile_image_path);
+                                    $imageUrl = url('/storage/' . $profileImage->image_path);
                                 }
                             }
                         @endphp
                         @if($imageUrl)
-                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex'; console.error('Failed to load image:', '{{ $imageUrl }}');">
+                            <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-avatar-img" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="trainer-avatar" style="display: none;">{{ substr($trainer->full_name, 0, 1) }}</div>
                         @else
                             <div class="trainer-avatar">{{ substr($trainer->full_name, 0, 1) }}</div>

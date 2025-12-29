@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Trainer extends Model
 {
@@ -23,7 +24,6 @@ class Trainer extends Model
         'instagram',
         'tiktok',
         'bio',
-        'profile_image_path',
         'status',
         'subscription_plan_id',
         'subscription_status',
@@ -79,6 +79,29 @@ class Trainer extends Model
             ->where('expires_at', '>', now())
             ->latest()
             ->first();
+    }
+
+    /**
+     * Get all images for this trainer.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(TrainerImage::class);
+    }
+
+    /**
+     * Get the primary profile image for this trainer.
+     * Returns the primary image if exists, otherwise the first profile image.
+     */
+    public function profileImage()
+    {
+        return $this->hasOne(TrainerImage::class)
+            ->where(function($query) {
+                $query->where('is_primary', true)
+                    ->orWhere('image_type', 'profile');
+            })
+            ->orderByRaw('CASE WHEN is_primary = 1 THEN 0 ELSE 1 END')
+            ->orderBy('created_at', 'asc');
     }
 
     /**
