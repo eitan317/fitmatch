@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Trainer;
 use App\Models\TrainerImage;
 use App\Models\SubscriptionPlan;
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -305,55 +306,20 @@ class TrainerController extends Controller
                     }
                     
                     $filename = time() . '_' . uniqid() . '.' . $originalExtension;
-                    $imagePath = $file->storeAs('trainer-images', $filename, 'public');
-                    $fullPath = storage_path('app/public/' . $imagePath);
                     
-                    if ($imagePath && file_exists($fullPath)) {
-                        // Resize image if Intervention Image is available
-                        if (class_exists(\Intervention\Image\ImageManager::class)) {
-                            try {
-                                // Try to create ImageManager with available driver
-                                $manager = null;
-                                
-                                // Try Imagick first (usually more reliable on servers)
-                                if (extension_loaded('imagick') && class_exists('Imagick')) {
-                                    try {
-                                        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Imagick\Driver());
-                                    } catch (\Exception $e) {
-                                        \Log::warning('Imagick driver failed, trying GD: ' . $e->getMessage());
-                                    }
-                                }
-                                
-                                // Fallback to GD if Imagick not available
-                                if (!$manager && extension_loaded('gd')) {
-                                    try {
-                                        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                                    } catch (\Exception $e) {
-                                        \Log::warning('GD driver failed: ' . $e->getMessage());
-                                    }
-                                }
-                                
-                                // Only resize if we have a working manager
-                                if ($manager) {
-                                    $image = $manager->read($fullPath);
-                                    $image->scale(width: 1000, height: 1000);
-                                    $image->save($fullPath, quality: 90);
-                                    
-                                    // Create thumbnail
-                                    $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
-                                    if (!File::exists($thumbnailDir)) {
-                                        File::makeDirectory($thumbnailDir, 0755, true);
-                                    }
-                                    $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
-                                    $thumbnail = $manager->read($fullPath);
-                                    $thumbnail->cover(200, 200);
-                                    $thumbnail->save($thumbnailPath, quality: 85);
-                                } else {
-                                    \Log::warning('No image driver available (GD or Imagick). Image saved without resizing.');
-                                }
-                            } catch (\Exception $e) {
-                                \Log::warning('Error resizing image in admin update: ' . $e->getMessage());
-                            }
+                    // Use 'public' disk (which can be configured as S3 or local)
+                    $disk = 'public';
+                    
+                    // Save file to storage (works with both local and S3)
+                    $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+                    
+                    if ($imagePath && Storage::disk($disk)->exists($imagePath)) {
+                        // Process image (resize and create thumbnail) - works with both local and S3
+                        try {
+                            ImageHelper::processImage($imagePath, $disk);
+                        } catch (\Exception $e) {
+                            \Log::warning('Error processing image in admin update: ' . $e->getMessage());
+                            // Continue even if processing fails - image is already saved
                         }
                         
                         TrainerImage::create([
@@ -426,15 +392,20 @@ class TrainerController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        // Delete the image file
+        // Use 'public' disk (which can be configured as S3 or local)
+        $disk = 'public';
+        
+        // Delete the image file (works with both local and S3)
         try {
-            if ($image->image_path && Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+            if ($image->image_path && Storage::disk($disk)->exists($image->image_path)) {
+                Storage::disk($disk)->delete($image->image_path);
             }
 
             // Delete thumbnail if exists
-            if ($image->thumbnail_path && Storage::disk('public')->exists($image->thumbnail_path)) {
-                Storage::disk('public')->delete($image->thumbnail_path);
+            $filename = basename($image->image_path);
+            $thumbnailPath = 'trainer-images/thumbnails/' . $filename;
+            if (Storage::disk($disk)->exists($thumbnailPath)) {
+                Storage::disk($disk)->delete($thumbnailPath);
             }
         } catch (\Exception $e) {
             \Log::warning('Error deleting image file: ' . $e->getMessage());

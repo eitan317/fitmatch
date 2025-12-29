@@ -113,82 +113,41 @@
                     <span>או</span>
                 </div>
 
-                <!-- Register Form - Multi Step -->
-                <div id="register-container">
-                    <!-- Step 1: Email Verification -->
-                    <div id="register-step-1" class="register-step">
-                        <h3 style="margin-bottom: 1rem; color: var(--text-main);">אימות אימייל</h3>
-                        <div class="form-group">
-                            <label for="register-email">דוא"ל:</label>
-                            <input type="email" id="register-email" name="email" class="form-control" value="{{ old('email') }}" required>
-                            <small class="form-text" style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
-                                נשלח קוד אימות לאימייל שלך
-                            </small>
-                            <div id="email-error" class="form-error" style="display: none; margin-top: 0.5rem;"></div>
-                        </div>
-                        <button type="button" id="send-code-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
-                            <span id="send-code-text">שלח קוד אימות</span>
-                            <span id="send-code-loading" style="display: none;">שולח...</span>
-                        </button>
+                <!-- Register Form -->
+                <form method="POST" action="{{ route('register') }}" id="register-form">
+                    @csrf
+
+                    <div class="form-group">
+                        <label for="register-name">שם מלא:</label>
+                        <input type="text" id="register-name" name="name" class="form-control" value="{{ old('name') }}" required autofocus>
+                        @error('name')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
-                    <!-- Step 2: Code Verification -->
-                    <div id="register-step-2" class="register-step" style="display: none;">
-                        <h3 style="margin-bottom: 1rem; color: var(--text-main);">הזן קוד אימות</h3>
-                        <div class="form-group">
-                            <label for="verification-code">קוד אימות (6 ספרות):</label>
-                            <input type="text" id="verification-code" name="code" class="form-control" maxlength="6" pattern="[0-9]{6}" required style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-family: monospace;">
-                            <small class="form-text" style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
-                                הקוד נשלח ל: <span id="verified-email-display"></span>
-                            </small>
-                            <div id="code-error" class="form-error" style="display: none; margin-top: 0.5rem;"></div>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                            <button type="button" id="verify-code-btn" class="btn btn-primary" style="flex: 1;">
-                                <span id="verify-code-text">אמת קוד</span>
-                                <span id="verify-code-loading" style="display: none;">בודק...</span>
-                            </button>
-                            <button type="button" id="resend-code-btn" class="btn btn-secondary" style="flex: 1;">
-                                שלח קוד חדש
-                            </button>
-                        </div>
-                        <button type="button" id="back-to-email-btn" class="btn btn-link" style="width: 100%; margin-top: 0.5rem; color: var(--text-muted);">
-                            חזור לשלב הקודם
-                        </button>
+                    <div class="form-group">
+                        <label for="register-email">דוא"ל:</label>
+                        <input type="email" id="register-email" name="email" class="form-control" value="{{ old('email') }}" required>
+                        @error('email')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
 
-                    <!-- Step 3: Registration Form -->
-                    <div id="register-step-3" class="register-step" style="display: none;">
-                        <h3 style="margin-bottom: 1rem; color: var(--text-main);">השלם את ההרשמה</h3>
-                        <form method="POST" action="{{ route('register') }}" id="register-form">
-                            @csrf
-                            <input type="hidden" id="register-email-final" name="email" value="">
-
-                            <div class="form-group">
-                                <label for="register-name">שם מלא:</label>
-                                <input type="text" id="register-name" name="name" class="form-control" value="{{ old('name') }}" required autofocus>
-                                @error('name')
-                                    <span class="form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="register-password">סיסמה:</label>
-                                <input type="password" id="register-password" name="password" class="form-control" required>
-                                @error('password')
-                                    <span class="form-error">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password_confirmation">אימות סיסמה:</label>
-                                <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">הרשמה</button>
-                        </form>
+                    <div class="form-group">
+                        <label for="register-password">סיסמה:</label>
+                        <input type="password" id="register-password" name="password" class="form-control" required>
+                        @error('password')
+                            <span class="form-error">{{ $message }}</span>
+                        @enderror
                     </div>
-                </div>
+
+                    <div class="form-group">
+                        <label for="password_confirmation">אימות סיסמה:</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">הרשמה</button>
+                </form>
                 
                 <div class="auth-links">
                     <a href="{{ route('trainers.create') }}">הרשמה כמאמן</a>
@@ -202,180 +161,6 @@
         // Initialize theme and navbar
         if (typeof initTheme === 'function') initTheme();
         if (typeof initNavbarToggle === 'function') initNavbarToggle();
-
-        // Email Verification Flow
-        (function() {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
-                             document.querySelector('input[name="_token"]')?.value;
-            
-            let currentEmail = '';
-
-            // Step 1: Send Code
-            const sendCodeBtn = document.getElementById('send-code-btn');
-            const registerEmailInput = document.getElementById('register-email');
-            const emailError = document.getElementById('email-error');
-
-            if (sendCodeBtn && registerEmailInput) {
-                sendCodeBtn.addEventListener('click', async function() {
-                    const email = registerEmailInput.value.trim().toLowerCase();
-                    
-                    if (!email || !email.includes('@')) {
-                        emailError.textContent = 'אנא הזן אימייל תקין';
-                        emailError.style.display = 'block';
-                        return;
-                    }
-
-                    emailError.style.display = 'none';
-                    sendCodeBtn.disabled = true;
-                    document.getElementById('send-code-text').style.display = 'none';
-                    document.getElementById('send-code-loading').style.display = 'inline';
-
-                    try {
-                        const response = await fetch('/verify-email/check', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ email })
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            currentEmail = email;
-                            document.getElementById('register-step-1').style.display = 'none';
-                            document.getElementById('register-step-2').style.display = 'block';
-                            document.getElementById('verified-email-display').textContent = email;
-                            document.getElementById('verification-code').focus();
-                        } else {
-                            emailError.textContent = data.message || 'שגיאה בשליחת הקוד';
-                            emailError.style.display = 'block';
-                        }
-                    } catch (error) {
-                        emailError.textContent = 'שגיאה בחיבור לשרת';
-                        emailError.style.display = 'block';
-                    } finally {
-                        sendCodeBtn.disabled = false;
-                        document.getElementById('send-code-text').style.display = 'inline';
-                        document.getElementById('send-code-loading').style.display = 'none';
-                    }
-                });
-            }
-
-            // Step 2: Verify Code
-            const verifyCodeBtn = document.getElementById('verify-code-btn');
-            const verificationCodeInput = document.getElementById('verification-code');
-            const codeError = document.getElementById('code-error');
-            const resendCodeBtn = document.getElementById('resend-code-btn');
-            const backToEmailBtn = document.getElementById('back-to-email-btn');
-
-            if (verificationCodeInput) {
-                // Auto-format code input (numbers only)
-                verificationCodeInput.addEventListener('input', function(e) {
-                    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
-                });
-            }
-
-            if (verifyCodeBtn && verificationCodeInput) {
-                verifyCodeBtn.addEventListener('click', async function() {
-                    const code = verificationCodeInput.value.trim();
-                    
-                    if (code.length !== 6) {
-                        codeError.textContent = 'אנא הזן קוד של 6 ספרות';
-                        codeError.style.display = 'block';
-                        return;
-                    }
-
-                    codeError.style.display = 'none';
-                    verifyCodeBtn.disabled = true;
-                    document.getElementById('verify-code-text').style.display = 'none';
-                    document.getElementById('verify-code-loading').style.display = 'inline';
-
-                    try {
-                        const response = await fetch('/verify-email/verify', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ 
-                                email: currentEmail,
-                                code: code
-                            })
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            document.getElementById('register-step-2').style.display = 'none';
-                            document.getElementById('register-step-3').style.display = 'block';
-                            document.getElementById('register-email-final').value = currentEmail;
-                            document.getElementById('register-name').focus();
-                        } else {
-                            codeError.textContent = data.message || 'קוד שגוי';
-                            codeError.style.display = 'block';
-                        }
-                    } catch (error) {
-                        codeError.textContent = 'שגיאה בחיבור לשרת';
-                        codeError.style.display = 'block';
-                    } finally {
-                        verifyCodeBtn.disabled = false;
-                        document.getElementById('verify-code-text').style.display = 'inline';
-                        document.getElementById('verify-code-loading').style.display = 'none';
-                    }
-                });
-            }
-
-            // Resend Code
-            if (resendCodeBtn) {
-                resendCodeBtn.addEventListener('click', async function() {
-                    if (!currentEmail) return;
-
-                    resendCodeBtn.disabled = true;
-                    resendCodeBtn.textContent = 'שולח...';
-
-                    try {
-                        const response = await fetch('/verify-email/resend', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': csrfToken,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ email: currentEmail })
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            alert('קוד חדש נשלח לאימייל שלך');
-                            verificationCodeInput.value = '';
-                            verificationCodeInput.focus();
-                        } else {
-                            alert(data.message || 'שגיאה בשליחת הקוד');
-                        }
-                    } catch (error) {
-                        alert('שגיאה בחיבור לשרת');
-                    } finally {
-                        resendCodeBtn.disabled = false;
-                        resendCodeBtn.textContent = 'שלח קוד חדש';
-                    }
-                });
-            }
-
-            // Back to Email Step
-            if (backToEmailBtn) {
-                backToEmailBtn.addEventListener('click', function() {
-                    document.getElementById('register-step-2').style.display = 'none';
-                    document.getElementById('register-step-1').style.display = 'block';
-                    verificationCodeInput.value = '';
-                    codeError.style.display = 'none';
-                });
-            }
-        })();
 
         // Tab Management
         (function() {

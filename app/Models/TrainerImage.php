@@ -40,7 +40,9 @@ class TrainerImage extends Model
         $filename = basename($this->image_path);
         $thumbnailPath = 'trainer-images/thumbnails/' . $filename;
         
-        if (file_exists(storage_path('app/public/' . $thumbnailPath))) {
+        // Check if thumbnail exists in storage (works with both local and S3)
+        // Use 'public' disk (which can be configured as S3 or local)
+        if (\Storage::disk('public')->exists($thumbnailPath)) {
             return $thumbnailPath;
         }
         
