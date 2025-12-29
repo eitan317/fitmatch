@@ -35,13 +35,39 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $email = strtolower($request->email);
+
+        // Check if email was verified in session
+        $verifiedEmail = session('email_verified');
+        $verifiedAt = session('email_verified_at');
+
+        if (!$verifiedEmail || $verifiedEmail !== $email) {
+            return redirect()->back()
+                ->withErrors(['email' => 'יש לאמת את האימייל לפני ההרשמה.'])
+                ->withInput();
+        }
+
+        // Check if verification is not too old (max 30 minutes)
+        if ($verifiedAt) {
+            $verifiedTime = \Carbon\Carbon::parse($verifiedAt);
+            if ($verifiedTime->diffInMinutes(now()) > 30) {
+                return redirect()->back()
+                    ->withErrors(['email' => 'אימות האימייל פג תוקף. אנא אמת את האימייל שוב.'])
+                    ->withInput();
+            }
+        }
+
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $email,
             'password' => Hash::make($request->password),
+            'email_verified_at' => now(), // Mark as verified since we verified via OTP
         ]);
 
         event(new Registered($user));
+
+        // Clear verification session
+        session()->forget(['email_verified', 'email_verified_at']);
 
         Auth::login($user);
 

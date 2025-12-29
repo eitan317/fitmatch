@@ -66,5 +66,25 @@ class TrainerImage extends Model
             return url('/storage/' . $this->thumbnail_path);
         }
     }
+
+    /**
+     * Get the full URL for the image.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) {
+            return null;
+        }
+        
+        try {
+            $url = \Storage::url($this->image_path);
+            if (!str_starts_with($url, 'http')) {
+                $url = url($url);
+            }
+            return $url;
+        } catch (\Exception $e) {
+            return url('/storage/' . $this->image_path);
+        }
+    }
 }
 

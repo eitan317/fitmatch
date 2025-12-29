@@ -207,21 +207,8 @@ use Illuminate\Support\Facades\Storage;
                             <div class="admin-trainer-identity">
                                 <div class="admin-trainer-avatar">
                                     @php
-                                        $imageUrl = null;
                                         $profileImage = $trainer->profileImage;
-                                        if ($profileImage && $profileImage->image_path) {
-                                            // Try Storage::url first, fallback to direct URL
-                                            try {
-                                                $imageUrl = \Storage::url($profileImage->image_path);
-                                                // If Storage::url returns relative path, make it absolute
-                                                if (!str_starts_with($imageUrl, 'http')) {
-                                                    $imageUrl = url($imageUrl);
-                                                }
-                                            } catch (\Exception $e) {
-                                                // Fallback to direct URL
-                                                $imageUrl = url('/storage/' . $profileImage->image_path);
-                                            }
-                                        }
+                                        $imageUrl = $profileImage ? $profileImage->image_url : null;
                                     @endphp
                                     @if($imageUrl)
                                         <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -442,11 +429,8 @@ use Illuminate\Support\Facades\Storage;
                                 <div class="admin-trainer-identity">
                                     <div class="admin-trainer-avatar admin-trainer-avatar-small">
                                         @php
-                                            $imageUrl = null;
                                             $profileImage = $trainer->profileImage;
-                                            if ($profileImage && $profileImage->image_path) {
-                                                $imageUrl = \Storage::url($profileImage->image_path);
-                                            }
+                                            $imageUrl = $profileImage ? $profileImage->image_url : null;
                                         @endphp
                                         @if($imageUrl)
                                             <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -563,11 +547,8 @@ use Illuminate\Support\Facades\Storage;
                                 <div class="admin-trainer-identity">
                                     <div class="admin-trainer-avatar">
                                         @php
-                                            $imageUrl = null;
                                             $profileImage = $trainer->profileImage;
-                                            if ($profileImage && $profileImage->image_path) {
-                                                $imageUrl = \Storage::url($profileImage->image_path);
-                                            }
+                                            $imageUrl = $profileImage ? $profileImage->image_url : null;
                                         @endphp
                                         @if($imageUrl)
                                             <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">

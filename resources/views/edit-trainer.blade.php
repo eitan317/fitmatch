@@ -204,17 +204,8 @@ use Illuminate\Support\Facades\Storage;
                                     @foreach($trainer->images as $image)
                                         <div style="position: relative; border: 2px solid {{ $image->is_primary ? 'var(--primary)' : 'rgba(74, 158, 255, 0.1)' }}; border-radius: 8px; padding: 0.5rem; background: rgba(30, 41, 59, 0.6);">
                                             @php
-                                                $imageUrl = null;
-                                                if ($image->image_path) {
-                                                    try {
-                                                        $imageUrl = \Storage::url($image->image_path);
-                                                        if (!str_starts_with($imageUrl, 'http')) {
-                                                            $imageUrl = url($imageUrl);
-                                                        }
-                                                    } catch (\Exception $e) {
-                                                        $imageUrl = url('/storage/' . $image->image_path);
-                                                    }
-                                                }
+                                                // Use the accessor from TrainerImage model
+                                                $imageUrl = $image->image_url;
                                             @endphp
                                             @if($imageUrl)
                                                 <img src="{{ $imageUrl }}" alt="תמונה" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;">
