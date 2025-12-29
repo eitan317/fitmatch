@@ -59,12 +59,17 @@ class TrainerImage extends Model
         }
         
         try {
-            $url = \Storage::url($this->thumbnail_path);
+            // Use 'public' disk (works with both S3 and local)
+            $url = \Storage::disk('public')->url($this->thumbnail_path);
+            
+            // If URL doesn't start with http, make it absolute
             if (!str_starts_with($url, 'http')) {
                 $url = url($url);
             }
+            
             return $url;
         } catch (\Exception $e) {
+            // Fallback: try direct URL
             return url('/storage/' . $this->thumbnail_path);
         }
     }
@@ -79,12 +84,28 @@ class TrainerImage extends Model
         }
         
         try {
-            $url = \Storage::url($this->image_path);
+            // Use 'public' disk (works with both S3 and local)
+            $disk = \Storage::disk('public');
+            $url = $disk->url($this->image_path);
+            
+            // For S3, the URL should already be absolute (starts with http/https)
+            // For local storage, it might be relative, so make it absolute
             if (!str_starts_with($url, 'http')) {
-                $url = url($url);
+                // Check if it's a relative path (starts with /storage)
+                if (str_starts_with($url, '/storage')) {
+                    $url = url($url);
+                } else {
+                    // If it doesn't start with /, add /storage/ prefix
+                    $url = url('/storage/' . ltrim($url, '/'));
+                }
             }
+            
             return $url;
         } catch (\Exception $e) {
+            // Fallback: try direct URL
+            \Log::warning('Error generating image URL: ' . $e->getMessage(), [
+                'image_path' => $this->image_path,
+            ]);
             return url('/storage/' . $this->image_path);
         }
     }
