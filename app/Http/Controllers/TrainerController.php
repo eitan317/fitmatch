@@ -145,9 +145,22 @@ class TrainerController extends Controller
 
         // Handle profile image upload if provided
         if ($request->hasFile('profile_image')) {
+            \Log::info('=== TRAINER IMAGE UPLOAD START ===');
+            \Log::info('File detected in request', [
+                'has_file' => $request->hasFile('profile_image'),
+                'file_name' => $request->file('profile_image')->getClientOriginalName(),
+                'file_size' => $request->file('profile_image')->getSize(),
+            ]);
+            
             $file = $request->file('profile_image');
             
             if ($file && $file->getSize() > 0) {
+                \Log::info('File is valid', [
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'extension' => $file->getClientOriginalExtension(),
+                ]);
+                
                 try {
                     $originalExtension = $file->getClientOriginalExtension();
                     if (empty($originalExtension)) {
@@ -164,17 +177,49 @@ class TrainerController extends Controller
                     }
                     
                     $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                    \Log::info('Attempting to save file', [
+                        'filename' => $filename,
+                        'disk' => 'public',
+                    ]);
+                    
                     $imagePath = $file->storeAs('trainer-images', $filename, 'public');
                     
+                    \Log::info('File save result', [
+                        'image_path' => $imagePath,
+                        'success' => (bool)$imagePath,
+                    ]);
+                    
                     if ($imagePath) {
+                        \Log::info('Updating trainer with image path', [
+                            'trainer_id' => $trainer->id,
+                            'image_path' => $imagePath,
+                        ]);
+                        
                         $trainer->profile_image_path = $imagePath;
                         $trainer->save();
+                        
+                        \Log::info('Trainer updated successfully', [
+                            'trainer_id' => $trainer->id,
+                            'profile_image_path' => $trainer->profile_image_path,
+                        ]);
+                    } else {
+                        \Log::error('File save returned empty path!');
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading profile image during registration: ' . $e->getMessage());
+                    \Log::error('Error uploading profile image', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
                     // Continue without image - don't fail registration
                 }
+            } else {
+                \Log::warning('File is empty or invalid', [
+                    'file_exists' => (bool)$file,
+                    'file_size' => $file ? $file->getSize() : 0,
+                ]);
             }
+        } else {
+            \Log::info('No profile_image file in request');
         }
 
         // Redirect to welcome page
