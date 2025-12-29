@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\TrainerDashboardController;
 use App\Http\Controllers\TrainerImageController;
+use App\Http\Controllers\TrainerLikeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
@@ -161,6 +162,8 @@ Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name('tra
 
 // Protected routes - require authentication
 Route::middleware('auth')->group(function () {
+    // Trainer like route
+    Route::post('/trainers/{trainer}/like', [TrainerLikeController::class, 'toggle'])->name('trainers.like');
     // Trainer registration and management routes
     Route::get('/register-trainer', [TrainerController::class, 'create'])->name('trainers.create');
     Route::post('/register-trainer', [TrainerController::class, 'store'])->name('trainers.store');

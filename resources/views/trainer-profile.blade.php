@@ -70,6 +70,22 @@ use Illuminate\Support\Facades\Storage;
                                 <p class="rating-text">{{ number_format($trainer->average_rating, 1) }} ({{ $trainer->rating_count }} ביקורות)</p>
                             </div>
                         @endif
+                        
+                        <!-- Like Button -->
+                        <div class="trainer-like-section" style="margin-top: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                            @auth
+                                <button id="likeBtn" class="like-btn {{ $isLiked ?? false ? 'liked' : '' }}" data-trainer-id="{{ $trainer->id }}" style="background: none; border: 2px solid var(--primary); border-radius: 50px; padding: 0.5rem 1rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s ease; color: var(--text-main);">
+                                    <i class="fas fa-heart" style="font-size: 1.2rem; {{ $isLiked ?? false ? 'color: #e74c3c;' : 'color: var(--primary);' }}"></i>
+                                    <span id="likeCount" style="font-weight: 600;">{{ $trainer->likes_count ?? 0 }}</span>
+                                </button>
+                            @else
+                                <div class="like-btn-disabled" style="background: rgba(74, 158, 255, 0.1); border: 2px solid var(--primary); border-radius: 50px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted);">
+                                    <i class="fas fa-heart" style="font-size: 1.2rem; color: var(--primary);"></i>
+                                    <span style="font-weight: 600;">{{ $trainer->likes_count ?? 0 }}</span>
+                                    <small style="font-size: 0.8rem; margin-right: 0.5rem;">(התחבר כדי לעשות לייק)</small>
+                                </div>
+                            @endauth
+                        </div>
                         @if($trainer->price_per_session)
                             <div class="price-large">{{ number_format($trainer->price_per_session) }} ₪ לשעה</div>
                         @endif
@@ -324,6 +340,78 @@ use Illuminate\Support\Facades\Storage;
                 alert('שגיאה בעדכון הדירוג');
             });
         }
+
+        // Like button functionality
+        const likeBtn = document.getElementById('likeBtn');
+        if (likeBtn) {
+            likeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const trainerId = this.getAttribute('data-trainer-id');
+                const heartIcon = this.querySelector('i');
+                const countSpan = document.getElementById('likeCount');
+                
+                // Disable button during request
+                this.disabled = true;
+                this.style.opacity = '0.6';
+                
+                fetch(`/trainers/${trainerId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI
+                        if (data.liked) {
+                            this.classList.add('liked');
+                            heartIcon.style.color = '#e74c3c';
+                            heartIcon.style.animation = 'heartBeat 0.5s ease';
+                        } else {
+                            this.classList.remove('liked');
+                            heartIcon.style.color = 'var(--primary)';
+                        }
+                        
+                        // Update count
+                        if (countSpan) {
+                            countSpan.textContent = data.count;
+                        }
+                    } else {
+                        alert(data.message || 'שגיאה בעדכון הלייק');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('שגיאה בעדכון הלייק');
+                })
+                .finally(() => {
+                    // Re-enable button
+                    this.disabled = false;
+                    this.style.opacity = '1';
+                });
+            });
+        }
     </script>
+    <style>
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1.1); }
+            75% { transform: scale(1.2); }
+        }
+        
+        .like-btn:hover {
+            background: rgba(74, 158, 255, 0.1) !important;
+            transform: translateY(-2px);
+        }
+        
+        .like-btn.liked {
+            border-color: #e74c3c !important;
+            background: rgba(231, 76, 60, 0.1) !important;
+        }
+    </style>
 </body>
 </html>

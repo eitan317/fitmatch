@@ -60,29 +60,29 @@ class TrainerController extends Controller
         // Get trainers by status - only approved trainers
         $trialTrainers = Trainer::where('status', 'trial')
             ->where('approved_by_admin', true)
-            ->with('profileImage')
+            ->with(['profileImage', 'profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingPaymentTrainers = Trainer::where('status', 'pending_payment')
-            ->with('profileImage')
+            ->with(['profileImage', 'profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $activeTrainers = Trainer::where('status', 'active')
             ->where('approved_by_admin', true)
-            ->with(['reviews', 'profileImage'])
+            ->with(['reviews', 'profileImage', 'profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingTrainers = Trainer::where('status', 'pending')
-            ->with('profileImage')
+            ->with(['profileImage', 'profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Get all trainers (for admin to see everything)
         $allTrainers = Trainer::orderBy('created_at', 'desc')
-            ->with(['reviews', 'profileImage'])
+            ->with(['reviews', 'profileImage', 'profileViews'])
             ->get();
 
         return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers', 'allTrainers'));
@@ -312,21 +312,45 @@ class TrainerController extends Controller
                         // Resize image if Intervention Image is available
                         if (class_exists(\Intervention\Image\ImageManager::class)) {
                             try {
-                                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                                // Try to create ImageManager with available driver
+                                $manager = null;
                                 
-                                $image = $manager->read($fullPath);
-                                $image->scale(width: 1000, height: 1000);
-                                $image->save($fullPath, quality: 90);
-                                
-                                // Create thumbnail
-                                $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
-                                if (!File::exists($thumbnailDir)) {
-                                    File::makeDirectory($thumbnailDir, 0755, true);
+                                // Try Imagick first (usually more reliable on servers)
+                                if (extension_loaded('imagick') && class_exists('Imagick')) {
+                                    try {
+                                        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Imagick\Driver());
+                                    } catch (\Exception $e) {
+                                        \Log::warning('Imagick driver failed, trying GD: ' . $e->getMessage());
+                                    }
                                 }
-                                $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
-                                $thumbnail = $manager->read($fullPath);
-                                $thumbnail->cover(200, 200);
-                                $thumbnail->save($thumbnailPath, quality: 85);
+                                
+                                // Fallback to GD if Imagick not available
+                                if (!$manager && extension_loaded('gd')) {
+                                    try {
+                                        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                                    } catch (\Exception $e) {
+                                        \Log::warning('GD driver failed: ' . $e->getMessage());
+                                    }
+                                }
+                                
+                                // Only resize if we have a working manager
+                                if ($manager) {
+                                    $image = $manager->read($fullPath);
+                                    $image->scale(width: 1000, height: 1000);
+                                    $image->save($fullPath, quality: 90);
+                                    
+                                    // Create thumbnail
+                                    $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
+                                    if (!File::exists($thumbnailDir)) {
+                                        File::makeDirectory($thumbnailDir, 0755, true);
+                                    }
+                                    $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
+                                    $thumbnail = $manager->read($fullPath);
+                                    $thumbnail->cover(200, 200);
+                                    $thumbnail->save($thumbnailPath, quality: 85);
+                                } else {
+                                    \Log::warning('No image driver available (GD or Imagick). Image saved without resizing.');
+                                }
                             } catch (\Exception $e) {
                                 \Log::warning('Error resizing image in admin update: ' . $e->getMessage());
                             }

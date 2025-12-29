@@ -69,28 +69,51 @@ class TrainerImageController extends Controller
             }
 
             try {
-                // Create ImageManager instance
-                $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                // Try to create ImageManager with available driver
+                $manager = null;
                 
-                // Resize main image to max 1000x1000px
-                $image = $manager->read($fullPath);
-                $image->scale(width: 1000, height: 1000);
-                $image->save($fullPath, quality: 90);
-                
-                // Create thumbnail directory if needed
-                $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
-                if (!File::exists($thumbnailDir)) {
-                    File::makeDirectory($thumbnailDir, 0755, true);
+                // Try Imagick first (usually more reliable on servers)
+                if (extension_loaded('imagick') && class_exists('Imagick')) {
+                    try {
+                        $manager = new ImageManager(new \Intervention\Image\Drivers\Imagick\Driver());
+                    } catch (\Exception $e) {
+                        \Log::warning('Imagick driver failed, trying GD: ' . $e->getMessage());
+                    }
                 }
                 
-                // Create thumbnail 200x200px
-                $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
-                $thumbnail = $manager->read($fullPath);
-                $thumbnail->cover(200, 200);
-                $thumbnail->save($thumbnailPath, quality: 85);
+                // Fallback to GD if Imagick not available
+                if (!$manager && extension_loaded('gd')) {
+                    try {
+                        $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    } catch (\Exception $e) {
+                        \Log::warning('GD driver failed: ' . $e->getMessage());
+                    }
+                }
+                
+                // Only resize if we have a working manager
+                if ($manager) {
+                    // Resize main image to max 1000x1000px
+                    $image = $manager->read($fullPath);
+                    $image->scale(width: 1000, height: 1000);
+                    $image->save($fullPath, quality: 90);
+                    
+                    // Create thumbnail directory if needed
+                    $thumbnailDir = storage_path('app/public/trainer-images/thumbnails');
+                    if (!File::exists($thumbnailDir)) {
+                        File::makeDirectory($thumbnailDir, 0755, true);
+                    }
+                    
+                    // Create thumbnail 200x200px
+                    $thumbnailPath = storage_path('app/public/trainer-images/thumbnails/' . $filename);
+                    $thumbnail = $manager->read($fullPath);
+                    $thumbnail->cover(200, 200);
+                    $thumbnail->save($thumbnailPath, quality: 85);
+                } else {
+                    \Log::warning('No image driver available (GD or Imagick). Image saved without resizing.');
+                }
             } catch (\Exception $e) {
                 \Log::warning('Error resizing image: ' . $e->getMessage());
-                // Continue even if resize fails
+                // Continue even if resize fails - image is already saved
             }
 
             // If this is set as primary, remove primary from other images

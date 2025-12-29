@@ -142,6 +142,36 @@ class Trainer extends Model
     }
 
     /**
+     * Get all likes for this trainer.
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(TrainerLike::class);
+    }
+
+    /**
+     * Check if a user has liked this trainer.
+     */
+    public function likedBy($user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        return $this->likes()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * Get total likes count for this trainer.
+     */
+    public function getLikesCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
+
+    /**
      * Get the average rating for the trainer.
      */
     public function getAverageRatingAttribute(): ?float

@@ -499,6 +499,18 @@ use Illuminate\Support\Facades\Storage;
                                             <span>{{ number_format($trainer->average_rating, 1) }} ({{ $trainer->reviews->count() }} ביקורות)</span>
                                         </div>
                                     @endif
+                                    <div class="admin-quick-info-item" style="color: var(--primary);">
+                                        <i class="fas fa-eye"></i>
+                                        <span>
+                                            <strong>{{ $trainer->total_views ?? 0 }}</strong> צפיות
+                                            @if(($trainer->views_today ?? 0) > 0)
+                                                <span style="color: var(--text-muted);">({{ $trainer->views_today }} היום)</span>
+                                            @endif
+                                            @if(($trainer->views_this_month ?? 0) > 0)
+                                                <span style="color: var(--text-muted);">({{ $trainer->views_this_month }} החודש)</span>
+                                            @endif
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -579,6 +591,13 @@ use Illuminate\Support\Facades\Storage;
                                                 <i class="fas fa-calendar"></i>
                                                 {{ $trainer->created_at->format('d/m/Y') }}
                                             </span>
+                                            <span class="admin-trainer-views" style="color: var(--primary); font-weight: 600;">
+                                                <i class="fas fa-eye"></i>
+                                                {{ $trainer->total_views ?? 0 }} צפיות
+                                                @if(($trainer->views_today ?? 0) > 0)
+                                                    <span style="color: var(--text-muted); font-size: 0.85rem;">({{ $trainer->views_today }} היום)</span>
+                                                @endif
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -637,6 +656,18 @@ use Illuminate\Support\Facades\Storage;
                                             <span>{{ number_format($trainer->price_per_session) }} ₪</span>
                                         </div>
                                     @endif
+                                    <div class="admin-quick-info-item" style="color: var(--primary);">
+                                        <i class="fas fa-eye"></i>
+                                        <span>
+                                            <strong>{{ $trainer->total_views ?? 0 }}</strong> צפיות
+                                            @if(($trainer->views_today ?? 0) > 0)
+                                                <span style="color: var(--text-muted);">({{ $trainer->views_today }} היום)</span>
+                                            @endif
+                                            @if(($trainer->views_this_month ?? 0) > 0)
+                                                <span style="color: var(--text-muted);">({{ $trainer->views_this_month }} החודש)</span>
+                                            @endif
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
