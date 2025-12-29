@@ -15,7 +15,7 @@ class TrainerDashboardController extends Controller
     public function index()
     {
         $trainer = Trainer::where('owner_email', Auth::user()->email)
-            ->with(['reviews', 'profileImage', 'profileViews'])
+            ->with(['reviews', 'profileViews'])
             ->firstOrFail();
 
         // Calculate statistics
@@ -101,7 +101,6 @@ class TrainerDashboardController extends Controller
     public function editProfile()
     {
         $trainer = Trainer::where('owner_email', Auth::user()->email)
-            ->with(['images', 'profileImage'])
             ->firstOrFail();
 
         return view('trainer-edit-profile', compact('trainer'));

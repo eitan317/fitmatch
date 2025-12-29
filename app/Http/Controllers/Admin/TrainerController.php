@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Trainer;
-use App\Models\TrainerImage;
 use App\Models\SubscriptionPlan;
-use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -61,29 +59,29 @@ class TrainerController extends Controller
         // Get trainers by status - only approved trainers
         $trialTrainers = Trainer::where('status', 'trial')
             ->where('approved_by_admin', true)
-            ->with(['profileImage', 'profileViews'])
+            ->with(['profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingPaymentTrainers = Trainer::where('status', 'pending_payment')
-            ->with(['profileImage', 'profileViews'])
+            ->with(['profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $activeTrainers = Trainer::where('status', 'active')
             ->where('approved_by_admin', true)
-            ->with(['reviews', 'profileImage', 'profileViews'])
+            ->with(['reviews', 'profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $pendingTrainers = Trainer::where('status', 'pending')
-            ->with(['profileImage', 'profileViews'])
+            ->with(['profileViews'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Get all trainers (for admin to see everything)
         $allTrainers = Trainer::orderBy('created_at', 'desc')
-            ->with(['reviews', 'profileImage', 'profileViews'])
+            ->with(['reviews', 'profileViews'])
             ->get();
 
         return view('admin', compact('stats', 'trialTrainers', 'pendingPaymentTrainers', 'activeTrainers', 'pendingTrainers', 'allTrainers'));
@@ -289,12 +287,6 @@ class TrainerController extends Controller
 
         // Handle new image upload
         if ($request->hasFile('new_image')) {
-            \Log::info('AdminTrainerController::update - New image file detected', [
-                'trainer_id' => $trainer->id,
-                'file_name' => $request->file('new_image')->getClientOriginalName(),
-                'file_size' => $request->file('new_image')->getSize(),
-            ]);
-            
             $file = $request->file('new_image');
             if ($file && $file->getSize() > 0) {
                 try {
@@ -312,125 +304,16 @@ class TrainerController extends Controller
                     }
                     
                     $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                    $imagePath = $file->storeAs('trainer-images', $filename, 'public');
                     
-                    // Use 'public' disk (which can be configured as S3 or local)
-                    $disk = 'public';
-                    
-                    \Log::info('AdminTrainerController::update - Saving file to storage', [
-                        'trainer_id' => $trainer->id,
-                        'filename' => $filename,
-                        'disk' => $disk,
-                    ]);
-                    
-                    // Save file to storage (works with both local and S3)
-                    try {
-                        $imagePath = $file->storeAs('trainer-images', $filename, $disk);
-                    } catch (\Exception $storageException) {
-                        \Log::error('AdminTrainerController::update - Failed to save file to storage', [
-                            'trainer_id' => $trainer->id,
-                            'filename' => $filename,
-                            'disk' => $disk,
-                            'error' => $storageException->getMessage(),
-                            'trace' => $storageException->getTraceAsString(),
-                        ]);
-                        throw $storageException; // Re-throw to be caught by outer catch
-                    }
-                    
-                    \Log::info('AdminTrainerController::update - File saved', [
-                        'trainer_id' => $trainer->id,
-                        'image_path' => $imagePath,
-                        'file_exists' => $imagePath ? Storage::disk($disk)->exists($imagePath) : false,
-                    ]);
-                    
-                    // Check if file was saved successfully
                     if ($imagePath) {
-                        // Try to verify file exists, but don't fail if check fails (S3 might have issues)
-                        $fileExists = false;
-                        try {
-                            $fileExists = Storage::disk($disk)->exists($imagePath);
-                        } catch (\Exception $checkException) {
-                            \Log::warning('AdminTrainerController::update - Could not verify file existence', [
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                                'error' => $checkException->getMessage(),
-                            ]);
-                            // Continue anyway - assume file was saved if we got a path
-                            $fileExists = true;
-                        }
-                        
-                        if ($fileExists) {
-                        // Process image (resize and create thumbnail) - works with both local and S3
-                        try {
-                            ImageHelper::processImage($imagePath, $disk);
-                            \Log::info('AdminTrainerController::update - Image processed successfully', [
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                            ]);
-                        } catch (\Exception $e) {
-                            \Log::warning('Error processing image in admin update: ' . $e->getMessage(), [
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                                'error' => $e->getMessage(),
-                            ]);
-                            // Continue even if processing fails - image is already saved
-                        }
-                        
-                        \Log::info('AdminTrainerController::update - Creating TrainerImage record', [
-                            'trainer_id' => $trainer->id,
-                            'image_path' => $imagePath,
-                        ]);
-                        
-                        try {
-                            $trainerImage = TrainerImage::create([
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                                'image_type' => 'profile',
-                                'sort_order' => 0,
-                                'is_primary' => false,
-                            ]);
-                            
-                            \Log::info('AdminTrainerController::update - TrainerImage created successfully', [
-                                'trainer_id' => $trainer->id,
-                                'trainer_image_id' => $trainerImage->id,
-                                'image_path' => $imagePath,
-                            ]);
-                        } catch (\Exception $e) {
-                            \Log::error('AdminTrainerController::update - Failed to create TrainerImage', [
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                                'error' => $e->getMessage(),
-                                'trace' => $e->getTraceAsString(),
-                            ]);
-                            throw $e; // Re-throw to be caught by outer catch
-                        }
-                        } else {
-                            \Log::warning('AdminTrainerController::update - File path returned but file does not exist', [
-                                'trainer_id' => $trainer->id,
-                                'image_path' => $imagePath,
-                            ]);
-                        }
-                    } else {
-                        \Log::warning('AdminTrainerController::update - File not saved (no path returned)', [
-                            'trainer_id' => $trainer->id,
-                        ]);
+                        $trainer->profile_image_path = $imagePath;
+                        $trainer->save();
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading image in admin update: ' . $e->getMessage(), [
-                        'trainer_id' => $trainer->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
+                    \Log::error('Error uploading image in admin update: ' . $e->getMessage());
                 }
-            } else {
-                \Log::warning('AdminTrainerController::update - File is empty or invalid', [
-                    'trainer_id' => $trainer->id,
-                    'file_size' => $file ? $file->getSize() : 0,
-                ]);
             }
-        } else {
-            \Log::info('AdminTrainerController::update - No new image file provided', [
-                'trainer_id' => $trainer->id,
-            ]);
         }
 
         return redirect()->route('admin.trainers.index')
@@ -479,62 +362,5 @@ class TrainerController extends Controller
             ->with('success', "מנוי המאמן עודכן ל: {$planName}.");
     }
 
-    /**
-     * Delete a trainer image.
-     */
-    public function deleteImage(Trainer $trainer, TrainerImage $image)
-    {
-        // Verify the image belongs to this trainer
-        if ($image->trainer_id !== $trainer->id) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Use 'public' disk (which can be configured as S3 or local)
-        $disk = 'public';
-        
-        // Delete the image file (works with both local and S3)
-        try {
-            if ($image->image_path && Storage::disk($disk)->exists($image->image_path)) {
-                Storage::disk($disk)->delete($image->image_path);
-            }
-
-            // Delete thumbnail if exists
-            $filename = basename($image->image_path);
-            $thumbnailPath = 'trainer-images/thumbnails/' . $filename;
-            if (Storage::disk($disk)->exists($thumbnailPath)) {
-                Storage::disk($disk)->delete($thumbnailPath);
-            }
-        } catch (\Exception $e) {
-            \Log::warning('Error deleting image file: ' . $e->getMessage());
-        }
-
-        // Delete the database record
-        $image->delete();
-
-        return redirect()->back()
-            ->with('success', 'התמונה נמחקה בהצלחה.');
-    }
-
-    /**
-     * Set an image as primary.
-     */
-    public function setPrimaryImage(Trainer $trainer, TrainerImage $image)
-    {
-        // Verify the image belongs to this trainer
-        if ($image->trainer_id !== $trainer->id) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Remove primary from all other images
-        TrainerImage::where('trainer_id', $trainer->id)
-            ->where('id', '!=', $image->id)
-            ->update(['is_primary' => false]);
-
-        // Set this image as primary
-        $image->update(['is_primary' => true]);
-
-        return redirect()->back()
-            ->with('success', 'התמונה הוגדרה כתמונה ראשית.');
-    }
 }
 

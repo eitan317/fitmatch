@@ -196,53 +196,27 @@ use Illuminate\Support\Facades\Storage;
                         </div>
                         <div class="admin-trainer-card-body">
                             @php
-                                $trainer->load('images');
+                                $imageUrl = null;
+                                if ($trainer->profile_image_path) {
+                                    $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                    if (!str_starts_with($imageUrl, 'http')) {
+                                        $imageUrl = url($imageUrl);
+                                    }
+                                }
                             @endphp
                             
-                            @if($trainer->images->count() > 0)
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-                                    @foreach($trainer->images as $image)
-                                        <div style="position: relative; border: 2px solid {{ $image->is_primary ? 'var(--primary)' : 'rgba(74, 158, 255, 0.1)' }}; border-radius: 8px; padding: 0.5rem; background: rgba(30, 41, 59, 0.6);">
-                                            @php
-                                                // Use the accessor from TrainerImage model
-                                                $imageUrl = $image->image_url;
-                                            @endphp
-                                            @if($imageUrl)
-                                                <img src="{{ $imageUrl }}" alt="תמונה" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px;">
-                                            @endif
-                                            @if($image->is_primary)
-                                                <div style="position: absolute; top: 0.5rem; left: 0.5rem; background: var(--primary); color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
-                                                    ראשית
-                                                </div>
-                                            @endif
-                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                                                @if(!$image->is_primary)
-                                                    <form action="{{ route('admin.trainers.images.set-primary', [$trainer, $image]) }}" method="POST" style="flex: 1;">
-                                                        @csrf
-                                                        <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;">
-                                                            <i class="fas fa-star"></i> הגדר ראשית
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                                <form action="{{ route('admin.trainers.images.delete', [$trainer, $image]) }}" method="POST" style="flex: 1;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="admin-btn admin-btn-danger" style="width: 100%; padding: 0.5rem; font-size: 0.85rem;" onclick="return confirm('האם אתה בטוח שברצונך למחוק את התמונה?');">
-                                                        <i class="fas fa-trash"></i> מחק
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                            @if($imageUrl)
+                                <div style="margin-bottom: 1rem;">
+                                    <img src="{{ $imageUrl }}" alt="תמונת פרופיל" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--primary);">
                                 </div>
                             @else
-                                <p style="color: var(--text-muted);">אין תמונות למאמן זה</p>
+                                <p style="color: var(--text-muted);">אין תמונת פרופיל למאמן זה</p>
                             @endif
 
                             <div class="form-group">
-                                <label for="new_image">הוסף תמונה חדשה</label>
+                                <label for="new_image">הוסף תמונת פרופיל חדשה</label>
                                 <input type="file" id="new_image" name="new_image" accept="image/*">
-                                <small style="color: var(--text-muted);">התמונה תתאים אוטומטית לגודל 1000x1000px</small>
+                                <small style="color: var(--text-muted);">התמונה תישמר כתמונת הפרופיל</small>
                             </div>
                         </div>
                     </div>

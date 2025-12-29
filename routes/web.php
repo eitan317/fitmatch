@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrainerController;
 use App\Http\Controllers\TrainerDashboardController;
-use App\Http\Controllers\TrainerImageController;
 use App\Http\Controllers\TrainerLikeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
@@ -187,11 +186,6 @@ Route::middleware('auth')->group(function () {
     // Review routes
     Route::post('/trainers/{trainer}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-    // Trainer image routes
-    Route::post('/trainers/{trainer}/images', [TrainerImageController::class, 'store'])->name('trainer-images.store');
-    Route::put('/trainers/images/{image}', [TrainerImageController::class, 'update'])->name('trainer-images.update');
-    Route::delete('/trainers/images/{image}', [TrainerImageController::class, 'destroy'])->name('trainer-images.destroy');
-    Route::post('/trainers/images/{image}/set-primary', [TrainerImageController::class, 'setPrimary'])->name('trainer-images.set-primary');
 
     // Admin review management routes
     Route::middleware('auth')->group(function () {
@@ -226,8 +220,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/trainers/{trainer}/block', [AdminTrainerController::class, 'block'])->name('trainers.block');
     Route::post('/trainers/{trainer}/unblock', [AdminTrainerController::class, 'unblock'])->name('trainers.unblock');
     Route::post('/trainers/{trainer}/change-subscription', [AdminTrainerController::class, 'changeSubscription'])->name('trainers.change-subscription');
-    Route::delete('/trainers/{trainer}/images/{image}', [AdminTrainerController::class, 'deleteImage'])->name('trainers.images.delete');
-    Route::post('/trainers/{trainer}/images/{image}/set-primary', [AdminTrainerController::class, 'setPrimaryImage'])->name('trainers.images.set-primary');
     Route::delete('/trainers/{trainer}', [AdminTrainerController::class, 'destroy'])->name('trainers.destroy');
 });
 

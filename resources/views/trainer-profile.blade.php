@@ -25,8 +25,13 @@ use Illuminate\Support\Facades\Storage;
                 <div class="trainer-profile-header">
                     <div class="trainer-profile-image-container">
                         @php
-                            $profileImage = $trainer->profileImage;
-                            $imageUrl = $profileImage ? $profileImage->image_url : null;
+                            $imageUrl = null;
+                            if ($trainer->profile_image_path) {
+                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                if (!str_starts_with($imageUrl, 'http')) {
+                                    $imageUrl = url($imageUrl);
+                                }
+                            }
                         @endphp
                         @if($imageUrl)
                             <img src="{{ $imageUrl }}" alt="{{ $trainer->full_name }}" class="trainer-profile-image-large" loading="lazy" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">

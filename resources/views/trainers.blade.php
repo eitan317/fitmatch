@@ -125,22 +125,12 @@ use Illuminate\Support\Facades\Storage;
                     <div class="trainer-card">
                     <div class="trainer-card-image">
                         @php
-                            $profileImage = $trainer->profileImage;
-                            if (config('app.debug')) {
-                                \Log::info('Trainers Page: Profile Image Check', [
-                                    'trainer_id' => $trainer->id,
-                                    'trainer_name' => $trainer->full_name,
-                                    'has_profile_image' => $profileImage ? 'yes' : 'no',
-                                    'profile_image_id' => $profileImage?->id,
-                                    'profile_image_path' => $profileImage?->image_path,
-                                ]);
-                            }
-                            $imageUrl = $profileImage ? $profileImage->image_url : null;
-                            if (config('app.debug') && $imageUrl) {
-                                \Log::info('Trainers Page: Image URL', [
-                                    'trainer_id' => $trainer->id,
-                                    'image_url' => $imageUrl,
-                                ]);
+                            $imageUrl = null;
+                            if ($trainer->profile_image_path) {
+                                $imageUrl = Storage::disk('public')->url($trainer->profile_image_path);
+                                if (!str_starts_with($imageUrl, 'http')) {
+                                    $imageUrl = url($imageUrl);
+                                }
                             }
                         @endphp
                         @if($imageUrl)

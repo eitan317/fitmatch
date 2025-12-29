@@ -24,6 +24,7 @@ class Trainer extends Model
         'instagram',
         'tiktok',
         'bio',
+        'profile_image_path',
         'status',
         'subscription_plan_id',
         'subscription_status',
@@ -81,28 +82,6 @@ class Trainer extends Model
             ->first();
     }
 
-    /**
-     * Get all images for this trainer.
-     */
-    public function images(): HasMany
-    {
-        return $this->hasMany(TrainerImage::class);
-    }
-
-    /**
-     * Get the primary profile image for this trainer.
-     * Returns the primary image if exists, otherwise the first profile image.
-     */
-    public function profileImage()
-    {
-        return $this->hasOne(TrainerImage::class)
-            ->where(function($query) {
-                $query->where('is_primary', true)
-                    ->orWhere('image_type', 'profile');
-            })
-            ->orderByRaw('CASE WHEN is_primary = 1 THEN 0 ELSE 1 END')
-            ->orderBy('created_at', 'asc');
-    }
 
     /**
      * Get all profile views for this trainer.
