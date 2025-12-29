@@ -9,12 +9,15 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
     nodejs \
     npm \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
     && docker-php-ext-enable pdo_mysql mbstring exif pcntl bcmath gd \
     && rm -rf /var/lib/apt/lists/*
