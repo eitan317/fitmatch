@@ -40,7 +40,7 @@ return [
 
         'public' => [
             'driver' => env('FILESYSTEM_DISK', 'local') === 's3' ? 's3' : 'local',
-            'root' => storage_path('app/public'),
+            'root' => env('FILESYSTEM_DISK', 'local') === 's3' ? '' : storage_path('app/public'), // Empty root for S3
             'url' => env('FILESYSTEM_DISK', 'local') === 's3' 
                 ? (env('AWS_URL') ?: null) // S3 URL (auto-generated if not set)
                 : (env('APP_URL') ? rtrim(env('APP_URL'), '/').'/storage' : '/storage'),

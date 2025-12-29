@@ -57,11 +57,52 @@ class TrainerImageController extends Controller
             $disk = 'public';
             
             // Save file to storage (works with both local and S3)
-            $imagePath = $file->storeAs('trainer-images', $filename, $disk);
-            
-            if (!$imagePath || !Storage::disk($disk)->exists($imagePath)) {
+            try {
+                $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+            } catch (\Exception $storageException) {
+                \Log::error('TrainerImageController::store - Failed to save file to storage', [
+                    'trainer_id' => $trainer->id,
+                    'filename' => $filename,
+                    'disk' => $disk,
+                    'error' => $storageException->getMessage(),
+                    'trace' => $storageException->getTraceAsString(),
+                ]);
                 return redirect()->back()
-                    ->with('error', 'שגיאה בשמירת התמונה.');
+                    ->with('error', 'שגיאה בשמירת התמונה: ' . $storageException->getMessage());
+            }
+            
+            if (!$imagePath) {
+                \Log::error('TrainerImageController::store - No path returned from storeAs', [
+                    'trainer_id' => $trainer->id,
+                    'filename' => $filename,
+                    'disk' => $disk,
+                ]);
+                return redirect()->back()
+                    ->with('error', 'שגיאה בשמירת התמונה - לא התקבל נתיב קובץ.');
+            }
+            
+            // Try to verify file exists, but don't fail if check fails (S3 might have credential issues)
+            $fileExists = false;
+            try {
+                $fileExists = Storage::disk($disk)->exists($imagePath);
+            } catch (\Exception $checkException) {
+                \Log::warning('TrainerImageController::store - Could not verify file existence', [
+                    'trainer_id' => $trainer->id,
+                    'image_path' => $imagePath,
+                    'error' => $checkException->getMessage(),
+                ]);
+                // Continue anyway - assume file was saved if we got a path
+                $fileExists = true;
+            }
+            
+            if (!$fileExists) {
+                \Log::error('TrainerImageController::store - File path returned but file does not exist', [
+                    'trainer_id' => $trainer->id,
+                    'image_path' => $imagePath,
+                    'disk' => $disk,
+                ]);
+                return redirect()->back()
+                    ->with('error', 'שגיאה בשמירת התמונה - הקובץ לא נמצא.');
             }
 
             // Process image (resize and create thumbnail) - works with both local and S3

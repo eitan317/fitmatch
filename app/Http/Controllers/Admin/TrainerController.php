@@ -289,6 +289,12 @@ class TrainerController extends Controller
 
         // Handle new image upload
         if ($request->hasFile('new_image')) {
+            \Log::info('AdminTrainerController::update - New image file detected', [
+                'trainer_id' => $trainer->id,
+                'file_name' => $request->file('new_image')->getClientOriginalName(),
+                'file_size' => $request->file('new_image')->getSize(),
+            ]);
+            
             $file = $request->file('new_image');
             if ($file && $file->getSize() > 0) {
                 try {
@@ -310,30 +316,121 @@ class TrainerController extends Controller
                     // Use 'public' disk (which can be configured as S3 or local)
                     $disk = 'public';
                     
-                    // Save file to storage (works with both local and S3)
-                    $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+                    \Log::info('AdminTrainerController::update - Saving file to storage', [
+                        'trainer_id' => $trainer->id,
+                        'filename' => $filename,
+                        'disk' => $disk,
+                    ]);
                     
-                    if ($imagePath && Storage::disk($disk)->exists($imagePath)) {
+                    // Save file to storage (works with both local and S3)
+                    try {
+                        $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+                    } catch (\Exception $storageException) {
+                        \Log::error('AdminTrainerController::update - Failed to save file to storage', [
+                            'trainer_id' => $trainer->id,
+                            'filename' => $filename,
+                            'disk' => $disk,
+                            'error' => $storageException->getMessage(),
+                            'trace' => $storageException->getTraceAsString(),
+                        ]);
+                        throw $storageException; // Re-throw to be caught by outer catch
+                    }
+                    
+                    \Log::info('AdminTrainerController::update - File saved', [
+                        'trainer_id' => $trainer->id,
+                        'image_path' => $imagePath,
+                        'file_exists' => $imagePath ? Storage::disk($disk)->exists($imagePath) : false,
+                    ]);
+                    
+                    // Check if file was saved successfully
+                    if ($imagePath) {
+                        // Try to verify file exists, but don't fail if check fails (S3 might have issues)
+                        $fileExists = false;
+                        try {
+                            $fileExists = Storage::disk($disk)->exists($imagePath);
+                        } catch (\Exception $checkException) {
+                            \Log::warning('AdminTrainerController::update - Could not verify file existence', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $checkException->getMessage(),
+                            ]);
+                            // Continue anyway - assume file was saved if we got a path
+                            $fileExists = true;
+                        }
+                        
+                        if ($fileExists) {
                         // Process image (resize and create thumbnail) - works with both local and S3
                         try {
                             ImageHelper::processImage($imagePath, $disk);
+                            \Log::info('AdminTrainerController::update - Image processed successfully', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                            ]);
                         } catch (\Exception $e) {
-                            \Log::warning('Error processing image in admin update: ' . $e->getMessage());
+                            \Log::warning('Error processing image in admin update: ' . $e->getMessage(), [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $e->getMessage(),
+                            ]);
                             // Continue even if processing fails - image is already saved
                         }
                         
-                        TrainerImage::create([
+                        \Log::info('AdminTrainerController::update - Creating TrainerImage record', [
                             'trainer_id' => $trainer->id,
                             'image_path' => $imagePath,
-                            'image_type' => 'profile',
-                            'sort_order' => 0,
-                            'is_primary' => false,
+                        ]);
+                        
+                        try {
+                            $trainerImage = TrainerImage::create([
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'image_type' => 'profile',
+                                'sort_order' => 0,
+                                'is_primary' => false,
+                            ]);
+                            
+                            \Log::info('AdminTrainerController::update - TrainerImage created successfully', [
+                                'trainer_id' => $trainer->id,
+                                'trainer_image_id' => $trainerImage->id,
+                                'image_path' => $imagePath,
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('AdminTrainerController::update - Failed to create TrainerImage', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString(),
+                            ]);
+                            throw $e; // Re-throw to be caught by outer catch
+                        }
+                        } else {
+                            \Log::warning('AdminTrainerController::update - File path returned but file does not exist', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                            ]);
+                        }
+                    } else {
+                        \Log::warning('AdminTrainerController::update - File not saved (no path returned)', [
+                            'trainer_id' => $trainer->id,
                         ]);
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading image in admin update: ' . $e->getMessage());
+                    \Log::error('Error uploading image in admin update: ' . $e->getMessage(), [
+                        'trainer_id' => $trainer->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
                 }
+            } else {
+                \Log::warning('AdminTrainerController::update - File is empty or invalid', [
+                    'trainer_id' => $trainer->id,
+                    'file_size' => $file ? $file->getSize() : 0,
+                ]);
             }
+        } else {
+            \Log::info('AdminTrainerController::update - No new image file provided', [
+                'trainer_id' => $trainer->id,
+            ]);
         }
 
         return redirect()->route('admin.trainers.index')

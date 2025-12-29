@@ -80,31 +80,60 @@ class TrainerImage extends Model
     public function getImageUrlAttribute(): ?string
     {
         if (!$this->image_path) {
+            \Log::warning('TrainerImage: No image_path', [
+                'trainer_image_id' => $this->id,
+                'trainer_id' => $this->trainer_id,
+            ]);
             return null;
         }
         
         try {
-            // Use 'public' disk (works with both S3 and local)
             $disk = \Storage::disk('public');
+            $driver = config('filesystems.disks.public.driver');
+            
+            // Check if file exists
+            $exists = $disk->exists($this->image_path);
+            
+            \Log::info('TrainerImage URL generation', [
+                'image_id' => $this->id,
+                'image_path' => $this->image_path,
+                'disk_driver' => $driver,
+                'file_exists' => $exists,
+            ]);
+            
+            if (!$exists) {
+                \Log::warning('TrainerImage: File does not exist in storage', [
+                    'image_path' => $this->image_path,
+                    'disk' => 'public',
+                ]);
+            }
+            
             $url = $disk->url($this->image_path);
             
-            // For S3, the URL should already be absolute (starts with http/https)
-            // For local storage, it might be relative, so make it absolute
+            \Log::info('TrainerImage: Generated URL', [
+                'image_path' => $this->image_path,
+                'raw_url' => $url,
+            ]);
+            
             if (!str_starts_with($url, 'http')) {
-                // Check if it's a relative path (starts with /storage)
                 if (str_starts_with($url, '/storage')) {
                     $url = url($url);
                 } else {
-                    // If it doesn't start with /, add /storage/ prefix
                     $url = url('/storage/' . ltrim($url, '/'));
                 }
             }
             
+            \Log::info('TrainerImage: Final URL', [
+                'image_path' => $this->image_path,
+                'final_url' => $url,
+            ]);
+            
             return $url;
         } catch (\Exception $e) {
-            // Fallback: try direct URL
-            \Log::warning('Error generating image URL: ' . $e->getMessage(), [
+            \Log::error('TrainerImage: Error generating URL', [
                 'image_path' => $this->image_path,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
             return url('/storage/' . $this->image_path);
         }

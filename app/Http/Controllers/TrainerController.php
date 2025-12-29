@@ -147,6 +147,12 @@ class TrainerController extends Controller
 
         // Handle profile image upload if provided
         if ($request->hasFile('profile_image')) {
+            \Log::info('TrainerController::store - Profile image file detected', [
+                'trainer_id' => $trainer->id,
+                'file_name' => $request->file('profile_image')->getClientOriginalName(),
+                'file_size' => $request->file('profile_image')->getSize(),
+            ]);
+            
             $file = $request->file('profile_image');
             
             if ($file && $file->getSize() > 0) {
@@ -171,32 +177,125 @@ class TrainerController extends Controller
                     // Use 'public' disk (which can be configured as S3 or local)
                     $disk = 'public';
                     
-                    // Save file to storage (works with both local and S3)
-                    $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+                    \Log::info('TrainerController::store - Saving file to storage', [
+                        'trainer_id' => $trainer->id,
+                        'filename' => $filename,
+                        'disk' => $disk,
+                    ]);
                     
-                    if ($imagePath && Storage::disk($disk)->exists($imagePath)) {
+                    // Save file to storage (works with both local and S3)
+                    try {
+                        $imagePath = $file->storeAs('trainer-images', $filename, $disk);
+                    } catch (\Exception $storageException) {
+                        \Log::error('TrainerController::store - Failed to save file to storage', [
+                            'trainer_id' => $trainer->id,
+                            'filename' => $filename,
+                            'disk' => $disk,
+                            'error' => $storageException->getMessage(),
+                            'trace' => $storageException->getTraceAsString(),
+                        ]);
+                        throw $storageException; // Re-throw to be caught by outer catch
+                    }
+                    
+                    \Log::info('TrainerController::store - File saved', [
+                        'trainer_id' => $trainer->id,
+                        'image_path' => $imagePath,
+                        'file_exists' => $imagePath ? Storage::disk($disk)->exists($imagePath) : false,
+                    ]);
+                    
+                    // Check if file was saved successfully
+                    // Note: For S3, exists() might fail if credentials are wrong, but storeAs() might still return a path
+                    // So we check if imagePath is not empty first
+                    if ($imagePath) {
+                        // Try to verify file exists, but don't fail if check fails (S3 might have issues)
+                        $fileExists = false;
+                        try {
+                            $fileExists = Storage::disk($disk)->exists($imagePath);
+                        } catch (\Exception $checkException) {
+                            \Log::warning('TrainerController::store - Could not verify file existence', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $checkException->getMessage(),
+                            ]);
+                            // Continue anyway - assume file was saved if we got a path
+                            $fileExists = true;
+                        }
+                        
+                        if ($fileExists) {
                         // Process image (resize and create thumbnail) - works with both local and S3
                         try {
                             ImageHelper::processImage($imagePath, $disk);
+                            \Log::info('TrainerController::store - Image processed successfully', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                            ]);
                         } catch (\Exception $e) {
-                            \Log::warning('Error processing image: ' . $e->getMessage());
+                            \Log::warning('Error processing image: ' . $e->getMessage(), [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $e->getMessage(),
+                            ]);
                             // Continue even if processing fails - image is already saved
                         }
                         
                         // Create database record as primary profile image
-                        TrainerImage::create([
+                        \Log::info('TrainerController::store - Creating TrainerImage record', [
                             'trainer_id' => $trainer->id,
                             'image_path' => $imagePath,
-                            'image_type' => 'profile',
-                            'sort_order' => 0,
-                            'is_primary' => true,
+                        ]);
+                        
+                        try {
+                            $trainerImage = TrainerImage::create([
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'image_type' => 'profile',
+                                'sort_order' => 0,
+                                'is_primary' => true,
+                            ]);
+                            
+                            \Log::info('TrainerController::store - TrainerImage created successfully', [
+                                'trainer_id' => $trainer->id,
+                                'trainer_image_id' => $trainerImage->id,
+                                'image_path' => $imagePath,
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('TrainerController::store - Failed to create TrainerImage', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString(),
+                            ]);
+                            throw $e; // Re-throw to be caught by outer catch
+                        }
+                        } else {
+                            \Log::warning('TrainerController::store - File path returned but file does not exist', [
+                                'trainer_id' => $trainer->id,
+                                'image_path' => $imagePath,
+                            ]);
+                        }
+                    } else {
+                        \Log::warning('TrainerController::store - File not saved (no path returned)', [
+                            'trainer_id' => $trainer->id,
                         ]);
                     }
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading profile image during registration: ' . $e->getMessage());
+                    \Log::error('Error uploading profile image during registration: ' . $e->getMessage(), [
+                        'trainer_id' => $trainer->id,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
                     // Continue without image - don't fail registration
                 }
+            } else {
+                \Log::warning('TrainerController::store - File is empty or invalid', [
+                    'trainer_id' => $trainer->id,
+                    'file_size' => $file ? $file->getSize() : 0,
+                ]);
             }
+        } else {
+            \Log::info('TrainerController::store - No profile image file provided', [
+                'trainer_id' => $trainer->id,
+            ]);
         }
 
         // Redirect to welcome page
