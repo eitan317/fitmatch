@@ -128,8 +128,15 @@ use Illuminate\Support\Facades\Storage;
                             $imageUrl = null;
                             $profileImage = $trainer->profileImage;
                             if ($profileImage && $profileImage->image_path) {
-                                $fullPath = storage_path('app/public/' . $profileImage->image_path);
-                                if (file_exists($fullPath) && is_file($fullPath) && filesize($fullPath) > 0) {
+                                // Try Storage::url first, fallback to direct URL
+                                try {
+                                    $imageUrl = \Storage::url($profileImage->image_path);
+                                    // If Storage::url returns relative path, make it absolute
+                                    if (!str_starts_with($imageUrl, 'http')) {
+                                        $imageUrl = url($imageUrl);
+                                    }
+                                } catch (\Exception $e) {
+                                    // Fallback to direct URL
                                     $imageUrl = url('/storage/' . $profileImage->image_path);
                                 }
                             }

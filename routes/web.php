@@ -22,10 +22,13 @@ Route::get('/storage/{path}', function ($path) {
     $path = str_replace('\\', '/', $path);
     $path = ltrim($path, '/');
     
+    // Normalize path - remove duplicate slashes
+    $path = preg_replace('#/+#', '/', $path);
+    
     // Try multiple locations for the file
     $possiblePaths = [
-        storage_path('app/public/' . $path), // Primary location
-        public_path('storage/' . $path), // Symlink location
+        storage_path('app/public/' . $path), // Primary location - where files are stored
+        public_path('storage/' . $path), // Symlink location - if symlink exists
         storage_path('app/' . $path), // Alternative location
     ];
     
@@ -33,6 +36,8 @@ Route::get('/storage/{path}', function ($path) {
     
     // Try to find the file in any of the possible locations
     foreach ($possiblePaths as $possiblePath) {
+        // Normalize the path
+        $possiblePath = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $possiblePath);
         if (file_exists($possiblePath) && is_file($possiblePath)) {
             $fileSize = @filesize($possiblePath);
             // Accept file even if size is 0 (might be valid)
