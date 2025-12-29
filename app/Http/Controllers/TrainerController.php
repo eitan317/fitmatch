@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trainer;
+use App\Models\TrainerImage;
 use App\Models\Review;
 use App\Models\SubscriptionPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 
 class TrainerController extends Controller
@@ -105,10 +107,10 @@ class TrainerController extends Controller
             'instagram' => 'nullable|string|max:255',
             'tiktok' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
+            'profile_image' => 'nullable|file', // Minimal validation
         ], [
             'age.min' => 'הגיל המינימלי המותר הוא 18',
             'age.integer' => 'הגיל חייב להיות מספר שלם',
-            // הסרת כל הודעות השגיאה על תמונה
         ]);
 
         // Note: Training types validation will be done after subscription is selected
@@ -139,6 +141,55 @@ class TrainerController extends Controller
         // or removed from the table entirely
 
         $trainer = Trainer::create($trainerData);
+
+        // Handle profile image upload if provided
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            
+            if ($file && $file->getSize() > 0) {
+                try {
+                    // Generate unique filename
+                    $originalExtension = $file->getClientOriginalExtension();
+                    if (empty($originalExtension)) {
+                        $mimeType = $file->getMimeType();
+                        $extensionMap = [
+                            'image/jpeg' => 'jpg',
+                            'image/png' => 'png',
+                            'image/gif' => 'gif',
+                            'image/webp' => 'webp',
+                            'image/bmp' => 'bmp',
+                            'image/svg+xml' => 'svg',
+                        ];
+                        $originalExtension = $extensionMap[$mimeType] ?? 'jpg';
+                    }
+                    
+                    $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                    
+                    // Ensure directory exists
+                    $trainerImagesPath = storage_path('app/public/trainer-images');
+                    if (!File::exists($trainerImagesPath)) {
+                        File::makeDirectory($trainerImagesPath, 0755, true);
+                    }
+                    
+                    // Save file
+                    $imagePath = $file->storeAs('trainer-images', $filename, 'public');
+                    
+                    if ($imagePath) {
+                        // Create database record as primary profile image
+                        TrainerImage::create([
+                            'trainer_id' => $trainer->id,
+                            'image_path' => $imagePath,
+                            'image_type' => 'profile',
+                            'sort_order' => 0,
+                            'is_primary' => true,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Error uploading profile image during registration: ' . $e->getMessage());
+                    // Continue without image - don't fail registration
+                }
+            }
+        }
 
         // Redirect to welcome page
         return redirect()->route('trainers.welcome')

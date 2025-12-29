@@ -167,6 +167,24 @@
                 </div>
                 <div class="accordion-content">
                     <div class="form-group">
+                        <label for="profile_image">תמונת פרופיל (אופציונלי)</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="profile_image" name="profile_image" accept="image/*" class="file-input-hidden">
+                            <label for="profile_image" class="file-upload-btn">
+                                <i class="fas fa-camera"></i>
+                                <span>לחץ להעלאת תמונה</span>
+                            </label>
+                        </div>
+                        <div id="imagePreview" style="display: none; margin-top: 1rem; text-align: center;">
+                            <img id="previewImg" src="" alt="תצוגה מקדימה" style="max-width: 200px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        </div>
+                        <small class="form-text text-muted" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem; display: block;">כל סוג קובץ יתקבל</small>
+                        @if($errors->has('profile_image'))
+                            <span class="error" style="color: var(--accent); font-size: 0.85rem; display: block; margin-top: 0.25rem;">{{ $errors->first('profile_image') }}</span>
+                        @endif
+                    </div>
+
+                    <div class="form-group">
                         <label for="instagram">אינסטגרם (אופציונלי)</label>
                         <input type="text" id="instagram" name="instagram" value="{{ old('instagram') }}">
                     </div>
@@ -217,6 +235,41 @@
                 });
             }
 
+            // Image preview
+            const profileImageInput = document.getElementById('profile_image');
+            if (profileImageInput) {
+                profileImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    const preview = document.getElementById('imagePreview');
+                    const img = document.getElementById('previewImg');
+                    
+                    if (file) {
+                        if (preview && img) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                img.src = e.target.result;
+                                preview.style.display = 'block';
+                            };
+                            try {
+                                reader.readAsDataURL(file);
+                            } catch (err) {
+                                // Continue without preview
+                            }
+                        }
+                    } else {
+                        if (preview) preview.style.display = 'none';
+                    }
+                });
+                
+                // Add click event to label for better mobile support
+                const fileUploadBtn = document.querySelector('.file-upload-btn');
+                if (fileUploadBtn) {
+                    fileUploadBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        profileImageInput.click();
+                    });
+                }
+            }
 
             // Form submission validation
             const form = document.getElementById('trainerRegistrationForm');
