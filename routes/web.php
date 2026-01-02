@@ -199,7 +199,7 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    $content .= "Sitemap: " . config('app.url') . "/sitemap.php\n";
+    // sitemap.xml - קובץ סטטי שנוצר אוטומטית
     $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
     
     return response($content, 200)
