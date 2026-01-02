@@ -24,13 +24,23 @@ Route::get('/sitemap-test', function () {
 });
 
 // Main sitemap route - explicitly defined without controller first to test
+// This route MUST be defined before php artisan serve checks for static files
 Route::get('/sitemap.xml', function () {
-    \Log::info('Sitemap.xml route hit directly');
+    \Log::info('Sitemap.xml route hit at ' . now());
+    
+    // Delete static file if it exists to force dynamic generation
+    $staticFile = public_path('sitemap.xml');
+    if (file_exists($staticFile)) {
+        @unlink($staticFile);
+        \Log::info('Deleted static sitemap.xml file');
+    }
+    
     try {
         return app(\App\Http\Controllers\SitemapController::class)->main();
     } catch (\Exception $e) {
-        \Log::error('Error in sitemap.xml route: ' . $e->getMessage());
-        return response('Error: ' . $e->getMessage(), 500);
+        \Log::error('Error in sitemap.xml route: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+        return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
+            ->header('Content-Type', 'application/xml; charset=utf-8');
     }
 })->name('sitemap.main');
 
