@@ -15,6 +15,13 @@
                 'name' => $appName,
                 'url' => $baseUrl,
                 'logo' => $logoUrl,
+                'description' => 'פלטפורמה למציאת מאמני כושר אישיים מקצועיים',
+                'email' => 'fitmatchcoil@gmail.com',
+                'telephone' => '+972527020113',
+                'areaServed' => [
+                    '@type' => 'Country',
+                    'name' => 'Israel'
+                ],
                 'sameAs' => [
                     'https://www.instagram.com/fitmatch.org.il/',
                     'https://www.tiktok.com/@fitmatch912'
@@ -32,10 +39,18 @@
                     ],
                     'query-input' => 'required name=search_term_string'
                 ]
+            ],
+            [
+                '@type' => 'LocalBusiness',
+                '@id' => $baseUrl . '#business',
+                'name' => $appName,
+                'image' => $logoUrl,
+                'url' => $baseUrl,
+                'description' => 'פלטפורמה למציאת מאמני כושר אישיים מקצועיים בישראל'
             ]
         ]
     ];
 @endphp
 
-<script type="application/ld+json">{!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}</script>
+<script type="application/ld+json">{!! json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}</script>
 

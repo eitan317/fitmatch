@@ -6,7 +6,51 @@ use Illuminate\Support\Facades\Storage;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מצא מאמן כושר</title>
+    
+    @php
+        use App\Models\Trainer;
+        $searchQuery = request('search');
+        $city = request('city');
+        $trainingType = request('training_type');
+        
+        // Use the Trainer model method for consistency
+        $trainingTypeLabels = Trainer::getTrainingTypeLabels();
+        $trainingTypeLabel = $trainingType ? ($trainingTypeLabels[$trainingType] ?? $trainingType) : null;
+        
+        $title = 'מצא מאמן כושר';
+        $description = 'חיפוש מאמני כושר מקצועיים. מאות מאמנים מאומתים בכל סוגי האימונים - כוח, חיטוב, יוגה, פילאטיס ועוד.';
+        
+        if ($searchQuery || $city || $trainingType) {
+            $title .= ' - ';
+            $title .= $searchQuery ? $searchQuery . ' ' : '';
+            $title .= $city ? 'ב' . $city . ' ' : '';
+            $title .= $trainingTypeLabel ? '(' . $trainingTypeLabel . ')' : '';
+            $title .= ' | FitMatch';
+            
+            $description = 'מצא מאמן כושר';
+            $description .= $city ? ' ב' . $city : '';
+            $description .= $trainingTypeLabel ? ' לאימוני ' . $trainingTypeLabel : '';
+            $description .= '. מאות מאמנים מקצועיים ומאומתים.';
+        } else {
+            $title .= ' | FitMatch';
+        }
+        
+        $keywords = 'מצא מאמן כושר, מאמני כושר, אימון אישי';
+        if ($city) {
+            $keywords .= ', מאמן כושר ' . $city;
+        }
+        if ($trainingTypeLabel) {
+            $keywords .= ', ' . $trainingTypeLabel;
+        }
+        $keywords .= ', מצא מאמן כושר מקצועי';
+    @endphp
+    
+    @include('partials.seo-meta', [
+        'title' => $title,
+        'description' => $description,
+        'keywords' => $keywords
+    ])
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/site/style.css">
     @include('partials.schema-ld')

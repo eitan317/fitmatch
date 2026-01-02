@@ -134,6 +134,23 @@ Route::get('/download-hero-image', function () {
     }
 })->name('download.hero.image');
 
+// Sitemap routes
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-trainers.xml', [\App\Http\Controllers\SitemapController::class, 'trainers'])->name('sitemap.trainers');
+Route::get('/sitemap-index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
+
+// Dynamic robots.txt
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\n";
+    $content .= "Allow: /\n";
+    $content .= "Disallow: /admin/\n";
+    $content .= "Disallow: /trainer/dashboard\n\n";
+    $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
+    
+    return response($content, 200)
+        ->header('Content-Type', 'text/plain');
+})->name('robots.txt');
+
 Route::get('/', [PageController::class, 'welcome'])->name('welcome');
 
 // Public pages routes

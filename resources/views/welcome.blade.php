@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מציאת מאמני כושר - דף הבית</title>
+    
+    @php
+        $seoTitle = 'מצא מאמן כושר מקצועי - FitMatch | מאות מאמנים מאומתים';
+        $seoDescription = 'מצא מאמן כושר אישי מקצועי בקלות. מאות מאמנים מאומתים בכל סוגי האימונים. חיפוש לפי עיר, סוג אימון ומחיר. התחל עוד היום!';
+    @endphp
+    
+    @include('partials.seo-meta', [
+        'title' => $seoTitle,
+        'description' => $seoDescription,
+        'keywords' => 'מאמן כושר, אימון אישי, מאמן כושר אישי, מאמני כושר, מצא מאמן כושר, אימון בית, מאמן כושר תל אביב, אימון כושר ביתי'
+    ])
     
     <!-- Preconnect to CDNs for faster resource loading (must be before resource requests) -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
