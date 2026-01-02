@@ -134,8 +134,18 @@ Route::get('/download-hero-image', function () {
     }
 })->name('download.hero.image');
 
-// Sitemap routes
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'main'])->name('sitemap.main');
+// Sitemap routes - Check if static file exists first, otherwise use controller
+Route::get('/sitemap.xml', function () {
+    $staticFile = public_path('sitemap.xml');
+    if (file_exists($staticFile)) {
+        return response()->file($staticFile, [
+            'Content-Type' => 'application/xml',
+        ]);
+    }
+    // Fallback to controller if static file doesn't exist
+    return app(\App\Http\Controllers\SitemapController::class)->main();
+})->name('sitemap.main');
+
 Route::get('/sitemap-trainers.xml', [\App\Http\Controllers\SitemapController::class, 'trainers'])->name('sitemap.trainers');
 Route::get('/sitemap-index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
 
