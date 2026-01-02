@@ -17,7 +17,23 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be before other routes to catch sitemap requests
-Route::get('/sitemap.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+// Test route to verify routing works
+Route::get('/sitemap-test', function () {
+    \Log::info('Sitemap test route called at ' . now());
+    return response('Sitemap test route works! Route registered successfully.', 200);
+});
+
+// Main sitemap route - explicitly defined without controller first to test
+Route::get('/sitemap.xml', function () {
+    \Log::info('Sitemap.xml route hit directly');
+    try {
+        return app(\App\Http\Controllers\SitemapController::class)->main();
+    } catch (\Exception $e) {
+        \Log::error('Error in sitemap.xml route: ' . $e->getMessage());
+        return response('Error: ' . $e->getMessage(), 500);
+    }
+})->name('sitemap.main');
+
 Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
