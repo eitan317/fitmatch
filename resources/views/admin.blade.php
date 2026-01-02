@@ -375,6 +375,15 @@ use Illuminate\Support\Facades\Storage;
                                     <i class="fas fa-edit"></i>
                                     ערוך
                                 </a>
+                                @php
+                                    $hasMissingImage = $trainer->profile_image_path && !Storage::disk('public')->exists($trainer->profile_image_path);
+                                @endphp
+                                @if($hasMissingImage || !$trainer->profile_image_path)
+                                    <a href="{{ route('admin.trainers.upload-image', $trainer) }}" class="admin-btn" style="background: #ff9800; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fas fa-image"></i>
+                                        העלה תמונה
+                                    </a>
+                                @endif
                                 <form action="{{ route('admin.trainers.approve', $trainer) }}" method="POST" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="admin-btn admin-btn-primary" onclick="return confirm('האם אתה בטוח שברצונך לאשר את המאמן?')">
@@ -514,6 +523,15 @@ use Illuminate\Support\Facades\Storage;
                                         <i class="fas fa-edit"></i>
                                         ערוך
                                     </a>
+                                    @php
+                                        $hasMissingImage = $trainer->profile_image_path && !Storage::disk('public')->exists($trainer->profile_image_path);
+                                    @endphp
+                                    @if($hasMissingImage || !$trainer->profile_image_path)
+                                        <a href="{{ route('admin.trainers.upload-image', $trainer) }}" class="admin-btn" style="background: #ff9800; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-image"></i>
+                                            העלה תמונה
+                                        </a>
+                                    @endif
                                     <a href="{{ route('trainers.show', $trainer) }}" target="_blank" class="admin-btn admin-btn-secondary">
                                         <i class="fas fa-external-link-alt"></i>
                                         צפה בפרופיל
@@ -673,6 +691,15 @@ use Illuminate\Support\Facades\Storage;
                                         <i class="fas fa-edit"></i>
                                         ערוך
                                     </a>
+                                    @php
+                                        $hasMissingImage = $trainer->profile_image_path && !Storage::disk('public')->exists($trainer->profile_image_path);
+                                    @endphp
+                                    @if($hasMissingImage || !$trainer->profile_image_path)
+                                        <a href="{{ route('admin.trainers.upload-image', $trainer) }}" class="admin-btn" style="background: #ff9800; color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fas fa-image"></i>
+                                            העלה תמונה
+                                        </a>
+                                    @endif
                                     <a href="{{ route('trainers.show', $trainer) }}" class="admin-btn admin-btn-secondary">
                                         <i class="fas fa-eye"></i>
                                         צפה בפרופיל

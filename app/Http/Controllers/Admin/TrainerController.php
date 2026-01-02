@@ -321,6 +321,79 @@ class TrainerController extends Controller
     }
 
     /**
+     * Show upload image form for a trainer.
+     */
+    public function showUploadImage(Trainer $trainer)
+    {
+        return view('admin.upload-image', compact('trainer'));
+    }
+
+    /**
+     * Upload image for a trainer.
+     */
+    public function uploadImage(Request $request, Trainer $trainer)
+    {
+        $request->validate([
+            'image' => 'required|image|max:10240', // 10MB max
+        ]);
+
+        try {
+            $file = $request->file('image');
+            
+            // Ensure directory exists
+            Storage::disk('public')->makeDirectory('trainer-images');
+            
+            // Get original extension
+            $originalExtension = $file->getClientOriginalExtension();
+            if (empty($originalExtension)) {
+                $mimeType = $file->getMimeType();
+                $extensionMap = [
+                    'image/jpeg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                    'image/bmp' => 'bmp',
+                ];
+                $originalExtension = $extensionMap[$mimeType] ?? 'jpg';
+            }
+            
+            // Try to use original filename from database if exists
+            $originalPath = $trainer->profile_image_path;
+            $targetPath = null;
+            
+            if ($originalPath && str_starts_with($originalPath, 'trainer-images/')) {
+                // Use original filename
+                $targetPath = $originalPath;
+            } else {
+                // Generate new filename
+                $filename = time() . '_' . uniqid() . '.' . $originalExtension;
+                $targetPath = 'trainer-images/' . $filename;
+            }
+            
+            // Store the file
+            $stored = $file->storeAs('trainer-images', basename($targetPath), 'public');
+            
+            if ($stored) {
+                // Update trainer record
+                $trainer->profile_image_path = $stored;
+                $trainer->save();
+                
+                \Log::info("Image uploaded for trainer: ID {$trainer->id}, Path: {$stored}");
+                
+                return redirect()->route('admin.trainers.index')
+                    ->with('success', 'התמונה הועלתה בהצלחה עבור ' . $trainer->full_name);
+            } else {
+                return redirect()->back()
+                    ->with('error', 'שגיאה בהעלאת התמונה. אנא נסה שוב.');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error uploading image: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'שגיאה בהעלאת התמונה: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Block a trainer.
      */
     public function block(Trainer $trainer)
