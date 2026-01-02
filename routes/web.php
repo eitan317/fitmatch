@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\SitemapController;
 
 // Health check endpoint for Railway (DB-independent)
 Route::get('/health', function () {
@@ -16,33 +17,12 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be before other routes to catch sitemap requests
-Route::get('/sitemap.xml', function () {
-    try {
-        $staticFile = public_path('sitemap.xml');
-        if (file_exists($staticFile) && is_file($staticFile)) {
-            return response()->file($staticFile, [
-                'Content-Type' => 'application/xml; charset=utf-8',
-            ]);
-        }
-    } catch (\Exception $e) {
-        \Log::warning('Error serving static sitemap.xml: ' . $e->getMessage());
-    }
-    
-    // Fallback to controller if static file doesn't exist
-    try {
-        return app(\App\Http\Controllers\SitemapController::class)->main();
-    } catch (\Exception $e) {
-        \Log::error('Error generating sitemap from controller: ' . $e->getMessage());
-        return response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>', 200)
-            ->header('Content-Type', 'application/xml; charset=utf-8');
-    }
-})->name('sitemap.main');
-
-Route::get('/sitemap-trainers.xml', [\App\Http\Controllers\SitemapController::class, 'trainers'])->name('sitemap.trainers');
-Route::get('/sitemap-index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
+Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
 // Route to serve storage files - IMPROVED VERSION
-// This route MUST be before other routes to catch storage requests
+// This route MUST be after sitemap routes to avoid catching sitemap.xml
 Route::get('/storage/{path}', function ($path) {
     // Security: Prevent directory traversal
     $path = str_replace('..', '', $path);
@@ -137,7 +117,7 @@ Route::get('/storage/{path}', function ($path) {
         'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
         'Cache-Control' => 'public, max-age=31536000',
     ]);
-})->where('path', '.*'); // Accept any path
+})->where('path', '^(?!sitemap).*'); // Accept any path except sitemap files
 
 // Temporary route to download hero image (remove after use)
 Route::get('/download-hero-image', function () {
