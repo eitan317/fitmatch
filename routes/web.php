@@ -17,28 +17,55 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be before other routes to catch sitemap requests
-// Test route to verify routing works
+// Test routes to verify routing works
 Route::get('/sitemap-test', function () {
     \Log::info('Sitemap test route called at ' . now());
     return response('Sitemap test route works! Route registered successfully.', 200);
 });
 
-// Main sitemap route - explicitly defined without controller first to test
-// This route MUST be defined before php artisan serve checks for static files
+// Alternative sitemap route without .xml extension (for testing)
+Route::get('/sitemap', function () {
+    \Log::info('Sitemap route (no extension) called at ' . now());
+    try {
+        $response = app(\App\Http\Controllers\SitemapController::class)->main();
+        return $response;
+    } catch (\Exception $e) {
+        \Log::error('Error in /sitemap route: ' . $e->getMessage());
+        return response('Error: ' . $e->getMessage(), 500);
+    }
+})->name('sitemap.alt');
+
+// Main sitemap route - redirect to PHP file that generates XML dynamically
+// This bypasses php artisan serve's static file serving
 Route::get('/sitemap.xml', function () {
-    \Log::info('Sitemap.xml route hit at ' . now());
+    \Log::info('Sitemap.xml route hit - redirecting to sitemap.php');
     
-    // Delete static file if it exists to force dynamic generation
-    $staticFile = public_path('sitemap.xml');
-    if (file_exists($staticFile)) {
-        @unlink($staticFile);
-        \Log::info('Deleted static sitemap.xml file');
+    // Check if sitemap.php exists, if not create it
+    $phpFile = public_path('sitemap.php');
+    if (!file_exists($phpFile)) {
+        \Log::warning('sitemap.php not found, generating sitemap via controller');
+        try {
+            $controller = app(\App\Http\Controllers\SitemapController::class);
+            return $controller->main();
+        } catch (\Exception $e) {
+            \Log::error('Error generating sitemap: ' . $e->getMessage());
+            return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
+                ->header('Content-Type', 'application/xml; charset=utf-8');
+        }
     }
     
+    // Generate XML via controller and also write to static file as backup
     try {
-        return app(\App\Http\Controllers\SitemapController::class)->main();
+        $controller = app(\App\Http\Controllers\SitemapController::class);
+        $response = $controller->main();
+        $xmlContent = $response->getContent();
+        
+        // Write to static file as backup
+        file_put_contents(public_path('sitemap.xml'), $xmlContent);
+        
+        return $response;
     } catch (\Exception $e) {
-        \Log::error('Error in sitemap.xml route: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+        \Log::error('Error in sitemap.xml route: ' . $e->getMessage());
         return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
             ->header('Content-Type', 'application/xml; charset=utf-8');
     }
@@ -172,6 +199,7 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
+    $content .= "Sitemap: " . config('app.url') . "/sitemap.php\n";
     $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
     
     return response($content, 200)
