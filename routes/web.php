@@ -15,6 +15,32 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
+// Sitemap routes - MUST be before other routes to catch sitemap requests
+Route::get('/sitemap.xml', function () {
+    try {
+        $staticFile = public_path('sitemap.xml');
+        if (file_exists($staticFile) && is_file($staticFile)) {
+            return response()->file($staticFile, [
+                'Content-Type' => 'application/xml; charset=utf-8',
+            ]);
+        }
+    } catch (\Exception $e) {
+        \Log::warning('Error serving static sitemap.xml: ' . $e->getMessage());
+    }
+    
+    // Fallback to controller if static file doesn't exist
+    try {
+        return app(\App\Http\Controllers\SitemapController::class)->main();
+    } catch (\Exception $e) {
+        \Log::error('Error generating sitemap from controller: ' . $e->getMessage());
+        return response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>', 200)
+            ->header('Content-Type', 'application/xml; charset=utf-8');
+    }
+})->name('sitemap.main');
+
+Route::get('/sitemap-trainers.xml', [\App\Http\Controllers\SitemapController::class, 'trainers'])->name('sitemap.trainers');
+Route::get('/sitemap-index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
+
 // Route to serve storage files - IMPROVED VERSION
 // This route MUST be before other routes to catch storage requests
 Route::get('/storage/{path}', function ($path) {
@@ -133,21 +159,6 @@ Route::get('/download-hero-image', function () {
         return response()->json(['success' => false, 'message' => 'Failed to download image'], 500);
     }
 })->name('download.hero.image');
-
-// Sitemap routes - Check if static file exists first, otherwise use controller
-Route::get('/sitemap.xml', function () {
-    $staticFile = public_path('sitemap.xml');
-    if (file_exists($staticFile)) {
-        return response()->file($staticFile, [
-            'Content-Type' => 'application/xml',
-        ]);
-    }
-    // Fallback to controller if static file doesn't exist
-    return app(\App\Http\Controllers\SitemapController::class)->main();
-})->name('sitemap.main');
-
-Route::get('/sitemap-trainers.xml', [\App\Http\Controllers\SitemapController::class, 'trainers'])->name('sitemap.trainers');
-Route::get('/sitemap-index.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
 
 // Dynamic robots.txt
 Route::get('/robots.txt', function () {

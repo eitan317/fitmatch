@@ -57,6 +57,21 @@ class SitemapController extends Controller
             $xml .= $this->url($baseUrl . $page, '0.8', 'weekly', now()->subDays(7));
         }
         
+        // Get all approved trainers
+        $query = Trainer::where('approved_by_admin', true);
+        
+        if (\Illuminate\Support\Facades\Schema::hasColumn('trainers', 'status')) {
+            $query->whereIn('status', ['active', 'trial']);
+        }
+        
+        $trainers = $query->get();
+        
+        foreach ($trainers as $trainer) {
+            $url = $baseUrl . '/trainers/' . $trainer->id;
+            $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
+            $xml .= $this->url($url, '0.7', 'monthly', $lastmod);
+        }
+        
         $xml .= '</urlset>';
         
         return response($xml, 200)
