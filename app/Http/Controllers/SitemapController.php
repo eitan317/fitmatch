@@ -49,7 +49,8 @@ class SitemapController extends Controller
             $xml .= '</sitemapindex>';
             
             return response($xml, 200)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
+                ->header('Content-Type', 'application/xml; charset=utf-8')
+                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
         } catch (\Exception $e) {
             Log::error('Sitemap index error: ' . $e->getMessage());
             return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
@@ -90,7 +91,8 @@ class SitemapController extends Controller
             Log::info('Sitemap generated successfully');
             
             return response($xml, 200)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
+                ->header('Content-Type', 'application/xml; charset=utf-8')
+                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
         } catch (\Exception $e) {
             Log::error('Sitemap main error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
             return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
@@ -125,7 +127,8 @@ class SitemapController extends Controller
             $xml .= '</urlset>';
             
             return response($xml, 200)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
+                ->header('Content-Type', 'application/xml; charset=utf-8')
+                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
         } catch (\Exception $e) {
             Log::error('Sitemap trainers error: ' . $e->getMessage());
             return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)

@@ -16,13 +16,16 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-// Sitemap routes - MUST be before other routes to catch sitemap requests
+// Sitemap routes - MUST be at the very top, before ANY other routes
+// Use explicit route patterns to ensure they're caught
 Route::get('/sitemap.xml', [SitemapController::class, 'main'])->name('sitemap.main');
 Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
-// Alternative sitemap route without .xml extension (for testing)
+// Alternative routes without .xml extension (for Railway compatibility)
 Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
+Route::get('/sitemap-trainers', [SitemapController::class, 'trainers'])->name('sitemap.trainers.alt');
+Route::get('/sitemap-index', [SitemapController::class, 'index'])->name('sitemap.index.alt');
 
 // Route to serve storage files - IMPROVED VERSION
 // This route MUST be after sitemap routes to avoid catching sitemap.xml
@@ -149,8 +152,10 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    // sitemap.xml - קובץ סטטי שנוצר אוטומטית
+    // sitemap.xml - primary sitemap
     $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
+    // Fallback sitemap without .xml extension (for Railway compatibility)
+    $content .= "Sitemap: " . config('app.url') . "/sitemap\n";
     
     return response($content, 200)
         ->header('Content-Type', 'text/plain');
