@@ -6,9 +6,41 @@
  * Usage: php test-sitemap.php
  */
 
-$baseUrl = 'https://www.fitmatch.org.il';
+// Allow testing local or production
+$baseUrl = $argv[1] ?? 'https://www.fitmatch.org.il';
+$testLocal = isset($argv[1]) && $argv[1] === 'local';
 
-echo "🔍 Testing FitMatch Sitemap...\n\n";
+echo "🔍 Testing FitMatch Sitemap...\n";
+echo "📍 Testing URL: $baseUrl\n\n";
+
+// If testing locally, test the controller directly first
+if ($testLocal) {
+    echo "0. Testing controller directly (local)...\n";
+    try {
+        require __DIR__ . '/vendor/autoload.php';
+        $app = require_once __DIR__ . '/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        
+        $controller = $app->make(\App\Http\Controllers\SitemapController::class);
+        $response = $controller->main();
+        $localResponse = $response->getContent();
+        
+        if (strpos($localResponse, 'xmlns:xhtml') !== false) {
+            echo "   ✅ Controller generates hreflang namespace\n";
+        } else {
+            echo "   ❌ Controller missing hreflang namespace\n";
+        }
+        
+        if (strpos($localResponse, 'xhtml:link') !== false) {
+            echo "   ✅ Controller generates hreflang links\n";
+        } else {
+            echo "   ❌ Controller missing hreflang links\n";
+        }
+        echo "\n";
+    } catch (\Exception $e) {
+        echo "   ❌ Error: " . $e->getMessage() . "\n\n";
+    }
+}
 
 // Test 1: Check sitemap accessibility
 echo "1. Testing sitemap.xml accessibility...\n";
@@ -147,8 +179,16 @@ echo "✅ XML structure is correct\n";
 echo "✅ Hreflang tags are present\n";
 echo "✅ Found $found/" . count($requiredPages) . " required pages\n";
 echo "\n🎯 Next Steps:\n";
-echo "1. Submit sitemap to Google Search Console: $baseUrl/sitemap.xml\n";
-echo "2. Wait 24-48 hours for Google to crawl\n";
-echo "3. Check Google Search Console for indexing status\n";
-echo "\n✨ All tests passed! Your sitemap is ready for Google.\n";
+if (!$testLocal) {
+    echo "1. If tests failed, deploy changes to Railway first:\n";
+    echo "   git add . && git commit -m 'Fix sitemap' && git push\n";
+    echo "2. Wait for Railway deployment to complete\n";
+    echo "3. Run this test again: php test-sitemap.php\n";
+    echo "4. Submit sitemap to Google Search Console: $baseUrl/sitemap.xml\n";
+} else {
+    echo "1. Test passed locally! Deploy to Railway:\n";
+    echo "   git add . && git commit -m 'Fix sitemap' && git push\n";
+    echo "2. After deployment, test production: php test-sitemap.php\n";
+}
+echo "\n✨ Sitemap is ready!\n";
 
