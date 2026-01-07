@@ -17,26 +17,34 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be at the very top, before ANY other routes
-// Note: php artisan serve serves static files before routes, so we also have public/sitemap.php as fallback
-Route::get('/sitemap.xml', function() {
-    \Log::info('Sitemap.xml route hit', [
-        'uri' => request()->getRequestUri(),
-        'static_file_exists' => file_exists(public_path('sitemap.xml')),
-    ]);
-    
-    // If static file exists, log warning but still use route
-    if (file_exists(public_path('sitemap.xml'))) {
-        \Log::warning('Static sitemap.xml file exists but route is being used');
-    }
-    
-    return app(\App\Http\Controllers\SitemapController::class)->main();
-})->name('sitemap.main');
+// Exclude session middleware since sitemaps don't need sessions (and may not have DB connection)
+// This prevents database connection errors when DB is unavailable
+Route::withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\Session\Middleware\AuthenticateSession::class,
+    \App\Http\Middleware\SetLocale::class, // Also exclude SetLocale since it uses Session
+    \App\Http\Middleware\TrackPageViews::class, // Exclude tracking since it may use DB
+])->group(function () {
+    Route::get('/sitemap.xml', function() {
+        \Log::info('Sitemap.xml route hit', [
+            'uri' => request()->getRequestUri(),
+            'static_file_exists' => file_exists(public_path('sitemap.xml')),
+        ]);
+        
+        // If static file exists, log warning but still use route
+        if (file_exists(public_path('sitemap.xml'))) {
+            \Log::warning('Static sitemap.xml file exists but route is being used');
+        }
+        
+        return app(\App\Http\Controllers\SitemapController::class)->main();
+    })->name('sitemap.main');
 
-Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
-Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
+    Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
-// Alternative route without .xml extension (fallback if needed)
-Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
+    // Alternative route without .xml extension (fallback if needed)
+    Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
+});
 
 // Route to serve storage files - IMPROVED VERSION
 // This route MUST be after sitemap routes to avoid catching sitemap.xml
