@@ -22,6 +22,8 @@ Route::get('/health', function () {
 Route::withoutMiddleware([
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\Session\Middleware\AuthenticateSession::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class, // Requires session
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, // Requires session for CSRF
     \App\Http\Middleware\SetLocale::class, // Also exclude SetLocale since it uses Session
     \App\Http\Middleware\TrackPageViews::class, // Exclude tracking since it may use DB
 ])->group(function () {

@@ -4,36 +4,31 @@
  * This ensures sitemap.xml requests route to Laravel even if static file doesn't exist
  */
 
-$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+// Get the request URI
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 
-// Handle sitemap.xml requests - route to Laravel if file doesn't exist
+// Handle sitemap.xml requests - ALWAYS route to Laravel (never serve static file)
 if (preg_match('#^/sitemap.*\.xml$#', $uri)) {
-    $file = __DIR__ . $uri;
-    
-    // If static file doesn't exist, route to Laravel
-    if (!file_exists($file) || !is_file($file)) {
-        // Route to Laravel index.php
-        $_SERVER['SCRIPT_NAME'] = '/index.php';
-        chdir(__DIR__);
-        require __DIR__ . '/index.php';
-        return true;
-    }
-    
-    // If file exists, serve it normally
-    return false;
+    // Always route to Laravel for sitemap requests, regardless of static file existence
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    $_SERVER['PHP_SELF'] = '/index.php';
+    chdir(__DIR__);
+    require __DIR__ . '/index.php';
+    exit; // Stop execution after routing to Laravel
 }
 
 // For all other requests, check if file exists
 $file = __DIR__ . $uri;
 
 // If file exists and is not a directory, serve it
-if (file_exists($file) && is_file($file) && $uri !== '/') {
-    return false; // Let PHP serve the file
+if ($uri !== '/' && file_exists($file) && is_file($file)) {
+    return false; // Let PHP serve the static file
 }
 
 // Otherwise, route to Laravel
 $_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
 chdir(__DIR__);
 require __DIR__ . '/index.php';
-return true;
+exit; // Stop execution after routing to Laravel
 
