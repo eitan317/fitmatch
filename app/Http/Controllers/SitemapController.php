@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Log;
 
 class SitemapController extends Controller
 {
+    /**
+     * Supported locales for the sitemap
+     */
+    private function getSupportedLocales(): array
+    {
+        return ['he', 'en', 'ru', 'ar'];
+    }
+
+    /**
+     * Get locale code for hreflang (ISO 639-1 format)
+     */
+    private function getHreflangCode(string $locale): string
+    {
+        return $locale; // Already in ISO 639-1 format
+    }
+
     public function index()
     {
         try {
@@ -45,46 +61,28 @@ class SitemapController extends Controller
     {
         try {
             Log::info('Sitemap main called');
-            $baseUrl = config('app.url');
+            $baseUrl = rtrim(config('app.url'), '/');
+            $locales = $this->getSupportedLocales();
             
             $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
             
-            // Homepage
-            $xml .= $this->url($baseUrl . '/', '1.0', 'daily', now());
+            // Homepage with all language versions
+            $xml .= $this->urlWithHreflang('/', '1.0', 'daily', now(), $locales, $baseUrl);
             
-            // Static pages
+            // Static pages with all language versions
             $pages = [
-                '/trainers',
-                '/about',
-                '/faq',
-                '/contact',
-                '/privacy',
-                '/terms',
+                '/trainers' => ['priority' => '0.9', 'changefreq' => 'weekly'],
+                '/about' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+                '/faq' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+                '/contact' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+                '/privacy' => ['priority' => '0.5', 'changefreq' => 'yearly'],
+                '/terms' => ['priority' => '0.5', 'changefreq' => 'yearly'],
             ];
             
-            foreach ($pages as $page) {
-                $xml .= $this->url($baseUrl . $page, '0.8', 'weekly', now()->subDays(7));
-            }
-            
-            // Get all approved trainers
-            try {
-                $query = Trainer::where('approved_by_admin', true);
-                
-                if (Schema::hasColumn('trainers', 'status')) {
-                    $query->whereIn('status', ['active', 'trial']);
-                }
-                
-                $trainers = $query->get();
-                
-                foreach ($trainers as $trainer) {
-                    $url = $baseUrl . '/trainers/' . $trainer->id;
-                    $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
-                    $xml .= $this->url($url, '0.7', 'monthly', $lastmod);
-                }
-            } catch (\Exception $e) {
-                Log::warning('Error fetching trainers for sitemap: ' . $e->getMessage());
-                // Continue without trainers if DB error
+            foreach ($pages as $page => $config) {
+                $lastmod = ($page === '/trainers') ? now() : now()->subDays(7);
+                $xml .= $this->urlWithHreflang($page, $config['priority'], $config['changefreq'], $lastmod, $locales, $baseUrl);
             }
             
             $xml .= '</urlset>';
@@ -103,10 +101,11 @@ class SitemapController extends Controller
     public function trainers()
     {
         try {
-            $baseUrl = config('app.url');
+            $baseUrl = rtrim(config('app.url'), '/');
+            $locales = $this->getSupportedLocales();
             
             $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
             
             // Check if status column exists (for migration compatibility)
             $query = Trainer::where('approved_by_admin', true);
@@ -118,9 +117,9 @@ class SitemapController extends Controller
             $trainers = $query->get();
             
             foreach ($trainers as $trainer) {
-                $url = $baseUrl . '/trainers/' . $trainer->id;
+                $path = '/trainers/' . $trainer->id;
                 $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
-                $xml .= $this->url($url, '0.7', 'monthly', $lastmod);
+                $xml .= $this->urlWithHreflang($path, '0.7', 'monthly', $lastmod, $locales, $baseUrl);
             }
             
             $xml .= '</urlset>';
@@ -134,6 +133,54 @@ class SitemapController extends Controller
         }
     }
     
+    /**
+     * Generate URL entry with hreflang tags for all language versions
+     */
+    private function urlWithHreflang(string $path, string $priority, string $changefreq, $lastmod, array $locales, string $baseUrl): string
+    {
+        if (!$lastmod instanceof \Illuminate\Support\Carbon) {
+            $lastmod = now();
+        }
+        
+        // Normalize path
+        $path = '/' . ltrim($path, '/');
+        
+        // Canonical URL (Hebrew with /he/ prefix for SEO consistency)
+        $canonicalUrl = $baseUrl . '/he' . $path;
+        
+        $xml = '  <url>' . "\n";
+        $xml .= '    <loc>' . htmlspecialchars($canonicalUrl, ENT_XML1, 'UTF-8') . '</loc>' . "\n";
+        $xml .= '    <lastmod>' . $lastmod->toAtomString() . '</lastmod>' . "\n";
+        $xml .= '    <changefreq>' . $changefreq . '</changefreq>' . "\n";
+        $xml .= '    <priority>' . $priority . '</priority>' . "\n";
+        
+        // Add hreflang tags for all language versions
+        foreach ($locales as $locale) {
+            $hreflang = $this->getHreflangCode($locale);
+            
+            // Build language-specific URL
+            $langUrl = $baseUrl . '/' . $locale . $path;
+            
+            $xml .= '    <xhtml:link rel="alternate" hreflang="' . htmlspecialchars($hreflang, ENT_XML1, 'UTF-8') . '" href="' . htmlspecialchars($langUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
+        }
+        
+        // Add hreflang for backward-compatible URL (Hebrew without prefix)
+        $backwardCompatUrl = $baseUrl . $path;
+        if ($backwardCompatUrl !== $canonicalUrl) {
+            $xml .= '    <xhtml:link rel="alternate" hreflang="he" href="' . htmlspecialchars($backwardCompatUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
+        }
+        
+        // Add x-default (pointing to Hebrew canonical URL)
+        $xml .= '    <xhtml:link rel="alternate" hreflang="x-default" href="' . htmlspecialchars($canonicalUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
+        
+        $xml .= '  </url>' . "\n";
+        
+        return $xml;
+    }
+    
+    /**
+     * Legacy method for backward compatibility (not used but kept for safety)
+     */
     private function url($loc, $priority, $changefreq, $lastmod)
     {
         if (!$lastmod instanceof \Illuminate\Support\Carbon) {

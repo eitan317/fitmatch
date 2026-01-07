@@ -17,62 +17,12 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be before other routes to catch sitemap requests
-// Test routes to verify routing works
-Route::get('/sitemap-test', function () {
-    \Log::info('Sitemap test route called at ' . now());
-    return response('Sitemap test route works! Route registered successfully.', 200);
-});
-
-// Alternative sitemap route without .xml extension (for testing)
-Route::get('/sitemap', function () {
-    \Log::info('Sitemap route (no extension) called at ' . now());
-    try {
-        $response = app(\App\Http\Controllers\SitemapController::class)->main();
-        return $response;
-    } catch (\Exception $e) {
-        \Log::error('Error in /sitemap route: ' . $e->getMessage());
-        return response('Error: ' . $e->getMessage(), 500);
-    }
-})->name('sitemap.alt');
-
-// Main sitemap route - redirect to PHP file that generates XML dynamically
-// This bypasses php artisan serve's static file serving
-Route::get('/sitemap.xml', function () {
-    \Log::info('Sitemap.xml route hit - redirecting to sitemap.php');
-    
-    // Check if sitemap.php exists, if not create it
-    $phpFile = public_path('sitemap.php');
-    if (!file_exists($phpFile)) {
-        \Log::warning('sitemap.php not found, generating sitemap via controller');
-        try {
-            $controller = app(\App\Http\Controllers\SitemapController::class);
-            return $controller->main();
-        } catch (\Exception $e) {
-            \Log::error('Error generating sitemap: ' . $e->getMessage());
-            return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
-        }
-    }
-    
-    // Generate XML via controller and also write to static file as backup
-    try {
-        $controller = app(\App\Http\Controllers\SitemapController::class);
-        $response = $controller->main();
-        $xmlContent = $response->getContent();
-        
-        // Write to static file as backup
-        file_put_contents(public_path('sitemap.xml'), $xmlContent);
-        
-        return $response;
-    } catch (\Exception $e) {
-        \Log::error('Error in sitemap.xml route: ' . $e->getMessage());
-        return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
-            ->header('Content-Type', 'application/xml; charset=utf-8');
-    }
-})->name('sitemap.main');
-
+Route::get('/sitemap.xml', [SitemapController::class, 'main'])->name('sitemap.main');
 Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+
+// Alternative sitemap route without .xml extension (for testing)
+Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
 
 // Route to serve storage files - IMPROVED VERSION
 // This route MUST be after sitemap routes to avoid catching sitemap.xml
@@ -206,30 +156,42 @@ Route::get('/robots.txt', function () {
         ->header('Content-Type', 'text/plain');
 })->name('robots.txt');
 
-Route::get('/', [PageController::class, 'welcome'])->name('welcome');
+// Language switching (must be before language-prefixed routes)
+Route::get('/language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
 
-// Public pages routes
+// Google Auth routes (no language prefix needed)
+Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
+
+// Public routes with optional language prefix
+// Define routes both with and without language prefix for backward compatibility
+$supportedLocales = ['he', 'en', 'ru', 'ar'];
+
+// Routes without language prefix (backward compatibility - default to Hebrew)
+Route::get('/', [PageController::class, 'welcome'])->name('welcome');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'storeContact'])->name('contact.store');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
-
-// Google Auth routes
-Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
-Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
-
-// Language switching
-Route::get('/language/{locale}', [LanguageController::class, 'switchLanguage'])->name('language.switch');
-
-// Public routes
-// Auth routes are handled by Laravel Breeze in routes/auth.php
-// The routes are loaded in bootstrap/app.php
-
-// Public trainer routes - anyone can view trainers without authentication
 Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers.index');
 Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name('trainers.show');
+
+// Routes with language prefix (SEO-friendly URLs)
+foreach ($supportedLocales as $locale) {
+    Route::prefix($locale)->group(function () use ($locale) {
+        Route::get('/', [PageController::class, 'welcome'])->name("welcome.{$locale}");
+        Route::get('/about', [PageController::class, 'about'])->name("about.{$locale}");
+        Route::get('/faq', [PageController::class, 'faq'])->name("faq.{$locale}");
+        Route::get('/contact', [PageController::class, 'contact'])->name("contact.{$locale}");
+        Route::post('/contact', [PageController::class, 'storeContact'])->name("contact.store.{$locale}");
+        Route::get('/privacy', [PageController::class, 'privacy'])->name("privacy.{$locale}");
+        Route::get('/terms', [PageController::class, 'terms'])->name("terms.{$locale}");
+        Route::get('/trainers', [TrainerController::class, 'index'])->name("trainers.index.{$locale}");
+        Route::get('/trainers/{trainer}', [TrainerController::class, 'show'])->name("trainers.show.{$locale}");
+    });
+}
 
 // Protected routes - require authentication
 Route::middleware('auth')->group(function () {
