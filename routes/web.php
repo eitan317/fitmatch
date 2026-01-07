@@ -163,8 +163,10 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    // sitemap.xml
-    $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
+    // sitemap - use .php file since php artisan serve doesn't route .xml to Laravel
+    $content .= "Sitemap: " . config('app.url') . "/sitemap.php\n";
+    $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n"; // Also try route
+    $content .= "Sitemap: " . config('app.url') . "/sitemap\n"; // Fallback
     
     return response($content, 200)
         ->header('Content-Type', 'text/plain');

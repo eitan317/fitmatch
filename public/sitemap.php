@@ -3,7 +3,15 @@
  * Dynamic Sitemap Generator
  * This PHP file generates the sitemap.xml dynamically
  * It bypasses php artisan serve's static file serving
+ * 
+ * Access via: /sitemap.php (works with php artisan serve)
+ * Or: /sitemap.xml (if route works)
  */
+
+// Log that sitemap.php is being used
+if (function_exists('error_log')) {
+    error_log('Sitemap.php file accessed: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown'));
+}
 
 try {
     // Bootstrap Laravel
@@ -17,6 +25,8 @@ try {
 
     // Output with proper headers
     header('Content-Type: application/xml; charset=utf-8');
+    header('Cache-Control: public, max-age=3600');
+    http_response_code($response->getStatusCode());
     echo $response->getContent();
     
 } catch (\Exception $e) {
