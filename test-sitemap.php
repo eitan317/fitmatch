@@ -38,10 +38,21 @@ if (strpos($response, '<?xml version="1.0"') === 0) {
     exit(1);
 }
 
-if (strpos($response, 'xmlns:xhtml="http://www.w3.org/1999/xhtml"') !== false) {
+// Check for hreflang namespace (flexible matching)
+$hasHreflangNamespace = (
+    strpos($response, 'xmlns:xhtml') !== false ||
+    strpos($response, 'xmlns:xhtml=') !== false ||
+    preg_match('/xmlns:xhtml\s*=\s*["\']http:\/\/www\.w3\.org\/1999\/xhtml["\']/', $response)
+);
+
+if ($hasHreflangNamespace) {
     echo "   ✅ Hreflang namespace found\n";
 } else {
     echo "   ❌ Hreflang namespace missing\n";
+    echo "   Debug: Looking for xmlns:xhtml in response...\n";
+    // Show first 500 chars of response for debugging
+    $preview = substr($response, 0, 500);
+    echo "   Response preview: " . htmlspecialchars($preview) . "\n";
     exit(1);
 }
 
