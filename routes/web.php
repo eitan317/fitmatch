@@ -17,15 +17,26 @@ Route::get('/health', function () {
 });
 
 // Sitemap routes - MUST be at the very top, before ANY other routes
-// Use explicit route patterns to ensure they're caught
-Route::get('/sitemap.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+// Note: php artisan serve serves static files before routes, so we also have public/sitemap.php as fallback
+Route::get('/sitemap.xml', function() {
+    \Log::info('Sitemap.xml route hit', [
+        'uri' => request()->getRequestUri(),
+        'static_file_exists' => file_exists(public_path('sitemap.xml')),
+    ]);
+    
+    // If static file exists, log warning but still use route
+    if (file_exists(public_path('sitemap.xml'))) {
+        \Log::warning('Static sitemap.xml file exists but route is being used');
+    }
+    
+    return app(\App\Http\Controllers\SitemapController::class)->main();
+})->name('sitemap.main');
+
 Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
 Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
-// Alternative routes without .xml extension (for Railway compatibility)
+// Alternative route without .xml extension (fallback if needed)
 Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
-Route::get('/sitemap-trainers', [SitemapController::class, 'trainers'])->name('sitemap.trainers.alt');
-Route::get('/sitemap-index', [SitemapController::class, 'index'])->name('sitemap.index.alt');
 
 // Route to serve storage files - IMPROVED VERSION
 // This route MUST be after sitemap routes to avoid catching sitemap.xml
@@ -152,10 +163,8 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    // sitemap.xml - primary sitemap
+    // sitemap.xml
     $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
-    // Fallback sitemap without .xml extension (for Railway compatibility)
-    $content .= "Sitemap: " . config('app.url') . "/sitemap\n";
     
     return response($content, 200)
         ->header('Content-Type', 'text/plain');

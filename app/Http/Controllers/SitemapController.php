@@ -61,7 +61,14 @@ class SitemapController extends Controller
     public function main()
     {
         try {
-            Log::info('Sitemap main called');
+            // Detailed logging for debugging
+            Log::info('Sitemap main called', [
+                'request_uri' => request()->getRequestUri(),
+                'method' => request()->getMethod(),
+                'app_url' => config('app.url'),
+                'static_file_exists' => file_exists(public_path('sitemap.xml')),
+            ]);
+            
             $baseUrl = rtrim(config('app.url'), '/');
             $locales = $this->getSupportedLocales();
             
