@@ -93,6 +93,28 @@ class SitemapController extends Controller
                 $xml .= $this->urlWithHreflang($page, $config['priority'], $config['changefreq'], $lastmod, $locales, $baseUrl);
             }
             
+            // Get all approved trainers and add them to main sitemap
+            try {
+                $query = Trainer::where('approved_by_admin', true);
+                
+                if (Schema::hasColumn('trainers', 'status')) {
+                    $query->whereIn('status', ['active', 'trial']);
+                }
+                
+                $trainers = $query->get();
+                
+                Log::info('Adding trainers to main sitemap', ['count' => $trainers->count()]);
+                
+                foreach ($trainers as $trainer) {
+                    $path = '/trainers/' . $trainer->id;
+                    $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
+                    $xml .= $this->urlWithHreflang($path, '0.7', 'monthly', $lastmod, $locales, $baseUrl);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error fetching trainers for main sitemap: ' . $e->getMessage());
+                // Continue without trainers if DB error
+            }
+            
             $xml .= '</urlset>';
             
             Log::info('Sitemap generated successfully');

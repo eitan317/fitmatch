@@ -39,10 +39,10 @@ Route::withoutMiddleware([
         }
         
         return app(\App\Http\Controllers\SitemapController::class)->main();
-    })->name('sitemap.main');
+})->name('sitemap.main');
 
-    Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
-    Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
+Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 
     // Alternative route without .xml extension (fallback if needed)
     Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
