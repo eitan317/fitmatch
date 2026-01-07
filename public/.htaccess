@@ -19,11 +19,10 @@
     RewriteRule ^ %1 [L,R=301]
 
     # Send Requests To Front Controller...
-    # Note: Storage files will be handled by Laravel route, not .htaccess
-    # Exception: Always route sitemap.xml through Laravel for dynamic generation
-    # This MUST come before the file existence check to ensure dynamic sitemap is used
-    RewriteCond %{REQUEST_URI} ^/sitemap.*\.xml$
-    RewriteRule ^ index.php [L]
+    # CRITICAL: Route sitemap.xml to Laravel BEFORE checking for static files
+    # This ensures dynamic sitemap generation even if static file exists
+    RewriteCond %{REQUEST_URI} ^/sitemap.*\.xml$ [NC]
+    RewriteRule ^ index.php [L,QSA]
     
     # Standard Laravel routing for other files
     RewriteCond %{REQUEST_FILENAME} !-d
