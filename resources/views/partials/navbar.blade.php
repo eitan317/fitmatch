@@ -47,7 +47,7 @@
         </div>
         
         <!-- Hamburger Menu Button -->
-        <button class="hamburger-menu" id="navToggle" aria-label="פתיחת תפריט">
+        <button id="navToggle" class="hamburger-menu" aria-label="תפריט">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>

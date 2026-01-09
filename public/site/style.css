@@ -471,32 +471,38 @@ h2, .section-title {
     width: 80%;
 }
 
-/* Hamburger Menu Icon */
+/* Hamburger Menu Icon - IMPROVED FOR TOUCH */
 .hamburger-menu {
     display: none;
     flex-direction: column;
-    justify-content: space-around;
-    width: 28px;
-    height: 24px;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0;
-    z-index: 102;
+    padding: 8px; /* הגדל padding ל-touch target */
+    z-index: 1000 !important; /* z-index גבוה */
     position: relative;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-width: 48px; /* Touch target minimum */
+    min-height: 48px; /* Touch target minimum */
 }
 
 .hamburger-line {
-    width: 100%;
+    width: 24px;
     height: 3px;
     background: var(--primary);
     border-radius: 3px;
     transition: all 0.3s ease;
     transform-origin: center;
+    pointer-events: none; /* מונע הפרעה */
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(7px, 7px);
+    transform: rotate(45deg) translate(6px, 6px);
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(2) {
@@ -504,7 +510,7 @@ h2, .section-title {
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
+    transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* Legacy nav-toggle - keep for compatibility */
@@ -685,17 +691,29 @@ h2, .section-title {
     font-size: 0.9rem;
 }
 
-/* Responsive Navbar - Mobile Menu */
+/* Responsive Navbar - Mobile Menu - IMPROVED */
 @media (max-width: 768px) {
     .site-header {
-        z-index: 100;
+        z-index: 999;
         position: relative;
     }
     
     .hamburger-menu {
-        display: flex !important; /* Show hamburger on mobile */
-        z-index: 102;
+        display: flex !important;
+        width: 48px !important; /* גדול יותר */
+        height: 48px !important; /* גדול יותר */
+        padding: 12px !important; /* יותר padding */
+        z-index: 1001 !important; /* גבוה יותר */
         position: relative;
+        flex-shrink: 0; /* לא מתכווץ */
+        margin-left: auto; /* דוחף שמאלה */
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(74, 158, 255, 0.2);
+    }
+    
+    .hamburger-line {
+        width: 24px !important;
+        height: 3px !important;
     }
 
     .nav-toggle {
@@ -707,10 +725,10 @@ h2, .section-title {
 
     .nav-inner {
         position: relative;
-        z-index: 100;
-        padding: 0.5rem 0.75rem; /* קטן מ-0.75rem 1rem */
-        gap: 0.5rem; /* קטן מ-1rem */
-        min-height: 50px; /* גובה מינימלי */
+        z-index: 999;
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+        min-height: 50px;
     }
 
     .nav-logo {
@@ -739,23 +757,35 @@ h2, .section-title {
         flex-direction: column;
         background: rgba(0, 0, 0, 0.98) !important;
         backdrop-filter: blur(20px);
-        padding: 4rem 1.5rem 2rem 1.5rem !important;
+        padding: 5rem 1.5rem 2rem 1.5rem !important; /* יותר padding מלמעלה */
         gap: 0.5rem;
         display: none !important;
         overflow-y: auto;
-        z-index: 101 !important;
+        z-index: 1000 !important; /* מתחת ל-hamburger */
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         transform: translateX(0);
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.3s ease, visibility 0.3s ease;
         margin: 0 !important;
+        -webkit-overflow-scrolling: touch; /* Smooth scroll ב-iOS */
     }
 
     .nav-links.nav-open {
         display: flex !important;
         opacity: 1 !important;
         visibility: visible !important;
+    }
+
+    /* Close button in menu */
+    .nav-links::before {
+        content: '';
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        width: 48px;
+        height: 48px;
+        z-index: 1001;
     }
 
     .nav-link-item {
@@ -819,13 +849,14 @@ h2, .section-title {
 
 @media (max-width: 480px) {
     .hamburger-menu {
-        width: 22px; /* קטן מ-24px */
-        height: 18px; /* קטן מ-20px */
-        flex-shrink: 0; /* לא מתכווץ */
+        width: 48px !important; /* גדול גם במובייל קטן */
+        height: 48px !important;
+        padding: 12px !important;
     }
     
     .hamburger-line {
-        height: 2px; /* קטן מ-2.5px */
+        width: 22px !important;
+        height: 3px !important;
     }
 
     .nav-inner {

@@ -1181,18 +1181,28 @@ function initNavbarToggle() {
     const links = document.getElementById("navLinks");
     const body = document.body;
     
-    if (!toggle || !links) return;
+    if (!toggle || !links) {
+        console.warn("Navbar toggle elements not found");
+        return;
+    }
 
+    // Prevent default and stop propagation for better touch handling
     toggle.addEventListener("click", function (e) {
-        e.stopPropagation(); // מונע סגירה מיידית
-        toggle.classList.toggle("active"); // Toggle hamburger animation
-        links.classList.toggle("nav-open");
+        e.preventDefault();
+        e.stopPropagation();
         
-        // מונע scroll של body כשהתפריט פתוח
-        if (links.classList.contains("nav-open")) {
-            body.style.overflow = "hidden";
-        } else {
+        const isOpen = links.classList.contains("nav-open");
+        
+        if (isOpen) {
+            // Close menu
+            toggle.classList.remove("active");
+            links.classList.remove("nav-open");
             body.style.overflow = "";
+        } else {
+            // Open menu
+            toggle.classList.add("active");
+            links.classList.add("nav-open");
+            body.style.overflow = "hidden";
         }
         
         // Close language menu when opening nav
@@ -1200,7 +1210,14 @@ function initNavbarToggle() {
         if (languageMenu) {
             languageMenu.classList.remove('active');
         }
-    });
+    }, { passive: false });
+    
+    // Touch event support for mobile
+    toggle.addEventListener("touchend", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle.click(); // Trigger click
+    }, { passive: false });
     
     // Close nav when clicking outside on mobile
     document.addEventListener('click', function(e) {
@@ -1211,10 +1228,10 @@ function initNavbarToggle() {
                 body.style.overflow = "";
             }
         }
-    });
+    }, { passive: true });
     
     // Close nav when clicking on a link
-    const navLinks = links.querySelectorAll('a');
+    const navLinks = links.querySelectorAll('a, button, form');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
             if (window.innerWidth <= 768) {
@@ -1222,8 +1239,17 @@ function initNavbarToggle() {
                 links.classList.remove('nav-open');
                 body.style.overflow = "";
             }
-        });
+        }, { passive: true });
     });
+    
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && links.classList.contains('nav-open')) {
+            toggle.classList.remove('active');
+            links.classList.remove('nav-open');
+            body.style.overflow = "";
+        }
+    }, { passive: true });
 }
 
 // Language Selector Toggle
