@@ -22,6 +22,30 @@
     
     $url = $url ?? url()->current();
     $type = $type ?? 'website';
+    
+    // Generate hreflang URLs for all language versions
+    $supportedLocales = ['he', 'en', 'ru', 'ar'];
+    $baseUrl = rtrim(config('app.url'), '/');
+    $currentPath = parse_url($url, PHP_URL_PATH);
+    
+    // Remove existing language prefix if present
+    $pathSegments = explode('/', trim($currentPath, '/'));
+    if (!empty($pathSegments[0]) && in_array($pathSegments[0], $supportedLocales)) {
+        array_shift($pathSegments);
+    }
+    $basePath = empty($pathSegments) ? '/' : '/' . implode('/', $pathSegments);
+    
+    // Generate language URLs
+    $hreflangUrls = [];
+    foreach ($supportedLocales as $locale) {
+        if ($basePath === '/') {
+            $hreflangUrls[$locale] = $baseUrl . '/' . $locale . '/';
+        } else {
+            $hreflangUrls[$locale] = $baseUrl . '/' . $locale . $basePath;
+        }
+    }
+    // Also add backward-compatible URL (without prefix - defaults to Hebrew)
+    $hreflangUrls['he-backward'] = $baseUrl . $basePath;
 @endphp
 
 <!-- Primary Meta Tags -->
@@ -30,6 +54,16 @@
 <meta name="description" content="{{ $description }}">
 <meta name="keywords" content="{{ $keywords }}">
 <link rel="canonical" href="{{ $url }}">
+
+<!-- Hreflang Tags for Multi-Language Support -->
+@foreach($hreflangUrls as $locale => $langUrl)
+    @if($locale === 'he-backward')
+        <link rel="alternate" hreflang="he" href="{{ $langUrl }}">
+    @else
+        <link rel="alternate" hreflang="{{ $locale }}" href="{{ $langUrl }}">
+    @endif
+@endforeach
+<link rel="alternate" hreflang="x-default" href="{{ $hreflangUrls['he'] }}">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="{{ $type }}">

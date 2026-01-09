@@ -16,36 +16,20 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok'], 200);
 });
 
-// Sitemap routes - MUST be at the very top, before ANY other routes
-// Exclude session middleware since sitemaps don't need sessions (and may not have DB connection)
-// This prevents database connection errors when DB is unavailable
+// Sitemap route - MUST be at the very top, before ANY other routes
+// Stateless route: No session, no CSRF, no database dependencies
+// Works even if database is unavailable
 Route::withoutMiddleware([
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\Session\Middleware\AuthenticateSession::class,
-    \Illuminate\View\Middleware\ShareErrorsFromSession::class, // Requires session
-    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, // Requires session for CSRF
-    \App\Http\Middleware\SetLocale::class, // Also exclude SetLocale since it uses Session
-    \App\Http\Middleware\TrackPageViews::class, // Exclude tracking since it may use DB
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+    \App\Http\Middleware\SetLocale::class,
+    \App\Http\Middleware\TrackPageViews::class,
 ])->group(function () {
-    Route::get('/sitemap.xml', function() {
-        \Log::info('Sitemap.xml route hit', [
-            'uri' => request()->getRequestUri(),
-            'static_file_exists' => file_exists(public_path('sitemap.xml')),
-        ]);
-        
-        // If static file exists, log warning but still use route
-        if (file_exists(public_path('sitemap.xml'))) {
-            \Log::warning('Static sitemap.xml file exists but route is being used');
-        }
-        
-        return app(\App\Http\Controllers\SitemapController::class)->main();
-})->name('sitemap.main');
-
-Route::get('/sitemap-trainers.xml', [SitemapController::class, 'trainers'])->name('sitemap.trainers');
-Route::get('/sitemap-index.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-
-    // Alternative route without .xml extension (fallback if needed)
-    Route::get('/sitemap', [SitemapController::class, 'main'])->name('sitemap.alt');
+    // Primary sitemap route - generates XML dynamically
+    Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
+        ->name('sitemap.xml');
 });
 
 // Route to serve storage files - IMPROVED VERSION
@@ -173,10 +157,8 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    // sitemap - use .php file since php artisan serve doesn't route .xml to Laravel
-    $content .= "Sitemap: " . config('app.url') . "/sitemap.php\n";
-    $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n"; // Also try route
-    $content .= "Sitemap: " . config('app.url') . "/sitemap\n"; // Fallback
+    // Sitemap - primary route
+    $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
     
     return response($content, 200)
         ->header('Content-Type', 'text/plain');

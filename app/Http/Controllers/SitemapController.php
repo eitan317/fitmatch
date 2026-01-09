@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Trainer;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 
@@ -13,190 +12,136 @@ class SitemapController extends Controller
     /**
      * Supported locales for the sitemap
      */
-    private function getSupportedLocales(): array
+    private const SUPPORTED_LOCALES = ['he', 'en', 'ru', 'ar'];
+
+    /**
+     * Single source of truth: All public routes that should be in the sitemap
+     * 
+     * Format: 'path' => ['priority' => '0.8', 'changefreq' => 'monthly']
+     * 
+     * Note: Dynamic routes (like trainer profiles) are handled separately
+     */
+    private function getPublicRoutes(): array
     {
-        return ['he', 'en', 'ru', 'ar'];
+        return [
+            '/' => ['priority' => '1.0', 'changefreq' => 'daily'],
+            '/trainers' => ['priority' => '0.9', 'changefreq' => 'weekly'],
+            '/about' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/faq' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/contact' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/privacy' => ['priority' => '0.5', 'changefreq' => 'yearly'],
+            '/terms' => ['priority' => '0.5', 'changefreq' => 'yearly'],
+        ];
     }
 
     /**
-     * Get locale code for hreflang (ISO 639-1 format)
+     * Generate the main sitemap.xml
+     * 
+     * This is a stateless route that works even if database is unavailable
      */
-    private function getHreflangCode(string $locale): string
-    {
-        return $locale; // Already in ISO 639-1 format
-    }
-
-    public function index()
+    public function index(): Response
     {
         try {
-            $baseUrl = config('app.url');
-            
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-            
-            // Main sitemap
-            $xml .= '  <sitemap>' . "\n";
-            $xml .= '    <loc>' . $baseUrl . '/sitemap.xml</loc>' . "\n";
-            $xml .= '    <lastmod>' . now()->toAtomString() . '</lastmod>' . "\n";
-            $xml .= '  </sitemap>' . "\n";
-            
-            // Trainers sitemap
-            $xml .= '  <sitemap>' . "\n";
-            $xml .= '    <loc>' . $baseUrl . '/sitemap-trainers.xml</loc>' . "\n";
-            $xml .= '    <lastmod>' . now()->toAtomString() . '</lastmod>' . "\n";
-            $xml .= '  </sitemap>' . "\n";
-            
-            $xml .= '</sitemapindex>';
-            
-            return response($xml, 200)
-                ->header('Content-Type', 'application/xml; charset=utf-8')
-                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-        } catch (\Exception $e) {
-            Log::error('Sitemap index error: ' . $e->getMessage());
-            return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
-        }
-    }
-    
-    public function main()
-    {
-        try {
-            // Detailed logging for debugging
-            Log::info('Sitemap main called', [
-                'request_uri' => request()->getRequestUri(),
-                'method' => request()->getMethod(),
-                'app_url' => config('app.url'),
-                'static_file_exists' => file_exists(public_path('sitemap.xml')),
-            ]);
-            
             $baseUrl = rtrim(config('app.url'), '/');
-            $locales = $this->getSupportedLocales();
+            $locales = self::SUPPORTED_LOCALES;
             
             $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
             $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
             
-            // Homepage with all language versions
-            $xml .= $this->urlWithHreflang('/', '1.0', 'daily', now(), $locales, $baseUrl);
-            
-            // Static pages with all language versions
-            $pages = [
-                '/trainers' => ['priority' => '0.9', 'changefreq' => 'weekly'],
-                '/about' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-                '/faq' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-                '/contact' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-                '/privacy' => ['priority' => '0.5', 'changefreq' => 'yearly'],
-                '/terms' => ['priority' => '0.5', 'changefreq' => 'yearly'],
-            ];
-            
-            foreach ($pages as $page => $config) {
-                $lastmod = ($page === '/trainers') ? now() : now()->subDays(7);
-                $xml .= $this->urlWithHreflang($page, $config['priority'], $config['changefreq'], $lastmod, $locales, $baseUrl);
+            // Add all static public routes
+            $publicRoutes = $this->getPublicRoutes();
+            foreach ($publicRoutes as $path => $config) {
+                $lastmod = ($path === '/' || $path === '/trainers') ? now() : now()->subDays(30);
+                $xml .= $this->generateUrlEntry($path, $config['priority'], $config['changefreq'], $lastmod, $locales, $baseUrl);
             }
             
-            // Get all approved trainers and add them to main sitemap
+            // Add dynamic trainer profiles (if database is available)
             try {
-                $query = Trainer::where('approved_by_admin', true);
-                
-                if (Schema::hasColumn('trainers', 'status')) {
-                    $query->whereIn('status', ['active', 'trial']);
-                }
-                
-                $trainers = $query->get();
-                
-                Log::info('Adding trainers to main sitemap', ['count' => $trainers->count()]);
+                $trainers = $this->getApprovedTrainers();
                 
                 foreach ($trainers as $trainer) {
                     $path = '/trainers/' . $trainer->id;
                     $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
-                    $xml .= $this->urlWithHreflang($path, '0.7', 'monthly', $lastmod, $locales, $baseUrl);
+                    $xml .= $this->generateUrlEntry($path, '0.7', 'monthly', $lastmod, $locales, $baseUrl);
                 }
             } catch (\Exception $e) {
-                Log::warning('Error fetching trainers for main sitemap: ' . $e->getMessage());
-                // Continue without trainers if DB error
-            }
-            
-            $xml .= '</urlset>';
-            
-            Log::info('Sitemap generated successfully');
-            
-            return response($xml, 200)
-                ->header('Content-Type', 'application/xml; charset=utf-8')
-                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-        } catch (\Exception $e) {
-            Log::error('Sitemap main error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
-            return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
-                ->header('Content-Type', 'application/xml; charset=utf-8');
-        }
-    }
-    
-    public function trainers()
-    {
-        try {
-            $baseUrl = rtrim(config('app.url'), '/');
-            $locales = $this->getSupportedLocales();
-            
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-            $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
-            
-            // Check if status column exists (for migration compatibility)
-            $query = Trainer::where('approved_by_admin', true);
-            
-            if (Schema::hasColumn('trainers', 'status')) {
-                $query->whereIn('status', ['active', 'trial']);
-            }
-            
-            $trainers = $query->get();
-            
-            foreach ($trainers as $trainer) {
-                $path = '/trainers/' . $trainer->id;
-                $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
-                $xml .= $this->urlWithHreflang($path, '0.7', 'monthly', $lastmod, $locales, $baseUrl);
+                // Log but continue - sitemap should work even if DB is unavailable
+                Log::warning('Could not fetch trainers for sitemap: ' . $e->getMessage());
             }
             
             $xml .= '</urlset>';
             
             return response($xml, 200)
                 ->header('Content-Type', 'application/xml; charset=utf-8')
-                ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+                ->header('Cache-Control', 'public, max-age=3600');
+                
         } catch (\Exception $e) {
-            Log::error('Sitemap trainers error: ' . $e->getMessage());
-            return response('<?xml version="1.0" encoding="UTF-8"?><error>' . htmlspecialchars($e->getMessage()) . '</error>', 500)
+            Log::error('Sitemap generation error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Return valid XML even on error
+            $errorXml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+            $errorXml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+            $errorXml .= '  <error>' . htmlspecialchars($e->getMessage(), ENT_XML1, 'UTF-8') . '</error>' . "\n";
+            $errorXml .= '</urlset>';
+            
+            return response($errorXml, 500)
                 ->header('Content-Type', 'application/xml; charset=utf-8');
         }
     }
-    
+
     /**
-     * Generate URL entry with hreflang tags for all language versions
+     * Get approved trainers for sitemap
      */
-    private function urlWithHreflang(string $path, string $priority, string $changefreq, $lastmod, array $locales, string $baseUrl): string
+    private function getApprovedTrainers()
     {
+        $query = Trainer::where('approved_by_admin', true);
+        
+        if (Schema::hasColumn('trainers', 'status')) {
+            $query->whereIn('status', ['active', 'trial']);
+        }
+        
+        return $query->get();
+    }
+
+    /**
+     * Generate a URL entry with hreflang tags for all language versions
+     * 
+     * @param string $path The route path (e.g., '/about', '/trainers/123')
+     * @param string $priority Priority (0.0 to 1.0)
+     * @param string $changefreq Change frequency (always, hourly, daily, weekly, monthly, yearly, never)
+     * @param \Illuminate\Support\Carbon|string $lastmod Last modification date
+     * @param array $locales Supported locales
+     * @param string $baseUrl Base URL (e.g., 'https://fitmatch.org.il')
+     * @return string XML string for the URL entry
+     */
+    private function generateUrlEntry(string $path, string $priority, string $changefreq, $lastmod, array $locales, string $baseUrl): string
+    {
+        // Normalize path
+        $path = '/' . ltrim($path, '/');
+        
+        // Ensure lastmod is a Carbon instance
         if (!$lastmod instanceof \Illuminate\Support\Carbon) {
             $lastmod = now();
         }
         
-        // Normalize path
-        $path = '/' . ltrim($path, '/');
-        
-        // Canonical URL (Hebrew with /he/ prefix for SEO consistency)
+        // Canonical URL (Hebrew with /he/ prefix for SEO)
         $canonicalUrl = $baseUrl . '/he' . $path;
         
         $xml = '  <url>' . "\n";
         $xml .= '    <loc>' . htmlspecialchars($canonicalUrl, ENT_XML1, 'UTF-8') . '</loc>' . "\n";
         $xml .= '    <lastmod>' . $lastmod->toAtomString() . '</lastmod>' . "\n";
-        $xml .= '    <changefreq>' . $changefreq . '</changefreq>' . "\n";
-        $xml .= '    <priority>' . $priority . '</priority>' . "\n";
+        $xml .= '    <changefreq>' . htmlspecialchars($changefreq, ENT_XML1, 'UTF-8') . '</changefreq>' . "\n";
+        $xml .= '    <priority>' . htmlspecialchars($priority, ENT_XML1, 'UTF-8') . '</priority>' . "\n";
         
         // Add hreflang tags for all language versions
         foreach ($locales as $locale) {
-            $hreflang = $this->getHreflangCode($locale);
-            
-            // Build language-specific URL
             $langUrl = $baseUrl . '/' . $locale . $path;
-            
-            $xml .= '    <xhtml:link rel="alternate" hreflang="' . htmlspecialchars($hreflang, ENT_XML1, 'UTF-8') . '" href="' . htmlspecialchars($langUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
+            $xml .= '    <xhtml:link rel="alternate" hreflang="' . htmlspecialchars($locale, ENT_XML1, 'UTF-8') . '" href="' . htmlspecialchars($langUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
         }
         
-        // Add hreflang for backward-compatible URL (Hebrew without prefix)
+        // Add hreflang for backward-compatible URL (without language prefix - defaults to Hebrew)
         $backwardCompatUrl = $baseUrl . $path;
         if ($backwardCompatUrl !== $canonicalUrl) {
             $xml .= '    <xhtml:link rel="alternate" hreflang="he" href="' . htmlspecialchars($backwardCompatUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
@@ -208,22 +153,5 @@ class SitemapController extends Controller
         $xml .= '  </url>' . "\n";
         
         return $xml;
-    }
-    
-    /**
-     * Legacy method for backward compatibility (not used but kept for safety)
-     */
-    private function url($loc, $priority, $changefreq, $lastmod)
-    {
-        if (!$lastmod instanceof \Illuminate\Support\Carbon) {
-            $lastmod = now();
-        }
-        
-        return '  <url>' . "\n" .
-               '    <loc>' . htmlspecialchars($loc, ENT_XML1, 'UTF-8') . '</loc>' . "\n" .
-               '    <lastmod>' . $lastmod->toAtomString() . '</lastmod>' . "\n" .
-               '    <changefreq>' . $changefreq . '</changefreq>' . "\n" .
-               '    <priority>' . $priority . '</priority>' . "\n" .
-               '  </url>' . "\n";
     }
 }
