@@ -10,9 +10,15 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        
+        <!-- Font Awesome for icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Site CSS for navbar -->
+        <link rel="stylesheet" href="/site/style.css?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
 
         <!-- Schema.org JSON-LD Structured Data -->
         <script type="application/ld+json">
@@ -52,7 +58,7 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+            @include('partials.navbar')
 
             <!-- Page Heading -->
             @isset($header)
@@ -70,5 +76,16 @@
         </div>
         @include('partials.cookie-consent')
         @include('partials.accessibility-panel')
+        
+        <!-- Site JavaScript for navbar toggle -->
+        <script src="/site/script.js?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}"></script>
+        <script>
+            // Initialize navbar toggle on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof initNavbarToggle === 'function') {
+                    initNavbarToggle();
+                }
+            });
+        </script>
     </body>
 </html>
