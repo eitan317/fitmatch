@@ -108,7 +108,7 @@
     bottom: 20px;
     left: 20px;
     z-index: 9999;
-    font-family: "Inter", "Poppins", system-ui, sans-serif;
+    font-family: "Inter", "Assistant", "Rubik", system-ui, sans-serif;
 }
 
 /* Toggle Button */

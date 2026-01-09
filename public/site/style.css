@@ -1,51 +1,58 @@
 /* Google Fonts - Now loaded via link tag in HTML for better performance (removed @import) */
 
-/* CSS Variables - Cyan/Turquoise Fitness Theme with Advanced Animations */
+/* CSS Variables - Premium Israeli Fitness Platform */
 :root {
-    --primary: #4A9EFF;      /* soft blue */
-    --primary-dark: #3A8EEF; /* darker blue */
-    --primary-light: #8FC5FF; /* light blue */
-    --accent: #6BB6FF;       /* soft blue accent */
-    --bg-body: #0a1a1f;      /* dark cyan-tinted black background */
-    --bg-card: #0d2329;      /* dark cyan-gray for cards */
-    --bg-navbar: #001a1a;    /* dark cyan navbar */
-    --text-main: #ffffff;    /* white text */
-    --text-muted: #a0d4d9;   /* light cyan-gray for muted text */
-    --border-soft: rgba(74, 158, 255, 0.2); /* soft blue border */
-    --button-text: #000000;  /* black text on cyan buttons */
-    --cyan-glow: 0 0 10px rgba(74, 158, 255, 0.2), 0 0 20px rgba(74, 158, 255, 0.15), 0 0 30px rgba(74, 158, 255, 0.1);
-    --cyan-glow-strong: 0 0 20px rgba(74, 158, 255, 0.3), 0 0 40px rgba(74, 158, 255, 0.2), 0 0 60px rgba(74, 158, 255, 0.15);
-    --cyan-glow-intense: 0 0 15px rgba(74, 158, 255, 0.4), 0 0 30px rgba(74, 158, 255, 0.3), 0 0 45px rgba(74, 158, 255, 0.2);
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.5);
-    --shadow-md: 0 8px 16px rgba(0,0,0,0.7);
-    --shadow-lg: 0 16px 32px rgba(0,0,0,0.9);
+    /* Primary Colors */
+    --primary: #38BDF8;      /* כחול שמיים - Primary accent */
+    --primary-dark: #0EA5E9; /* darker sky blue */
+    --primary-light: #7DD3FC; /* light sky blue */
+    --secondary: #60A5FA;    /* כחול בהיר - Secondary accent */
+    
+    /* Background Colors */
+    --bg-body: #0F172A;      /* כחול כהה מאוד - Primary background */
+    --bg-card: #111827;      /* כחול־אפור כהה - Secondary background */
+    --bg-navbar: #0F172A;    /* dark navy navbar */
+    
+    /* Text Colors */
+    --text-main: #E5E7EB;    /* טקסט ראשי */
+    --text-muted: #9CA3AF;   /* טקסט משני */
+    
+    /* Borders & Shadows */
+    --border-soft: rgba(56, 189, 248, 0.2); /* subtle blue border */
+    --border-medium: rgba(56, 189, 248, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    
+    /* Button Colors */
+    --button-text-primary: #0F172A;  /* dark text on primary buttons */
+    --button-text-secondary: #38BDF8; /* blue text on secondary buttons */
+    
+    /* Subtle glow (professional, not flashy) */
+    --glow-subtle: 0 0 8px rgba(56, 189, 248, 0.15);
     
     /* Admin Dashboard Specific Colors */
-    --admin-bg: #0f172a;     /* dark navy */
-    --admin-card-bg: rgba(30, 41, 59, 0.6); /* dark slate with transparency */
-    --admin-text-primary: #f1f5f9; /* light gray */
-    --admin-text-secondary: #94a3b8; /* medium gray */
-    --admin-border: rgba(74, 158, 255, 0.1); /* subtle blue border */
-    
-    /* Background Images URLs */
-    --bg-image-1: url('https://totalfusion.com.au/wp-content/uploads/elementor/thumbs/2023_02_08_SF_GymFloor-860-1024x683-1-qep3pa1r6s1f1ajydt3vni5ytgt0pju0tyjufoufzk.jpg');
-    --bg-image-2: url('https://plus.unsplash.com/premium_photo-1661580282598-6883482b4c8e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29uYWwlMjB0cmFpbmVyfGVufDB8fDB8fHww');
-    --bg-image-3: url('https://t3.ftcdn.net/jpg/03/17/91/76/360_F_317917629_HjBCyRlH1Hpwwg2HfEbExTdkbyWiGFuN.jpg');
+    --admin-bg: #0f172a;
+    --admin-card-bg: rgba(17, 24, 39, 0.6);
+    --admin-text-primary: #E5E7EB;
+    --admin-text-secondary: #9CA3AF;
+    --admin-border: rgba(56, 189, 248, 0.1);
 }
 
-/* CSS Variables - Dark Theme (same as default for cyan theme) */
+/* CSS Variables - Dark Theme (matches new premium theme) */
 body.theme-dark {
-    --bg-body: #0a1a1f;
-    --bg-card: #0d2329;
-    --bg-navbar: #001a1a;
-    --primary: #4A9EFF;
-    --primary-dark: #3A8EEF;
-    --primary-light: #8FC5FF;
-    --accent: #6BB6FF;
-    --text-main: #ffffff;
-    --text-muted: #a0d4d9;
-    --border-soft: rgba(74, 158, 255, 0.2);
-    --button-text: #000000;
+    --bg-body: #0F172A;
+    --bg-card: #111827;
+    --bg-navbar: #0F172A;
+    --primary: #38BDF8;
+    --primary-dark: #0EA5E9;
+    --primary-light: #7DD3FC;
+    --secondary: #60A5FA;
+    --text-main: #E5E7EB;
+    --text-muted: #9CA3AF;
+    --border-soft: rgba(56, 189, 248, 0.2);
+    --button-text-primary: #0F172A;
+    --button-text-secondary: #38BDF8;
 }
 
 /* Reset & Base */
@@ -125,35 +132,22 @@ div:not(.training-types-dropdown):not(.accessibility-menu):not(.training-types-c
 
 body {
     background: var(--bg-body);
-    /* Fast loading - gradients only (images loaded async via JS) */
+    /* Clean gradient background - professional and subtle */
     background-image: 
-        /* Dark overlay gradient - ensures text readability */
         linear-gradient(
             to bottom,
-            rgba(10, 26, 31, 0.85) 0%,
-            rgba(10, 26, 31, 0.75) 30%,
-            rgba(10, 26, 31, 0.80) 70%,
-            rgba(10, 26, 31, 0.85) 100%
-        ),
-        /* Gradient overlay with cyan tint */
-        linear-gradient(
-            135deg,
-            rgba(10, 26, 31, 0.9) 0%,
-            rgba(0, 26, 26, 0.8) 50%,
-            rgba(10, 26, 31, 0.9) 100%
+            rgba(15, 23, 42, 0.98) 0%,
+            rgba(17, 24, 39, 0.95) 50%,
+            rgba(15, 23, 42, 0.98) 100%
         );
     
-    /* Background sizing and positioning for gradients only initially */
-    background-size: cover, cover;
-    background-position: center center, center center;
-    background-blend-mode: normal, multiply;
-    
+    background-size: cover;
+    background-position: center center;
     background-repeat: no-repeat;
     background-attachment: scroll;
-    transition: background-image 0.5s ease-in-out;
     
     color: var(--text-main);
-    font-family: "Inter", "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Inter", "Assistant", "Rubik", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     direction: rtl;
     text-align: right;
     margin: 0;
@@ -265,34 +259,28 @@ strong, b {
     
     body {
         font-size: 15px;
-        /* Mobile: gradient only for fast loading */
         background-image: 
             linear-gradient(
                 to bottom,
-                rgba(10, 26, 31, 0.92) 0%,
-                rgba(10, 26, 31, 0.88) 50%,
-                rgba(10, 26, 31, 0.92) 100%
+                rgba(15, 23, 42, 0.98) 0%,
+                rgba(17, 24, 39, 0.95) 50%,
+                rgba(15, 23, 42, 0.98) 100%
             );
-        
         background-size: cover;
         background-position: center center;
-        background-blend-mode: normal;
     }
 }
 
-/* Even more simplified for small mobile devices */
+/* Mobile devices */
 @media (max-width: 480px) {
     body {
-        /* Mobile: gradient only for fast loading */
         background-image: 
             linear-gradient(
                 to bottom,
-                rgba(10, 26, 31, 0.95) 0%,
-                rgba(10, 26, 31, 0.90) 100%
+                rgba(15, 23, 42, 0.98) 0%,
+                rgba(17, 24, 39, 0.96) 100%
             );
-        
         background-size: cover;
-        background-blend-mode: normal;
     }
 }
 
@@ -915,70 +903,56 @@ h2, .section-title {
     }
 }
 
-/* Buttons - Cyan Theme with Advanced Animations */
+/* Buttons - Professional Israeli Design */
 .btn,
 button[type="submit"],
 .btn-primary {
-    background: var(--primary);
-    color: var(--button-text);
+    background: var(--primary); /* כחול שמיים */
+    color: var(--button-text-primary); /* טקסט כהה */
     border: 2px solid var(--primary);
     padding: 0.75rem 2rem;
     border-radius: 8px;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
     display: inline-block;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.2);
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn:hover::before {
-    width: 300px;
-    height: 300px;
+    text-align: center;
 }
 
 .btn:hover,
 button[type="submit"]:hover,
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
-    background: var(--primary);
-    color: var(--button-text);
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn:active {
-    transform: translateY(-1px);
+    transform: translateY(0);
 }
 
-.btn:active::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    animation: ripple 0.6s ease-out;
+.btn-secondary {
+    background: transparent;
+    color: var(--button-text-secondary); /* כחול שמיים */
+    border: 2px solid var(--primary);
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--primary);
+    transform: translateY(-1px);
 }
 
 .btn-outline {
@@ -987,72 +961,62 @@ button[type="submit"]:hover,
     border: 2px solid var(--primary);
     color: var(--primary);
     padding: 0.75rem 2rem;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
     font-size: 0.95rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-outline::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.btn-outline:hover::before {
-    left: 100%;
+    font-weight: 600;
+    text-align: center;
 }
 
 .btn-outline:hover {
-    transform: translateY(-3px);
-    background: rgba(74, 158, 255, 0.1);
-    box-shadow: 0 2px 8px rgba(74, 158, 255, 0.2);
-    color: var(--primary);
-    border-color: var(--accent);
-}
-
-.btn-danger {
-    background: var(--primary);
-    color: var(--button-text);
-    border: 2px solid var(--primary);
-}
-
-.btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+    background: rgba(56, 189, 248, 0.1);
+    transform: translateY(-1px);
 }
 
 .btn-success {
     background: var(--primary);
-    color: var(--button-text);
+    color: var(--button-text-primary);
     border: 2px solid var(--primary);
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 
 .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary {
-    background: transparent;
-    color: var(--text-main);
-    border: 2px solid var(--text-muted);
+.btn-danger {
+    background: #ef4444;
+    color: #ffffff;
+    border: 2px solid #ef4444;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
 }
 
-.btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(100,116,139,0.6);
+.btn-danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-danger {
@@ -1101,20 +1065,12 @@ button[type="submit"]:hover,
 
 .hero h1,
 .hero-title {
-    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-size: clamp(2rem, 4vw, 3rem);
     margin-bottom: 1.5rem;
-    font-weight: 900;
-    position: relative;
-    z-index: 1;
-    background: linear-gradient(135deg, #00FFFF 0%, #00D9FF 50%, #7FFFD4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: 1.1;
-    animation: gradientShift 5s ease infinite, textReveal 1.2s ease-out;
-    background-size: 200% 200%;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 .hero-subtitle {
@@ -1123,9 +1079,9 @@ button[type="submit"]:hover,
 }
 
 .hero p {
-    font-size: 1.3rem;
-    margin-bottom: 2.5rem;
-    opacity: 0.95;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
     position: relative;
     z-index: 1;
     line-height: 1.7;
@@ -1156,21 +1112,7 @@ button[type="submit"]:hover,
     border-radius: 16px;
 }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 0.2; }
-    50% { opacity: 0.35; }
-}
+/* Decorative elements removed - clean professional design */
 
 .hero-buttons {
     display: flex;
@@ -1179,6 +1121,106 @@ button[type="submit"]:hover,
     flex-wrap: wrap;
     position: relative;
     z-index: 1;
+    margin-top: 2rem;
+}
+
+/* Home Search & Filter Bar */
+.home-search-filter {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-soft);
+}
+
+.filter-form {
+    width: 100%;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-item i {
+    color: var(--primary);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.filter-item select,
+.filter-item input {
+    background: var(--bg-body);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.filter-item select:focus,
+.filter-item input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+}
+
+.filter-item select option {
+    background: var(--bg-body);
+    color: var(--text-main);
+}
+
+.filter-submit-btn {
+    background: var(--primary);
+    color: var(--button-text-primary);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.filter-submit-btn:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-submit-btn i {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .home-search-filter {
+        padding: 1rem;
+    }
+    
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-submit-btn {
+        width: 100%;
+    }
 }
 
 /* Cards - Fitness Theme */
@@ -1214,8 +1256,8 @@ button[type="submit"]:hover,
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--glow-subtle), var(--shadow-md);
     border-color: var(--primary);
 }
 
@@ -1459,25 +1501,25 @@ button[type="submit"]:hover,
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(58, 142, 239, 0.05) 100%);
+    background: rgba(56, 189, 248, 0.05);
     opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 18px;
+    transition: opacity 0.2s ease;
+    border-radius: 12px;
     pointer-events: none;
 }
 
 .trainer-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-2px);
     border-color: var(--primary);
-    box-shadow: 0 20px 50px rgba(74, 158, 255, 0.2), 0 0 30px rgba(74, 158, 255, 0.1);
+    box-shadow: var(--glow-subtle), var(--shadow-md);
 }
 
 .trainer-card:hover::before {
-    opacity: 1;
+    opacity: 0.5;
 }
 
 .trainer-card:hover .trainer-card-image {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .trainer-card:hover .trainer-name {
@@ -4219,102 +4261,8 @@ fieldset legend {
     box-shadow: 0 0 0 3px rgba(0,0,0,0.8);
 }
 
-/* Floating Orbs Animation */
-.orb {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(40px);
-    opacity: 0.4;
-    pointer-events: none;
-    animation: orbFloat 24s ease-in-out infinite alternate;
-}
-
-.orb-1 {
-    width: 180px;
-    height: 180px;
-    background: rgba(74, 158, 255, 0.15);
-    top: 8%;
-    right: 5%;
-    box-shadow: 0 0 80px rgba(74, 158, 255, 0.4), 0 0 120px rgba(107, 182, 255, 0.2);
-    animation: cyanPulse 4s ease-in-out infinite, float 6s ease-in-out infinite;
-}
-
-.orb-2 {
-    width: 220px;
-    height: 220px;
-    background: rgba(107, 182, 255, 0.12);
-    bottom: 12%;
-    left: 6%;
-    box-shadow: 0 0 100px rgba(74, 158, 255, 0.3), 0 0 150px rgba(107, 182, 255, 0.15);
-    animation: cyanPulse 5s ease-in-out infinite, float 8s ease-in-out infinite reverse;
-}
-
-@keyframes orbFloat {
-    0%   { transform: translateY(0); }
-    50%  { transform: translateY(10px); }
-    100% { transform: translateY(18px); }
-}
-
-/* Floating Particles */
-.particle {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.particle-1 {
-    width: 4px;
-    height: 4px;
-    background: rgba(74, 158, 255, 0.6);
-    top: 20%;
-    right: 15%;
-    animation: particleFloat 15s linear infinite;
-    box-shadow: 0 0 10px rgba(74, 158, 255, 0.8);
-}
-
-.particle-2 {
-    width: 6px;
-    height: 6px;
-    background: rgba(107, 182, 255, 0.5);
-    top: 60%;
-    right: 80%;
-    animation: particleFloat 20s linear infinite;
-    animation-delay: -5s;
-    box-shadow: 0 0 15px rgba(107, 182, 255, 0.6);
-}
-
-.particle-3 {
-    width: 3px;
-    height: 3px;
-    background: rgba(127, 255, 212, 0.7);
-    top: 40%;
-    right: 50%;
-    animation: particleFloat 18s linear infinite;
-    animation-delay: -10s;
-    box-shadow: 0 0 8px rgba(127, 255, 212, 0.7);
-}
-
-/* Wave Animations */
-.wave {
-    position: absolute;
-    width: 100%;
-    height: 100px;
-    background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.1), transparent);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.3;
-}
-
-.wave-top {
-    top: 0;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(74, 158, 255, 0.15) 25%, 
-        rgba(107, 182, 255, 0.2) 50%, 
-        rgba(74, 158, 255, 0.15) 75%, 
-        transparent 100%);
-}
+/* Decorative elements removed - professional, clean design */
+/* Orbs, particles, and waves removed per design requirements */
 
 /* Trainers Filters - Dark Sporty Theme */
 .trainers-filters {
