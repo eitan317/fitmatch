@@ -18,14 +18,25 @@ class SecurityHeaders
         $response = $next($request);
 
         // Check if request is secure (HTTPS) - Railway sets X-Forwarded-Proto header
+        // Check multiple ways to detect HTTPS behind proxy
         $isSecure = $request->secure() || 
                    $request->header('X-Forwarded-Proto') === 'https' ||
-                   $request->header('X-Forwarded-Ssl') === 'on';
+                   $request->header('X-Forwarded-Ssl') === 'on' ||
+                   $request->server('HTTP_X_FORWARDED_PROTO') === 'https' ||
+                   $request->server('HTTPS') === 'on' ||
+                   $request->server('HTTP_X_FORWARDED_SSL') === 'on';
         
-        // Always add security headers when using HTTPS or in production
-        if ($isSecure || config('app.env') === 'production' || env('FORCE_HTTPS', false)) {
-            // Strict Transport Security (HSTS) - only if HTTPS
-            if ($isSecure) {
+        // CRITICAL: Always add security headers in production, even if $request->secure() returns false
+        // Use env() directly instead of config() to avoid bootstrap timing issues
+        $appEnv = env('APP_ENV', 'local');
+        $isProduction = $appEnv === 'production';
+        $forceHttps = env('FORCE_HTTPS', false);
+        
+        // Always add security headers in production or if HTTPS detected or if explicitly forced
+        if ($isSecure || $isProduction || $forceHttps) {
+            // Strict Transport Security (HSTS) - always set in production, even if secure() returns false
+            // This ensures HSTS is active even if proxy detection fails initially
+            if ($isSecure || $isProduction) {
                 $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
             }
             

@@ -22,8 +22,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Force HTTPS in production (important for Railway/cloud deployments)
-        if (config('app.env') === 'production' || env('FORCE_HTTPS', false)) {
+        // Use env() directly instead of config() to avoid bootstrap timing issues
+        $appEnv = env('APP_ENV', 'local');
+        $isProduction = $appEnv === 'production';
+        $forceHttps = env('FORCE_HTTPS', false);
+        
+        if ($isProduction || $forceHttps) {
             URL::forceScheme('https');
+            
+            // Ensure trusted proxies are set for Railway's proxy headers
+            // This helps Laravel correctly detect HTTPS behind Railway's proxy
+            \Illuminate\Http\Request::setTrustedProxies(
+                ['*'], 
+                \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR | 
+                \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO | 
+                \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST
+            );
         }
 
         // Ensure storage symlink exists (for Railway and other cloud platforms)
