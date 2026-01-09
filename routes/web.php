@@ -9,16 +9,8 @@ use App\Http\Controllers\Admin\TrainerController as AdminTrainerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\SitemapController;
 
-// Health check endpoint for Railway (DB-independent)
-Route::get('/health', function () {
-    return response()->json(['status' => 'ok'], 200);
-});
-
-// Sitemap route - MUST be at the very top, before ANY other routes
-// Stateless route: No session, no CSRF, no database dependencies
-// Works even if database is unavailable
+// Sitemap route - stateless, works on Railway
 Route::withoutMiddleware([
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -26,16 +18,14 @@ Route::withoutMiddleware([
     \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
     \App\Http\Middleware\SetLocale::class,
     \App\Http\Middleware\TrackPageViews::class,
-])->group(function () {
-    // Primary sitemap route - generates XML dynamically
-    // Use explicit path matching to ensure it works with router.php
-    Route::get('/sitemap.xml', function() {
-        return app(\App\Http\Controllers\SitemapController::class)->index();
-    })->name('sitemap.xml');
+])->get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.xml');
+
+// Health check endpoint for Railway (DB-independent)
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
 });
 
-// Route to serve storage files - IMPROVED VERSION
-// This route MUST be after sitemap routes to avoid catching sitemap.xml
+// Route to serve storage files
 Route::get('/storage/{path}', function ($path) {
     // Security: Prevent directory traversal
     $path = str_replace('..', '', $path);
@@ -130,7 +120,7 @@ Route::get('/storage/{path}', function ($path) {
         'Content-Disposition' => 'inline; filename="' . basename($path) . '"',
         'Cache-Control' => 'public, max-age=31536000',
     ]);
-})->where('path', '^(?!sitemap).*'); // Accept any path except sitemap files
+})->where('path', '.*');
 
 // Temporary route to download hero image (remove after use)
 Route::get('/download-hero-image', function () {
@@ -159,7 +149,6 @@ Route::get('/robots.txt', function () {
     $content .= "Allow: /\n";
     $content .= "Disallow: /admin/\n";
     $content .= "Disallow: /trainer/dashboard\n\n";
-    // Sitemap - primary route
     $content .= "Sitemap: " . config('app.url') . "/sitemap.xml\n";
     
     return response($content, 200)

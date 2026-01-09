@@ -5,16 +5,24 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Handle sitemap.xml requests - ensure they go through Laravel routes
-// php artisan serve serves static files before routes, so we need this check
-if (isset($_SERVER['REQUEST_URI']) && preg_match('#^/sitemap.*\.xml$#', $_SERVER['REQUEST_URI'])) {
-    // Log that we're handling sitemap request
-    if (function_exists('error_log')) {
-        error_log('Sitemap request detected in index.php: ' . $_SERVER['REQUEST_URI']);
+// Handle static files when used as router script
+// This allows PHP server to serve static files directly for performance
+// But ensures sitemap.xml always goes to Laravel
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
+$file = __DIR__ . $uri;
+
+// Serve static files directly (but NOT sitemap.xml - it must go to Laravel)
+if ($uri !== '/' && $uri !== '/sitemap.xml' && file_exists($file) && is_file($file)) {
+    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $staticExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'pdf', 'txt', 'json'];
+    
+    // If it's a static file (not PHP), let PHP server serve it directly
+    if (in_array($ext, $staticExtensions) && $ext !== 'php') {
+        return false; // PHP server will serve the static file
     }
-    // Continue to Laravel - don't serve static file
 }
 
+// All other requests (including /sitemap.xml) go to Laravel
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
