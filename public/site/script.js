@@ -1186,7 +1186,7 @@ function initNavbarToggle() {
         return;
     }
 
-    // Prevent default and stop propagation for better touch handling
+    // Click on hamburger button
     toggle.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1216,13 +1216,30 @@ function initNavbarToggle() {
     toggle.addEventListener("touchend", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        toggle.click(); // Trigger click
+        toggle.click();
     }, { passive: false });
     
-    // Close nav when clicking outside on mobile
+    // Close menu when clicking on backdrop (overlay)
+    // We need to detect clicks outside the menu panel itself
     document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-            if (!toggle.contains(e.target) && !links.contains(e.target)) {
+        if (window.innerWidth <= 768 && links.classList.contains('nav-open')) {
+            // Check if click is outside the menu panel
+            // The menu panel is the .nav-links element
+            const menuRect = links.getBoundingClientRect();
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+            
+            // If click is outside the menu panel (on the backdrop overlay)
+            const isOutsideMenu = clickX < menuRect.left || 
+                                 clickX > menuRect.right ||
+                                 clickY < menuRect.top ||
+                                 clickY > menuRect.bottom;
+            
+            // Make sure we're not clicking on the hamburger button
+            const isOnToggle = toggle.contains(e.target);
+            
+            // If click is outside menu and not on toggle, close menu
+            if (isOutsideMenu && !isOnToggle) {
                 toggle.classList.remove('active');
                 links.classList.remove('nav-open');
                 body.style.overflow = "";
@@ -1233,11 +1250,18 @@ function initNavbarToggle() {
     // Close nav when clicking on a link
     const navLinks = links.querySelectorAll('a, button, form');
     navLinks.forEach(link => {
-        link.addEventListener('click', function() {
+        link.addEventListener('click', function(e) {
+            // Don't close if it's a form submit (let it submit first)
+            if (link.tagName === 'FORM' || link.type === 'submit') {
+                return;
+            }
+            
             if (window.innerWidth <= 768) {
-                toggle.classList.remove('active');
-                links.classList.remove('nav-open');
-                body.style.overflow = "";
+                setTimeout(() => {
+                    toggle.classList.remove('active');
+                    links.classList.remove('nav-open');
+                    body.style.overflow = "";
+                }, 150); // Small delay for smooth transition
             }
         }, { passive: true });
     });
@@ -1245,6 +1269,37 @@ function initNavbarToggle() {
     // Close on escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && links.classList.contains('nav-open')) {
+            toggle.classList.remove('active');
+            links.classList.remove('nav-open');
+            body.style.overflow = "";
+        }
+    }, { passive: true });
+    
+    // Close button (the ::before element) - click handler
+    // Since ::before is a pseudo-element, we detect clicks near top-right corner
+    links.addEventListener('click', function(e) {
+        if (!links.classList.contains('nav-open')) return;
+        
+        // Check if clicking near the close button area (top-right corner in RTL)
+        // The close button (::before) is at top-right: right: 1rem (16px), top: 1rem (16px)
+        // Button size: 44px x 44px
+        const rect = links.getBoundingClientRect();
+        const clickX = e.clientX;
+        const clickY = e.clientY;
+        
+        // Close button area: top-right corner
+        const closeButtonRight = rect.right - 16; // 1rem from right
+        const closeButtonLeft = closeButtonRight - 44; // 44px width
+        const closeButtonTop = rect.top + 16; // 1rem from top
+        const closeButtonBottom = closeButtonTop + 44; // 44px height
+        
+        // Check if click is within close button area
+        if (clickX >= closeButtonLeft && 
+            clickX <= closeButtonRight &&
+            clickY >= closeButtonTop && 
+            clickY <= closeButtonBottom) {
+            // Prevent event from bubbling to links
+            e.stopPropagation();
             toggle.classList.remove('active');
             links.classList.remove('nav-open');
             body.style.overflow = "";

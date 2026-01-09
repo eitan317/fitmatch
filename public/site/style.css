@@ -691,29 +691,47 @@ h2, .section-title {
     font-size: 0.9rem;
 }
 
-/* Responsive Navbar - Mobile Menu - IMPROVED */
+/* Responsive Navbar - Mobile Menu - HALF SCREEN SLIDE-IN */
 @media (max-width: 768px) {
     .site-header {
         z-index: 999;
         position: relative;
     }
     
+    /* Hamburger Menu Button - VISIBLE AND LARGE */
     .hamburger-menu {
         display: flex !important;
-        width: 48px !important; /* גדול יותר */
-        height: 48px !important; /* גדול יותר */
-        padding: 12px !important; /* יותר padding */
-        z-index: 1001 !important; /* גבוה יותר */
+        width: 52px !important;
+        height: 52px !important;
+        padding: 14px !important;
+        z-index: 1001 !important;
         position: relative;
-        flex-shrink: 0; /* לא מתכווץ */
-        margin-left: auto; /* דוחף שמאלה */
+        flex-shrink: 0;
+        margin-left: auto;
         cursor: pointer;
+        background: rgba(74, 158, 255, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(74, 158, 255, 0.3);
         -webkit-tap-highlight-color: rgba(74, 158, 255, 0.2);
+        touch-action: manipulation;
+        transition: all 0.3s ease;
+    }
+    
+    .hamburger-menu:hover,
+    .hamburger-menu:active {
+        background: rgba(74, 158, 255, 0.2);
+        border-color: var(--primary);
+    }
+    
+    .hamburger-menu.active {
+        background: rgba(74, 158, 255, 0.25);
+        border-color: var(--primary);
     }
     
     .hamburger-line {
         width: 24px !important;
         height: 3px !important;
+        background: var(--primary) !important;
     }
 
     .nav-toggle {
@@ -746,58 +764,257 @@ h2, .section-title {
         letter-spacing: 0.05em; /* קטן יותר */
     }
 
+    /* Backdrop Overlay - when menu is open */
+    .nav-links::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .nav-links.nav-open::after {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+
+    /* Mobile Menu - HALF SCREEN from RIGHT (RTL) */
     .nav-links {
         position: fixed !important;
         top: 0 !important;
         right: 0 !important;
-        left: 0 !important;
         bottom: 0 !important;
-        width: 100% !important;
+        width: 85% !important;
+        max-width: 320px !important;
         height: 100vh !important;
+        left: auto !important;
         flex-direction: column;
-        background: rgba(0, 0, 0, 0.98) !important;
+        background: linear-gradient(135deg, #0d2329 0%, #001a1a 100%) !important;
         backdrop-filter: blur(20px);
-        padding: 5rem 1.5rem 2rem 1.5rem !important; /* יותר padding מלמעלה */
-        gap: 0.5rem;
-        display: none !important;
+        padding: 4rem 1.5rem 2rem 1.5rem !important;
+        gap: 0.75rem;
+        display: flex !important;
         overflow-y: auto;
-        z-index: 1000 !important; /* מתחת ל-hamburger */
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        transform: translateX(0);
+        z-index: 1000 !important;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.8);
+        transform: translateX(100%); /* Start off-screen to the right */
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                    opacity 0.3s ease, 
+                    visibility 0.3s ease;
         margin: 0 !important;
-        -webkit-overflow-scrolling: touch; /* Smooth scroll ב-iOS */
+        -webkit-overflow-scrolling: touch;
+        border-left: 1px solid rgba(74, 158, 255, 0.2);
     }
 
     .nav-links.nav-open {
-        display: flex !important;
+        transform: translateX(0) !important; /* Slide in from right */
         opacity: 1 !important;
         visibility: visible !important;
     }
 
-    /* Close button in menu */
+    /* Close button area - tap to close */
     .nav-links::before {
-        content: '';
+        content: '✕';
         position: absolute;
         top: 1rem;
-        left: 1rem;
-        width: 48px;
-        height: 48px;
+        right: 1rem;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--primary);
+        cursor: pointer;
         z-index: 1001;
+        background: rgba(74, 158, 255, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(74, 158, 255, 0.3);
+        transition: all 0.3s ease;
+        line-height: 1;
+        font-weight: 300;
+    }
+    
+    .nav-links::before:hover {
+        background: rgba(74, 158, 255, 0.2);
+        transform: scale(1.1);
     }
 
     .nav-link-item {
         width: 100%;
-        padding: 1rem;
+        padding: 1rem 1.25rem;
         font-size: 1rem;
-        border-bottom: 1px solid rgba(74, 158, 255, 0.1);
+        border-radius: 8px;
+        border-bottom: none;
         text-align: right;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        background: rgba(74, 158, 255, 0.05);
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-link-item i {
+        font-size: 1.1rem;
+        color: var(--primary);
+        width: 24px;
+        text-align: center;
+    }
+    
+    .nav-link-item span {
+        flex: 1;
+        font-weight: 500;
+    }
+    
+    .nav-link-item:hover,
+    .nav-link-item:active {
+        background: rgba(74, 158, 255, 0.15);
+        transform: translateX(-4px);
+        color: var(--primary);
     }
 
     .nav-link-item:last-of-type {
         border-bottom: none;
+    }
+
+    /* User section in mobile menu */
+    .nav-user-section-mobile {
+        margin-top: auto;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgba(74, 158, 255, 0.2);
+    }
+    
+    .nav-user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(74, 158, 255, 0.1);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .nav-avatar,
+    .nav-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--primary);
+    }
+    
+    .nav-avatar-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(74, 158, 255, 0.2);
+        color: var(--primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .nav-user-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+    }
+    
+    .nav-user-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+    
+    .nav-user-email-mobile {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+    
+    .nav-btn-logout {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: rgba(255, 74, 74, 0.1);
+        border: 1px solid rgba(255, 74, 74, 0.3);
+        border-radius: 8px;
+        color: #ff6b6b;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        text-align: right;
+    }
+    
+    .nav-btn-logout:hover,
+    .nav-btn-logout:active {
+        background: rgba(255, 74, 74, 0.2);
+        border-color: #ff6b6b;
+        transform: translateX(-4px);
+    }
+    
+    .nav-btn-logout i {
+        font-size: 1.1rem;
+    }
+
+    /* Auth buttons in mobile menu */
+    .nav-auth-section {
+        margin-top: auto;
+        padding-top: 1.5rem;
+        border-top: 2px solid rgba(74, 158, 255, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .nav-auth-btn {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-login-btn {
+        background: rgba(74, 158, 255, 0.1);
+        border: 1px solid rgba(74, 158, 255, 0.3);
+        color: var(--primary);
+    }
+    
+    .nav-login-btn:hover {
+        background: rgba(74, 158, 255, 0.2);
+        transform: translateX(-4px);
+    }
+    
+    .nav-register-btn {
+        background: var(--primary);
+        color: var(--button-text);
+        border: none;
+    }
+    
+    .nav-register-btn:hover {
+        background: var(--primary-dark);
+        transform: translateX(-4px);
     }
 
     .nav-links a,
@@ -805,8 +1022,8 @@ h2, .section-title {
     .nav-links form {
         width: 100%;
         text-align: right;
-        padding: 0.75rem 0;
-        font-size: 0.95rem;
+        padding: 0;
+        font-size: 1rem;
         font-weight: 500;
         display: block;
         color: var(--text-main) !important;
@@ -814,24 +1031,6 @@ h2, .section-title {
 
     .nav-links a:hover {
         color: var(--primary) !important;
-        background: rgba(74, 158, 255, 0.1);
-        padding-right: 1rem;
-    }
-
-    .nav-links > div {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        width: 100%;
-        padding: 0.5rem 0;
-        border-top: 1px solid rgba(74, 158, 255, 0.2);
-        margin-top: 0.5rem;
-    }
-
-    .nav-links > div > span {
-        font-size: 0.9rem;
-        color: var(--text-main);
-        padding: 0.5rem 0;
     }
     
     .nav-user-status {
@@ -848,14 +1047,15 @@ h2, .section-title {
 }
 
 @media (max-width: 480px) {
+    /* Hamburger menu - keep visible and large on small screens */
     .hamburger-menu {
-        width: 48px !important; /* גדול גם במובייל קטן */
-        height: 48px !important;
-        padding: 12px !important;
+        width: 52px !important; /* Same as 768px - keep it visible */
+        height: 52px !important;
+        padding: 14px !important;
     }
     
     .hamburger-line {
-        width: 22px !important;
+        width: 24px !important; /* Keep same size */
         height: 3px !important;
     }
 
@@ -878,14 +1078,15 @@ h2, .section-title {
         letter-spacing: 0.03em;
     }
 
+    /* Menu adjustments for very small screens */
     .nav-links {
-        top: 48px; /* קטן מ-50px */
-        padding: 1.5rem 1rem;
-        gap: 0.5rem;
+        width: 90% !important; /* Slightly wider on small screens */
+        max-width: 280px !important; /* Smaller max width */
+        padding: 3.5rem 1.25rem 1.5rem 1.25rem !important; /* Less top padding */
     }
 
     .nav-link-item {
-        padding: 0.875rem;
+        padding: 0.875rem 1rem;
         font-size: 0.95rem;
     }
 
@@ -893,11 +1094,20 @@ h2, .section-title {
     .nav-links button,
     .nav-links form {
         font-size: 0.9rem;
-        padding: 0.65rem 0;
     }
     
     .nav-user-email {
         max-width: 150px;
+    }
+    
+    .nav-btn-logout {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .nav-auth-btn {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
     }
 
     .language-selector {
