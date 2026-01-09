@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <!-- Google Fonts - Load as link tag instead of @import for better performance -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Assistant:wght@400;500;600;700;800;900&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Main CSS -->
     <link rel="stylesheet" href="/site/style.css?v={{ file_exists(public_path('site/style.css')) ? filemtime(public_path('site/style.css')) : time() }}">
@@ -37,72 +37,33 @@
     @include('partials.navbar')
 
     <main class="page-container">
-        <!-- Hero Section -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="wave wave-top"></div>
+        
         <div class="hero card">
             <div class="hero-content">
-                <h1>מצא את מאמן הכושר שמתאים לך</h1>
-                <p>מאמנים מוסמכים. תוצאות מוכחות. בלי קיצורי דרך.</p>
+                <h1>{{ __('messages.find_perfect_trainer') }}</h1>
+                <p>{{ __('messages.platform_description') }}</p>
                 <div class="hero-buttons">
-                    <a href="/trainers" class="btn btn-primary">מצא מאמן</a>
-                    <a href="/register-trainer" class="btn btn-secondary">הצטרף כמאמן</a>
+                    @auth
+                        <a href="/trainers" class="btn">{{ __('messages.find_trainer_btn') }}</a>
+                        <a href="/register-trainer" class="btn btn-success">{{ __('messages.register_as_trainer_btn') }}</a>
+                    @else
+                        <a href="/trainers" class="btn">{{ __('messages.find_trainer_btn') }}</a>
+                        <a href="/login" class="btn">{{ __('messages.login_to_start') }}</a>
+                        <a href="{{ route('register') }}" class="btn btn-success">{{ __('messages.register_btn') }}</a>
+                    @endauth
                 </div>
             </div>
             <div class="hero-visual">
                 <div class="hero-image-container">
-                    <img src="https://media.istockphoto.com/id/972833328/photo/male-personal-trainer-helping-sportswoman-to-do-exercises-with-barbell-at-gym.jpg?s=612x612&w=0&k=20&c=5kIxaobVDjjDrYvv8qNB2lGJoBImzHvj-csu30o_lZY=" alt="מאמן כושר מקצועי" class="hero-image" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='{{ asset('images/hero-trainers.jpg') }}';">
+                    <img src="https://media.istockphoto.com/id/972833328/photo/male-personal-trainer-helping-sportswoman-to-do-exercises-with-barbell-at-gym.jpg?s=612x612&w=0&k=20&c=5kIxaobVDjjDrYvv8qNB2lGJoBImzHvj-csu30o_lZY=" alt="מאמני כושר מקצועיים" class="hero-image" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='{{ asset('images/hero-trainers.jpg') }}';">
                 </div>
             </div>
-        </div>
-
-        <!-- Search & Filter Bar -->
-        <div class="home-search-filter">
-            <form method="GET" action="{{ route('trainers.index') }}" class="filter-form">
-                <div class="filter-row">
-                    <div class="filter-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <select name="city" id="home-city-filter">
-                            <option value="">מיקום</option>
-                            <option value="תל אביב" {{ request('city') == 'תל אביב' ? 'selected' : '' }}>תל אביב</option>
-                            <option value="ירושלים" {{ request('city') == 'ירושלים' ? 'selected' : '' }}>ירושלים</option>
-                            <option value="חיפה" {{ request('city') == 'חיפה' ? 'selected' : '' }}>חיפה</option>
-                            <option value="באר שבע" {{ request('city') == 'באר שבע' ? 'selected' : '' }}>באר שבע</option>
-                            <option value="ראשון לציון" {{ request('city') == 'ראשון לציון' ? 'selected' : '' }}>ראשון לציון</option>
-                            <option value="נתניה" {{ request('city') == 'נתניה' ? 'selected' : '' }}>נתניה</option>
-                            <option value="אשדוד" {{ request('city') == 'אשדוד' ? 'selected' : '' }}>אשדוד</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-item">
-                        <i class="fas fa-bullseye"></i>
-                        <select name="goal" id="home-goal-filter">
-                            <option value="">מטרה</option>
-                            <option value="mass">מסה</option>
-                            <option value="cutting">חיטוב</option>
-                            <option value="rehab">שיקום</option>
-                            <option value="youth">נוער</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-item">
-                        <i class="fas fa-laptop"></i>
-                        <select name="training_type" id="home-training-type-filter">
-                            <option value="">סוג אימון</option>
-                            <option value="frontal">פרונטלי</option>
-                            <option value="online">אונליין</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-item">
-                        <i class="fas fa-shekel-sign"></i>
-                        <input type="number" name="max_price" id="home-price-filter" placeholder="תקציב מקסימלי" min="0">
-                    </div>
-                    
-                    <button type="submit" class="filter-submit-btn">
-                        <i class="fas fa-search"></i>
-                        <span>חפש</span>
-                    </button>
-                </div>
-            </form>
         </div>
 
         <!-- Why Choose Us Section -->

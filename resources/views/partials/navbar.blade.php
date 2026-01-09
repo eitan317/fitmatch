@@ -28,15 +28,19 @@
             </button>
             <div class="language-menu" id="languageMenu">
                 <a href="{{ route('language.switch', 'he') }}" class="language-option {{ session('locale', 'he') == 'he' ? 'active' : '' }}">
+                    <span class="lang-flag">🇮🇱</span>
                     <span>עברית</span>
                 </a>
                 <a href="{{ route('language.switch', 'ar') }}" class="language-option {{ session('locale', 'he') == 'ar' ? 'active' : '' }}">
+                    <span class="lang-flag">🇵🇸</span>
                     <span>العربية</span>
                 </a>
                 <a href="{{ route('language.switch', 'ru') }}" class="language-option {{ session('locale', 'he') == 'ru' ? 'active' : '' }}">
+                    <span class="lang-flag">🇷🇺</span>
                     <span>Русский</span>
                 </a>
                 <a href="{{ route('language.switch', 'en') }}" class="language-option {{ session('locale', 'he') == 'en' ? 'active' : '' }}">
+                    <span class="lang-flag">🇬🇧</span>
                     <span>English</span>
                 </a>
             </div>
