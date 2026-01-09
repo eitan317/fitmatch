@@ -28,8 +28,10 @@ Route::withoutMiddleware([
     \App\Http\Middleware\TrackPageViews::class,
 ])->group(function () {
     // Primary sitemap route - generates XML dynamically
-    Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])
-        ->name('sitemap.xml');
+    // Use explicit path matching to ensure it works with router.php
+    Route::get('/sitemap.xml', function() {
+        return app(\App\Http\Controllers\SitemapController::class)->index();
+    })->name('sitemap.xml');
 });
 
 // Route to serve storage files - IMPROVED VERSION

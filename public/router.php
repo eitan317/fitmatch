@@ -6,15 +6,25 @@
  * even if a static file exists (for dynamic generation with latest data).
  */
 
+// Get the request URI
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 
-// ALWAYS route sitemap.xml to Laravel (never serve static file)
-// This ensures we get the latest data from the database
-if (preg_match('#^/sitemap\.xml$#i', $uri)) {
+// Normalize URI - remove query string and ensure leading slash
+$uri = '/' . ltrim($uri, '/');
+
+// CRITICAL: ALWAYS route sitemap.xml to Laravel FIRST (before checking for static files)
+// This must be checked before any file existence checks
+if (strtolower($uri) === '/sitemap.xml' || preg_match('#^/sitemap\.xml$#i', $uri)) {
+    // Set up environment for Laravel
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     $_SERVER['PHP_SELF'] = '/index.php';
-    $_SERVER['REQUEST_URI'] = $uri;
+    $_SERVER['REQUEST_URI'] = '/sitemap.xml';
+    $_SERVER['PATH_INFO'] = '/sitemap.xml';
+    
+    // Change to public directory
     chdir(__DIR__);
+    
+    // Route to Laravel
     require __DIR__ . '/index.php';
     exit;
 }
@@ -30,6 +40,7 @@ if ($uri !== '/' && file_exists($file) && is_file($file)) {
 // Otherwise, route to Laravel
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
+$_SERVER['PATH_INFO'] = $uri;
 chdir(__DIR__);
 require __DIR__ . '/index.php';
 exit;
