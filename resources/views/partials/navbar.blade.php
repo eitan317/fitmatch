@@ -46,15 +46,8 @@
             </div>
         </div>
         
-        <!-- Hamburger Menu Button -->
-        <button id="navToggle" class="hamburger-menu" aria-label="תפריט">
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </button>
-        
-        <!-- Navigation Menu -->
-        <nav class="nav-links" id="navLinks">
+        <!-- Desktop Navigation Links -->
+        <nav class="nav-links desktop-nav">
             <a href="/" class="nav-link-item">
                 <i class="fas fa-home"></i>
                 <span>{{ __('messages.home') }}</span>
@@ -74,40 +67,48 @@
                         <span>{{ __('messages.admin_panel') }}</span>
                     </a>
                 @endif
-                <div class="nav-user-section-mobile">
-                    <div class="nav-user-info">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="nav-avatar">
-                        @else
-                            <div class="nav-avatar-placeholder">
-                                {{ mb_substr(Auth::user()->name, 0, 1) }}
-                            </div>
-                        @endif
-                        <div class="nav-user-details">
-                            <span class="nav-user-name">{{ Auth::user()->name }}</span>
-                            <span class="nav-user-email-mobile">{{ Auth::user()->email }}</span>
-                        </div>
-                    </div>
-                    <form action="{{ route('logout') }}" method="POST" class="nav-logout-form">
-                        @csrf
-                        <button type="submit" class="nav-btn-logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>{{ __('messages.logout') }}</span>
-                        </button>
-                    </form>
-                </div>
-            @else
-                <div class="nav-auth-section">
-                    <a href="/login" class="nav-auth-btn nav-login-btn">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>{{ __('messages.login') }}</span>
-                    </a>
-                    <a href="{{ route('register') }}" class="nav-auth-btn nav-register-btn">
-                        <i class="fas fa-user-plus"></i>
-                        <span>{{ __('messages.register') }}</span>
-                    </a>
-                </div>
             @endauth
         </nav>
+    </div>
+    
+    <!-- Mobile Hamburger Menu -->
+    <button id="navToggle" class="hamburger-menu" aria-label="תפריט" aria-expanded="false">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+    
+    <!-- Mobile Menu Panel -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <nav class="mobile-menu-panel" id="mobileMenuPanel">
+        <button class="mobile-menu-close" id="mobileMenuClose" aria-label="סגור תפריט">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="mobile-menu-content">
+            <a href="/trainers" class="mobile-menu-item">
+                <i class="fas fa-search"></i>
+                <span>מציאת מאמן</span>
+            </a>
+            <a href="{{ route('register') }}" class="mobile-menu-item">
+                <i class="fas fa-user-plus"></i>
+                <span>הרשמה</span>
+            </a>
+            <div class="mobile-menu-divider"></div>
+            @auth
+                <form action="{{ route('logout') }}" method="POST" class="mobile-menu-logout-form">
+                    @csrf
+                    <button type="submit" class="mobile-menu-item mobile-menu-logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>התנתקות</span>
+                    </button>
+                </form>
+            @else
+                <a href="/login" class="mobile-menu-item">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>התחברות</span>
+                </a>
+            @endauth
+        </div>
+    </nav>
     </div>
 </header>

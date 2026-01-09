@@ -1175,138 +1175,103 @@ function initLoginPage() {
     // This function is kept for backward compatibility but does nothing
 }
 
-// Initialize navbar toggle for mobile menu
+// Initialize mobile menu toggle - SIMPLE AND CLEAN
 function initNavbarToggle() {
     const toggle = document.getElementById("navToggle");
-    const links = document.getElementById("navLinks");
+    const menuPanel = document.getElementById("mobileMenuPanel");
+    const menuOverlay = document.getElementById("mobileMenuOverlay");
+    const closeButton = document.getElementById("mobileMenuClose");
     const body = document.body;
     
-    if (!toggle || !links) {
-        console.warn("Navbar toggle elements not found", { toggle, links });
+    if (!toggle || !menuPanel || !menuOverlay) {
+        console.warn("Mobile menu elements not found");
         return;
     }
 
-    // Check if already initialized to avoid duplicate listeners
+    // Check if already initialized
     if (toggle.dataset.initialized === 'true') {
         return;
     }
     toggle.dataset.initialized = 'true';
 
-    // Click on hamburger button - SIMPLE AND DIRECT
-    toggle.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+    // Function to open menu
+    function openMenu() {
+        toggle.classList.add("active");
+        toggle.setAttribute("aria-expanded", "true");
+        menuPanel.classList.add("menu-open");
+        menuOverlay.classList.add("active");
+        body.classList.add("menu-open");
+        body.style.overflow = "hidden";
         
-        const isOpen = links.classList.contains("nav-open");
-        
-        if (isOpen) {
-            // Close menu
-            toggle.classList.remove("active");
-            links.classList.remove("nav-open");
-            body.style.overflow = "";
-        } else {
-            // Open menu
-            toggle.classList.add("active");
-            links.classList.add("nav-open");
-            body.style.overflow = "hidden";
-        }
-        
-        // Close language menu when opening nav
+        // Close language menu if open
         const languageMenu = document.getElementById('languageMenu');
         if (languageMenu) {
             languageMenu.classList.remove('active');
         }
-    }, { passive: false });
-    
-    // Touch event support for mobile - FALLBACK
-    toggle.addEventListener("touchend", function (e) {
+    }
+
+    // Function to close menu
+    function closeMenu() {
+        toggle.classList.remove("active");
+        toggle.setAttribute("aria-expanded", "false");
+        menuPanel.classList.remove("menu-open");
+        menuOverlay.classList.remove("active");
+        body.classList.remove("menu-open");
+        body.style.overflow = "";
+    }
+
+    // Toggle menu on hamburger button click
+    toggle.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        toggle.click();
+        
+        if (menuPanel.classList.contains("menu-open")) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
     }, { passive: false });
     
-    // Close menu when clicking on backdrop (overlay)
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768 && links.classList.contains('nav-open')) {
-            // Check if click is outside the menu panel
-            const menuRect = links.getBoundingClientRect();
-            const clickX = e.clientX;
-            const clickY = e.clientY;
-            
-            // If click is outside the menu panel (on the backdrop overlay)
-            const isOutsideMenu = clickX < menuRect.left || 
-                                 clickX > menuRect.right ||
-                                 clickY < menuRect.top ||
-                                 clickY > menuRect.bottom;
-            
-            // Make sure we're not clicking on the hamburger button
-            const isOnToggle = toggle.contains(e.target) || toggle === e.target;
-            
-            // If click is outside menu and not on toggle, close menu
-            if (isOutsideMenu && !isOnToggle) {
-                toggle.classList.remove('active');
-                links.classList.remove('nav-open');
-                body.style.overflow = "";
-            }
-        }
-    }, { passive: true });
+    // Close button click
+    if (closeButton) {
+        closeButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeMenu();
+        }, { passive: false });
+    }
     
-    // Close nav when clicking on a link
-    const navLinks = links.querySelectorAll('a, button, form');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // Close menu when clicking on backdrop overlay
+    menuOverlay.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+    }, { passive: false });
+    
+    // Close menu when clicking on a menu item (link)
+    const menuItems = menuPanel.querySelectorAll('.mobile-menu-item, .mobile-menu-logout-form');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
             // Don't close if it's a form submit (let it submit first)
-            if (link.tagName === 'FORM' || link.type === 'submit') {
+            if (item.tagName === 'FORM' || item.querySelector('button[type="submit"]')) {
+                // Close after a small delay to allow form submission
+                setTimeout(() => {
+                    closeMenu();
+                }, 200);
                 return;
             }
             
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    toggle.classList.remove('active');
-                    links.classList.remove('nav-open');
-                    body.style.overflow = "";
-                }, 150); // Small delay for smooth transition
-            }
+            // Close menu for regular links
+            setTimeout(() => {
+                closeMenu();
+            }, 100);
         }, { passive: true });
     });
     
-    // Close on escape key
+    // Close on Escape key
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && links.classList.contains('nav-open')) {
-            toggle.classList.remove('active');
-            links.classList.remove('nav-open');
-            body.style.overflow = "";
-        }
-    }, { passive: true });
-    
-    // Close button (the ::before element) - click handler
-    // Since ::before is a pseudo-element, we detect clicks near top-right corner
-    links.addEventListener('click', function(e) {
-        if (!links.classList.contains('nav-open')) return;
-        
-        // Check if clicking near the close button area (top-right corner in RTL)
-        // The close button (::before) is at top-right: right: 1rem (16px), top: 1rem (16px)
-        // Button size: 44px x 44px
-        const rect = links.getBoundingClientRect();
-        const clickX = e.clientX;
-        const clickY = e.clientY;
-        
-        // Close button area: top-right corner
-        const closeButtonRight = rect.right - 16; // 1rem from right
-        const closeButtonLeft = closeButtonRight - 44; // 44px width
-        const closeButtonTop = rect.top + 16; // 1rem from top
-        const closeButtonBottom = closeButtonTop + 44; // 44px height
-        
-        // Check if click is within close button area
-        if (clickX >= closeButtonLeft && 
-            clickX <= closeButtonRight &&
-            clickY >= closeButtonTop && 
-            clickY <= closeButtonBottom) {
-            // Prevent event from bubbling to links
-            e.stopPropagation();
-            toggle.classList.remove('active');
-            links.classList.remove('nav-open');
-            body.style.overflow = "";
+        if (e.key === 'Escape' && menuPanel.classList.contains('menu-open')) {
+            closeMenu();
         }
     }, { passive: true });
 }
