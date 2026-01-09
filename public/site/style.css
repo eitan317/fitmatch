@@ -471,38 +471,37 @@ h2, .section-title {
     width: 80%;
 }
 
-/* Hamburger Menu Icon - IMPROVED FOR TOUCH */
+/* Hamburger Menu Icon - SIMPLE AND CLEAN */
 .hamburger-menu {
     display: none;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 30px;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 8px; /* הגדל padding ל-touch target */
-    z-index: 1000 !important; /* z-index גבוה */
+    padding: 0;
+    z-index: 1001;
     position: relative;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(74, 158, 255, 0.3);
     touch-action: manipulation;
-    min-width: 48px; /* Touch target minimum */
-    min-height: 48px; /* Touch target minimum */
+    margin-left: auto;
 }
 
 .hamburger-line {
-    width: 24px;
+    width: 28px;
     height: 3px;
     background: var(--primary);
-    border-radius: 3px;
+    border-radius: 2px;
     transition: all 0.3s ease;
-    transform-origin: center;
-    pointer-events: none; /* מונע הפרעה */
+    display: block;
+    pointer-events: none;
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
+    transform: rotate(45deg) translate(8px, 8px);
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(2) {
@@ -510,7 +509,7 @@ h2, .section-title {
 }
 
 .hamburger-menu.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: rotate(-45deg) translate(8px, -8px);
 }
 
 /* Legacy nav-toggle - keep for compatibility */
@@ -698,40 +697,37 @@ h2, .section-title {
         position: relative;
     }
     
-    /* Hamburger Menu Button - VISIBLE AND LARGE */
+    /* Hamburger Menu Button - SIMPLE AND VISIBLE */
     .hamburger-menu {
         display: flex !important;
-        width: 52px !important;
-        height: 52px !important;
-        padding: 14px !important;
+        width: 40px !important;
+        height: 30px !important;
+        padding: 0 !important;
         z-index: 1001 !important;
-        position: relative;
-        flex-shrink: 0;
-        margin-left: auto;
-        cursor: pointer;
-        background: rgba(74, 158, 255, 0.1);
-        border-radius: 8px;
-        border: 1px solid rgba(74, 158, 255, 0.3);
-        -webkit-tap-highlight-color: rgba(74, 158, 255, 0.2);
-        touch-action: manipulation;
-        transition: all 0.3s ease;
+        position: relative !important;
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+        cursor: pointer !important;
+        background: transparent !important;
+        border: none !important;
+        -webkit-tap-highlight-color: rgba(74, 158, 255, 0.3) !important;
+        touch-action: manipulation !important;
+        transition: all 0.3s ease !important;
     }
     
-    .hamburger-menu:hover,
     .hamburger-menu:active {
-        background: rgba(74, 158, 255, 0.2);
-        border-color: var(--primary);
+        opacity: 0.7;
     }
     
     .hamburger-menu.active {
-        background: rgba(74, 158, 255, 0.25);
-        border-color: var(--primary);
+        opacity: 1;
     }
     
     .hamburger-line {
-        width: 24px !important;
+        width: 28px !important;
         height: 3px !important;
         background: var(--primary) !important;
+        border-radius: 2px !important;
     }
 
     .nav-toggle {
@@ -1047,15 +1043,15 @@ h2, .section-title {
 }
 
 @media (max-width: 480px) {
-    /* Hamburger menu - keep visible and large on small screens */
+    /* Hamburger menu - simple and visible on small screens */
     .hamburger-menu {
-        width: 52px !important; /* Same as 768px - keep it visible */
-        height: 52px !important;
-        padding: 14px !important;
+        width: 40px !important;
+        height: 30px !important;
+        padding: 0 !important;
     }
     
     .hamburger-line {
-        width: 24px !important; /* Keep same size */
+        width: 28px !important;
         height: 3px !important;
     }
 

@@ -1182,11 +1182,17 @@ function initNavbarToggle() {
     const body = document.body;
     
     if (!toggle || !links) {
-        console.warn("Navbar toggle elements not found");
+        console.warn("Navbar toggle elements not found", { toggle, links });
         return;
     }
 
-    // Click on hamburger button
+    // Check if already initialized to avoid duplicate listeners
+    if (toggle.dataset.initialized === 'true') {
+        return;
+    }
+    toggle.dataset.initialized = 'true';
+
+    // Click on hamburger button - SIMPLE AND DIRECT
     toggle.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1212,7 +1218,7 @@ function initNavbarToggle() {
         }
     }, { passive: false });
     
-    // Touch event support for mobile
+    // Touch event support for mobile - FALLBACK
     toggle.addEventListener("touchend", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1220,11 +1226,9 @@ function initNavbarToggle() {
     }, { passive: false });
     
     // Close menu when clicking on backdrop (overlay)
-    // We need to detect clicks outside the menu panel itself
     document.addEventListener('click', function(e) {
         if (window.innerWidth <= 768 && links.classList.contains('nav-open')) {
             // Check if click is outside the menu panel
-            // The menu panel is the .nav-links element
             const menuRect = links.getBoundingClientRect();
             const clickX = e.clientX;
             const clickY = e.clientY;
@@ -1236,7 +1240,7 @@ function initNavbarToggle() {
                                  clickY > menuRect.bottom;
             
             // Make sure we're not clicking on the hamburger button
-            const isOnToggle = toggle.contains(e.target);
+            const isOnToggle = toggle.contains(e.target) || toggle === e.target;
             
             // If click is outside menu and not on toggle, close menu
             if (isOutsideMenu && !isOnToggle) {
