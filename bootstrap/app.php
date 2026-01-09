@@ -20,7 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
         
-        // Add TrackPageViews and SetLocale middleware to web group
+        // Trust Railway proxy headers for HTTPS detection
+        // Railway sets X-Forwarded-Proto header - trust all proxies in production
+        if (config('app.env') === 'production' || env('TRUST_PROXIES', false)) {
+            $middleware->trustProxies(at: '*');
+        }
+        
+        // Add SecurityHeaders, TrackPageViews and SetLocale middleware to web group
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\TrackPageViews::class,

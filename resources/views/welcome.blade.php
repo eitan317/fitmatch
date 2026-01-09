@@ -251,9 +251,15 @@
 
     <script src="/site/script.js?v={{ file_exists(public_path('site/script.js')) ? filemtime(public_path('site/script.js')) : time() }}" defer></script>
     <script>
-        initTheme && initTheme();
-        initNavbarToggle && initNavbarToggle();
-        
+        // Wait for DOM and script.js to load before calling functions
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initTheme === 'function') {
+                initTheme();
+            }
+            if (typeof initNavbarToggle === 'function') {
+                initNavbarToggle();
+            }
+        });
     </script>
 </body>
 </html>
