@@ -21,8 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         
         // Trust Railway proxy headers for HTTPS detection
-        // Railway sets X-Forwarded-Proto header - trust all proxies in production
-        if (config('app.env') === 'production' || env('TRUST_PROXIES', false)) {
+        // Railway sets X-Forwarded-Proto header - trust all proxies (always safe on Railway)
+        // Always enable on Railway (APP_ENV=production) or if explicitly requested
+        $appEnv = env('APP_ENV', 'local');
+        if ($appEnv === 'production' || env('TRUST_PROXIES', false)) {
             $middleware->trustProxies(at: '*');
         }
         
