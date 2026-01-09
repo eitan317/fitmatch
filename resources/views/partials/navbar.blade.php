@@ -119,6 +119,14 @@
                         <span>חזרה לפרופיל הראשי</span>
                     </a>
                 @endif
+                
+                {{-- Admin Panel: Only show if user is admin --}}
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('admin.trainers.index') }}" class="mobile-menu-item">
+                        <i class="fas fa-cog"></i>
+                        <span>{{ __('messages.admin_panel') }}</span>
+                    </a>
+                @endif
             @endguest
             <div class="mobile-menu-divider"></div>
             @auth
