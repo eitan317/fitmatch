@@ -85,10 +85,26 @@
             <i class="fas fa-times"></i>
         </button>
         <div class="mobile-menu-content">
-            <a href="/trainers" class="mobile-menu-item">
-                <i class="fas fa-search"></i>
-                <span>מציאת מאמן</span>
-            </a>
+            @php
+                $isTrainersPage = request()->routeIs('trainers.index*') || 
+                                  request()->routeIs('trainers.show*') ||
+                                  request()->is('trainers') || 
+                                  request()->is('trainers/*') ||
+                                  (request()->is('*/trainers') && !request()->is('admin/*'));
+            @endphp
+            @if($isTrainersPage)
+                {{-- User is on trainers page - show "Back to Home" --}}
+                <a href="/" class="mobile-menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>חזור למסך הבית</span>
+                </a>
+            @else
+                {{-- User is on other pages - show "Find Trainer" --}}
+                <a href="/trainers" class="mobile-menu-item">
+                    <i class="fas fa-search"></i>
+                    <span>מציאת מאמן</span>
+                </a>
+            @endif
             <a href="{{ route('register') }}" class="mobile-menu-item">
                 <i class="fas fa-user-plus"></i>
                 <span>הרשמה</span>

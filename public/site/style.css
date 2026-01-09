@@ -471,7 +471,7 @@ h2, .section-title {
     width: 80%;
 }
 
-/* Hamburger Menu Icon - TOP CORNER (RTL: right, LTR: left) */
+/* Hamburger Menu Icon - TOP LEFT CORNER (Visual left, flush against edge) */
 .hamburger-menu {
     display: none;
     flex-direction: column;
@@ -487,18 +487,18 @@ h2, .section-title {
     padding: 10px;
     z-index: 1002;
     position: fixed;
-    top: 10px;
-    right: 10px; /* RTL: appears on right (which is left visually) */
-    left: auto;
+    top: 8px;
+    right: auto;
+    left: 8px; /* RTL: appears on visual left (which is left in RTL) */
     -webkit-tap-highlight-color: rgba(74, 158, 255, 0.3);
     touch-action: manipulation;
     transition: all 0.3s ease;
 }
 
-/* LTR support - hamburger on left */
+/* LTR support - hamburger on left (same position visually) */
 [dir="ltr"] .hamburger-menu {
+    left: 8px;
     right: auto;
-    left: 10px;
 }
 
 .hamburger-line {
@@ -1231,7 +1231,8 @@ body.menu-open {
 @media (max-width: 480px) {
     .hamburger-menu {
         top: 8px;
-        right: 8px;
+        left: 8px;
+        right: auto;
         width: 44px;
         height: 44px;
     }
