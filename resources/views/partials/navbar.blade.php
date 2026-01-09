@@ -105,10 +105,19 @@
                     <span>מציאת מאמן</span>
                 </a>
             @endif
-            <a href="{{ route('register') }}" class="mobile-menu-item">
-                <i class="fas fa-user-plus"></i>
-                <span>הרשמה</span>
-            </a>
+            @guest
+                {{-- User not logged in: Show "Register as Trainer" --}}
+                <a href="{{ route('trainers.create') }}" class="mobile-menu-item">
+                    <i class="fas fa-user-plus"></i>
+                    <span>הרשמה כמאמן</span>
+                </a>
+            @else
+                {{-- User logged in: Show "Back to Home" --}}
+                <a href="/" class="mobile-menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>חזרה לפרופיל הראשי</span>
+                </a>
+            @endguest
             <div class="mobile-menu-divider"></div>
             @auth
                 <form action="{{ route('logout') }}" method="POST" class="mobile-menu-logout-form">
