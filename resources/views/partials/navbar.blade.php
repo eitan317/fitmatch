@@ -106,17 +106,19 @@
                 </a>
             @endif
             @guest
-                {{-- User not logged in: Show "Register as Trainer" --}}
+                {{-- User not logged in: Always show "Register as Trainer" --}}
                 <a href="{{ route('trainers.create') }}" class="mobile-menu-item">
                     <i class="fas fa-user-plus"></i>
                     <span>הרשמה כמאמן</span>
                 </a>
             @else
-                {{-- User logged in: Show "Back to Home" --}}
-                <a href="/" class="mobile-menu-item">
-                    <i class="fas fa-home"></i>
-                    <span>חזרה לפרופיל הראשי</span>
-                </a>
+                {{-- User logged in: Only show "Back to Main Profile" if NOT on trainers page (avoid duplication) --}}
+                @if(!$isTrainersPage)
+                    <a href="/" class="mobile-menu-item">
+                        <i class="fas fa-home"></i>
+                        <span>חזרה לפרופיל הראשי</span>
+                    </a>
+                @endif
             @endguest
             <div class="mobile-menu-divider"></div>
             @auth
