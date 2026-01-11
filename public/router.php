@@ -24,13 +24,20 @@ if (strtolower($uri) === '/sitemap.xml' || preg_match('#^/sitemap\.xml$#i', $uri
 }
 
 // Serve static files directly (CSS, JS, images, etc.)
+// EXCLUDE XML files (including sitemap.xml) - they should always go through Laravel
 if ($uri !== '/' && file_exists($file) && is_file($file)) {
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-    $staticExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'pdf', 'txt', 'json'];
     
-    // If it's a static file (not PHP), let PHP server serve it directly
-    if (in_array($ext, $staticExtensions) && $ext !== 'php') {
-        return false; // PHP server will serve the static file
+    // Explicitly exclude XML files from static serving (must go through Laravel)
+    if ($ext === 'xml') {
+        // Route XML files to Laravel (fall through to Laravel routing)
+    } else {
+        $staticExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'woff', 'woff2', 'ttf', 'eot', 'pdf', 'txt', 'json'];
+        
+        // If it's a static file (not PHP), let PHP server serve it directly
+        if (in_array($ext, $staticExtensions) && $ext !== 'php') {
+            return false; // PHP server will serve the static file
+        }
     }
 }
 
