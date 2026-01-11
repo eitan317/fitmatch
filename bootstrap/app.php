@@ -28,7 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
             $middleware->trustProxies(at: '*');
         }
         
-        // Add SecurityHeaders, TrackPageViews and SetLocale middleware to web group
+        // Add RedirectToWww first (before other middleware)
+        // Then add SecurityHeaders, TrackPageViews and SetLocale middleware to web group
+        $middleware->web(prepend: [
+            \App\Http\Middleware\RedirectToWww::class,
+        ]);
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\TrackPageViews::class,
