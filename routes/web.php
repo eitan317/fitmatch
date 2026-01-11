@@ -13,14 +13,14 @@ use App\Http\Controllers\SitemapController;
 
 // Sitemap route - stateless, works on Railway
 // MUST be first route (before any other routes or middleware groups)
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml')->withoutMiddleware([
+Route::withoutMiddleware([
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\Session\Middleware\AuthenticateSession::class,
     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
     \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
     \App\Http\Middleware\SetLocale::class,
     \App\Http\Middleware\TrackPageViews::class,
-]);
+])->get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
 
 // Health check endpoint for Railway (DB-independent)
 Route::get('/health', function () {
