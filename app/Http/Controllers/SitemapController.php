@@ -19,11 +19,7 @@ class SitemapController extends Controller
     public function index(): Response
     {
         // Log request to verify it reaches Laravel (temporary debugging)
-        \Log::info('SitemapController::index() called', [
-            'uri' => request()->getRequestUri(),
-            'method' => request()->getMethod(),
-            'ip' => request()->ip(),
-        ]);
+        \Log::info('SitemapController@index called');
         
         $baseUrl = rtrim(config('app.url'), '/');
         
