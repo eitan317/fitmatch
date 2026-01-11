@@ -1,9 +1,17 @@
 <?php
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+// Router for PHP built-in server (Railway)
+// Routes static files directly, everything else to Laravel
+
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $file = __DIR__ . $path;
 
+// Debug logging (temporary - remove after verification)
+if (strpos($path, 'site/') !== false || strpos($path, '.css') !== false || strpos($path, '.js') !== false) {
+    error_log("router.php: Request for {$path}, file exists: " . (file_exists($file) ? 'yes' : 'no') . ", is_file: " . (is_file($file) ? 'yes' : 'no'));
+}
+
 // Serve existing static files directly (css/js/images/etc.)
-if ($path !== '/' && file_exists($file) && !is_dir($file)) {
+if ($path !== '/' && file_exists($file) && is_file($file)) {
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
     
     // MIME type mapping
@@ -28,6 +36,8 @@ if ($path !== '/' && file_exists($file) && !is_dir($file)) {
     
     $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
     
+    error_log("router.php: Serving static file {$path} with MIME type {$mimeType}");
+    
     // Clear any output buffering
     while (ob_get_level()) {
         ob_end_clean();
@@ -43,4 +53,5 @@ if ($path !== '/' && file_exists($file) && !is_dir($file)) {
 }
 
 // Route everything else through Laravel
+error_log("router.php: Routing {$path} to Laravel");
 require __DIR__ . '/index.php';
