@@ -20,7 +20,18 @@ Route::withoutMiddleware([
     \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
     \App\Http\Middleware\SetLocale::class,
     \App\Http\Middleware\TrackPageViews::class,
-])->get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
+])->get('/sitemap.xml', function () {
+    \Log::info('sitemap.xml route hit');
+    try {
+        return app(SitemapController::class)->index();
+    } catch (\Exception $e) {
+        \Log::error('sitemap.xml route ERROR', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        throw $e;
+    }
+})->name('sitemap.xml');
 
 // Health check endpoint for Railway (DB-independent)
 Route::get('/health', function () {
