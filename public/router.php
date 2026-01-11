@@ -12,7 +12,7 @@ if ($uri === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $uri)) {
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     chdir(__DIR__);
     require __DIR__ . '/index.php';
-    // No return needed - require already handles the request
+    exit; // CRITICAL: Stop execution after routing to Laravel
 }
 
 // Serve static files if they exist (CSS, JS, images, etc.)
