@@ -17,7 +17,39 @@ if ($uri === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $uri)) {
 
 // Serve static files if they exist (CSS, JS, images, etc.)
 if ($uri !== '/' && file_exists($file) && is_file($file)) {
-    return false; // Let PHP server serve the static file
+    // Get file extension for MIME type detection
+    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    
+    // MIME type mapping
+    $mimeTypes = [
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'json' => 'application/json',
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        'webp' => 'image/webp',
+        'ico' => 'image/x-icon',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf' => 'font/ttf',
+        'eot' => 'application/vnd.ms-fontobject',
+        'pdf' => 'application/pdf',
+        'txt' => 'text/plain',
+        'xml' => 'application/xml',
+    ];
+    
+    $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
+    
+    // Set headers and serve file
+    header('Content-Type: ' . $mimeType);
+    header('Content-Length: ' . filesize($file));
+    header('Cache-Control: public, max-age=31536000');
+    
+    readfile($file);
+    exit;
 }
 
 // Route everything else to Laravel
