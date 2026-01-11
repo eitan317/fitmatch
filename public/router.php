@@ -1,23 +1,9 @@
 <?php
-/**
- * Router for PHP built-in server (Railway)
- * Routes all requests to Laravel's index.php
- */
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$file = __DIR__ . $path;
 
-$uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
-$file = __DIR__ . $uri;
-
-// Always route sitemap.xml to Laravel (before any file checks)
-if ($uri === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $uri)) {
-    $_SERVER['SCRIPT_NAME'] = '/index.php';
-    chdir(__DIR__);
-    require __DIR__ . '/index.php';
-    exit; // CRITICAL: Stop execution after routing to Laravel
-}
-
-// Serve static files if they exist (CSS, JS, images, etc.)
-if ($uri !== '/' && file_exists($file) && is_file($file)) {
-    // Get file extension for MIME type detection
+// Serve existing static files directly (css/js/images/etc.)
+if ($path !== '/' && file_exists($file) && !is_dir($file)) {
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
     
     // MIME type mapping
@@ -38,21 +24,23 @@ if ($uri !== '/' && file_exists($file) && is_file($file)) {
         'eot' => 'application/vnd.ms-fontobject',
         'pdf' => 'application/pdf',
         'txt' => 'text/plain',
-        'xml' => 'application/xml',
     ];
     
     $mimeType = $mimeTypes[$ext] ?? 'application/octet-stream';
     
+    // Clear any output buffering
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
     // Set headers and serve file
-    header('Content-Type: ' . $mimeType);
-    header('Content-Length: ' . filesize($file));
-    header('Cache-Control: public, max-age=31536000');
+    header('Content-Type: ' . $mimeType, true);
+    header('Content-Length: ' . filesize($file), true);
+    header('Cache-Control: public, max-age=31536000', true);
     
     readfile($file);
     exit;
 }
 
-// Route everything else to Laravel
-$_SERVER['SCRIPT_NAME'] = '/index.php';
-chdir(__DIR__);
+// Route everything else through Laravel
 require __DIR__ . '/index.php';
