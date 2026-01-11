@@ -1,13 +1,26 @@
 <?php
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$file = __DIR__ . $path;
+/**
+ * Router for PHP built-in server (Railway)
+ * Routes all requests to Laravel's index.php
+ */
 
-// Log router.php execution for sitemap requests
-if (strpos($path, 'sitemap') !== false) {
-    error_log("router.php: Request for {$path}, file exists: " . (file_exists($file) ? 'yes' : 'no'));
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
+$file = __DIR__ . $uri;
+
+// Always route sitemap.xml to Laravel (before any file checks)
+if ($uri === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $uri)) {
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    chdir(__DIR__);
+    require __DIR__ . '/index.php';
+    return true;
 }
 
-if ($path !== '/' && file_exists($file) && !is_dir($file)) {
-    return false;
+// Serve static files if they exist (CSS, JS, images, etc.)
+if ($uri !== '/' && file_exists($file) && is_file($file)) {
+    return false; // Let PHP server serve the static file
 }
+
+// Route everything else to Laravel
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+chdir(__DIR__);
 require __DIR__ . '/index.php';
