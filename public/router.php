@@ -12,7 +12,7 @@ if ($uri === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $uri)) {
     $_SERVER['SCRIPT_NAME'] = '/index.php';
     chdir(__DIR__);
     require __DIR__ . '/index.php';
-    return true;
+    // No return needed - require already handles the request
 }
 
 // Serve static files if they exist (CSS, JS, images, etc.)
