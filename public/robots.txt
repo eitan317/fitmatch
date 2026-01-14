@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /trainer/dashboard
+
+Sitemap: https://www.fitmatch.org.il/sitemap.xml

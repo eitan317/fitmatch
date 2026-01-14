@@ -20,7 +20,15 @@
         $imageUrl = url($imageUrl);
     }
     
-    $url = $url ?? url()->current();
+    // Generate canonical URL using config('app.url') to ensure it always points to www.fitmatch.org.il
+    // This prevents canonical URLs from using old Railway subdomains
+    if (!isset($url)) {
+        $baseUrl = rtrim(config('app.url'), '/');
+        $currentPath = request()->getRequestUri();
+        // Remove query string for canonical URL
+        $path = parse_url($currentPath, PHP_URL_PATH);
+        $url = $baseUrl . $path;
+    }
     $type = $type ?? 'website';
     
     // Generate hreflang URLs for all language versions
