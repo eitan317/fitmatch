@@ -45,12 +45,21 @@ class SitemapController extends Controller
                 '/terms' => ['priority' => '0.5', 'changefreq' => 'yearly'],
             ];
             
+            // Generate URL entry for each language version of each page
             foreach ($pages as $path => $config) {
                 $lastmod = ($path === '/' || $path === '/trainers') ? now() : now()->subDays(30);
-                $xml .= $this->urlEntry($path, $config['priority'], $config['changefreq'], $lastmod, $baseUrl);
+                
+                // Create separate URL entry for each language
+                foreach (self::LOCALES as $locale) {
+                    $xml .= $this->urlEntryForLocale($path, $locale, $config['priority'], $config['changefreq'], $lastmod, $baseUrl);
+                }
+                
+                // Also add backward-compatible URL (without prefix - defaults to Hebrew)
+                $xml .= $this->urlEntryForLocale($path, null, $config['priority'], $config['changefreq'], $lastmod, $baseUrl);
             }
             
-            \Log::debug('SitemapController: Static pages added', ['count' => count($pages)]);
+            $totalStaticUrls = count($pages) * (count(self::LOCALES) + 1);
+            \Log::debug('SitemapController: Static pages added', ['count' => $totalStaticUrls]);
             
             // Trainer profiles
             try {
@@ -65,7 +74,14 @@ class SitemapController extends Controller
                 foreach ($trainers as $trainer) {
                     $path = '/trainers/' . $trainer->id;
                     $lastmod = $trainer->updated_at ?? $trainer->created_at ?? now();
-                    $xml .= $this->urlEntry($path, '0.7', 'monthly', $lastmod, $baseUrl);
+                    
+                    // Create separate URL entry for each language
+                    foreach (self::LOCALES as $locale) {
+                        $xml .= $this->urlEntryForLocale($path, $locale, '0.7', 'monthly', $lastmod, $baseUrl);
+                    }
+                    
+                    // Also add backward-compatible URL (without prefix - defaults to Hebrew)
+                    $xml .= $this->urlEntryForLocale($path, null, '0.7', 'monthly', $lastmod, $baseUrl);
                 }
             } catch (\Exception $e) {
                 \Log::warning('SitemapController: Error fetching trainers', [
@@ -104,9 +120,17 @@ class SitemapController extends Controller
     }
 
     /**
-     * Generate URL entry with hreflang tags
+     * Generate URL entry for a specific locale with hreflang tags
+     * 
+     * @param string $path The page path (e.g., '/about')
+     * @param string|null $locale The locale (e.g., 'he', 'en', 'ru', 'ar') or null for backward-compatible URL
+     * @param string $priority
+     * @param string $changefreq
+     * @param mixed $lastmod
+     * @param string $baseUrl
+     * @return string
      */
-    private function urlEntry(string $path, string $priority, string $changefreq, $lastmod, string $baseUrl): string
+    private function urlEntryForLocale(string $path, ?string $locale, string $priority, string $changefreq, $lastmod, string $baseUrl): string
     {
         $path = '/' . ltrim($path, '/');
         
@@ -114,8 +138,12 @@ class SitemapController extends Controller
             $lastmod = now();
         }
         
-        // Canonical URL (Hebrew)
-        $canonical = $baseUrl . '/he' . $path;
+        // Build URL with locale prefix (or without prefix if locale is null)
+        if ($locale === null) {
+            $canonical = $baseUrl . $path;
+        } else {
+            $canonical = $baseUrl . '/' . $locale . $path;
+        }
         
         $xml = '  <url>' . "\n";
         $xml .= '    <loc>' . htmlspecialchars($canonical, ENT_XML1, 'UTF-8') . '</loc>' . "\n";
@@ -124,19 +152,20 @@ class SitemapController extends Controller
         $xml .= '    <priority>' . htmlspecialchars($priority, ENT_XML1, 'UTF-8') . '</priority>' . "\n";
         
         // Hreflang tags for all languages
-        foreach (self::LOCALES as $locale) {
-            $url = $baseUrl . '/' . $locale . $path;
-            $xml .= '    <xhtml:link rel="alternate" hreflang="' . htmlspecialchars($locale, ENT_XML1, 'UTF-8') . '" href="' . htmlspecialchars($url, ENT_XML1, 'UTF-8') . '" />' . "\n";
+        foreach (self::LOCALES as $lang) {
+            $url = $baseUrl . '/' . $lang . $path;
+            $xml .= '    <xhtml:link rel="alternate" hreflang="' . htmlspecialchars($lang, ENT_XML1, 'UTF-8') . '" href="' . htmlspecialchars($url, ENT_XML1, 'UTF-8') . '" />' . "\n";
         }
         
-        // Backward-compatible URL (without prefix)
-        $backwardUrl = $baseUrl . $path;
-        if ($backwardUrl !== $canonical) {
+        // Backward-compatible URL (without prefix) - only if current entry is not already the backward-compatible one
+        if ($locale !== null) {
+            $backwardUrl = $baseUrl . $path;
             $xml .= '    <xhtml:link rel="alternate" hreflang="he" href="' . htmlspecialchars($backwardUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
         }
         
-        // x-default
-        $xml .= '    <xhtml:link rel="alternate" hreflang="x-default" href="' . htmlspecialchars($canonical, ENT_XML1, 'UTF-8') . '" />' . "\n";
+        // x-default always points to Hebrew version
+        $hebrewUrl = $baseUrl . '/he' . $path;
+        $xml .= '    <xhtml:link rel="alternate" hreflang="x-default" href="' . htmlspecialchars($hebrewUrl, ENT_XML1, 'UTF-8') . '" />' . "\n";
         
         $xml .= '  </url>' . "\n";
         
