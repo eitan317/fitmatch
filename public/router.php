@@ -5,6 +5,14 @@
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $file = __DIR__ . $path;
 
+// ALWAYS route sitemap.xml to Laravel (before any file checks)
+if ($path === '/sitemap.xml' || preg_match('#^/sitemap.*\.xml$#i', $path)) {
+    $_SERVER['SCRIPT_NAME'] = '/index.php';
+    chdir(__DIR__);
+    require __DIR__ . '/index.php';
+    exit; // CRITICAL: Stop execution after routing to Laravel
+}
+
 // Serve existing static files directly (css/js/images/etc.)
 if ($path !== '/' && file_exists($file) && is_file($file)) {
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));

@@ -15,6 +15,8 @@
         'keywords' => 'מאמן כושר, אימון אישי, מאמן כושר אישי, מאמני כושר, מצא מאמן כושר, אימון בית, מאמן כושר תל אביב, אימון כושר ביתי'
     ])
     
+    @include('partials.adsense')
+    
     <!-- Preconnect to CDNs for faster resource loading (must be before resource requests) -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
