@@ -57,12 +57,14 @@ class SecurityHeaders
             
             // Content Security Policy - ONLY HTTPS resources (no HTTP - prevents mixed content!)
             // Note: 'unsafe-inline' is needed for inline scripts, but we should minimize this
+            // Added Google AdSense domains to allow AdSense scripts and connections
             $csp = "default-src 'self' https:; " .
-                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; " .
+                   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com https://pagead2.googlesyndication.com; " .
                    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; " .
                    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " .
                    "img-src 'self' data: https:; " .  // REMOVED http: - only HTTPS images (prevents mixed content!)
-                   "connect-src 'self' https:; " .    // REMOVED http: - only HTTPS connections
+                   "connect-src 'self' https: https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; " .    // Added AdSense domains for API calls
+                   "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; " .  // Allow AdSense iframes
                    "frame-ancestors 'self'; " .
                    "base-uri 'self';";  // Prevent base tag injection
             $response->headers->set('Content-Security-Policy', $csp);
