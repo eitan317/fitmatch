@@ -7,6 +7,7 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
+        @include('partials.adsense-verification')
         @include('partials.adsense')
 
         <!-- Fonts -->

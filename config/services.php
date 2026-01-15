@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/auth/google/callback'),
     ],
 
+    'adsense' => [
+        'verification_code' => env('GOOGLE_ADSENSE_VERIFICATION_CODE'),
+    ],
+
 ];

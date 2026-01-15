@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>טופס הרשמה למאמני כושר</title>
+    @include('partials.adsense-verification')
     @include('partials.adsense')
     <link rel="stylesheet" href="/site/style.css">
     @include('partials.schema-ld')

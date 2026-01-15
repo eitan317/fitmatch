@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FitMatch - התחברות</title>
+    @include('partials.adsense-verification')
     @include('partials.adsense')
     @include('partials.schema-ld')
 </head>
